@@ -1,0 +1,178 @@
+server:
+  port: 8080
+  tomcat:
+    max-swallow-size: -1
+  error:
+    include-exception: true
+    include-stacktrace: ALWAYS
+    include-message: ALWAYS
+  servlet:
+    context-path: /ky
+  compression:
+    enabled: true
+    min-response-size: 1024
+    mime-types: application/javascript,application/json,application/xml,text/html,text/xml,text/plain,text/css,image/*
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: metrics,httptrace
+
+##文件上传和转换工具的配置
+base:
+  #上传文件保存的路径
+  upload-dir: /opt/KmDocs
+  # libreOffice安装路径
+  soffice-path: /opt/libreoffice7.0/program/soffice
+  one-system-url:
+
+##ElasticSearch服务配置 for highLevelRestClient
+esclient:
+  master-host: 127.0.0.1
+  master-port: 9200
+  master-user-name: elastic
+  master-user-pwd: xxxxxxxx
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 2000MB
+      max-request-size: 2000MB
+  mail:
+    host:
+    username:
+    password: ??
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  jackson:
+    date-format:   yyyy-MM-dd HH:mm:ss
+    time-zone:   GMT+8
+  aop:
+    proxy-target-class: true
+  freemarker:
+    suffix: .ftl
+    content-type: text/html
+    charset: UTF-8
+    cache: false
+    prefer-file-system-access: false
+    template-loader-path:
+      - classpath:/templates
+  mvc:
+    static-path-pattern: /**
+  resource:
+    static-locations: classpath:/static/,classpath:/public/
+  autoconfigure:
+    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+  datasource:
+    druid:
+      stat-view-servlet:
+        enabled: true
+        loginUsername: admin
+        loginPassword: 123456
+        allow:
+      web-stat-filter:
+        enabled: true
+    dynamic:
+      druid:
+        initial-size: 5
+        min-idle: 5
+        maxActive: 1000
+        maxWait: 60000
+        timeBetweenEvictionRunsMillis: 60000
+        minEvictableIdleTimeMillis: 300000
+        validationQuery: SELECT 1 FROM DUAL
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        poolPreparedStatements: false
+        maxPoolPreparedStatementPerConnectionSize: -1
+        filters: stat,wall,slf4j
+        connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+      datasource:
+        # 数据库登录信息配置
+        master:
+          url: jdbc:mysql://127.0.0.1:3306/km?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          username: root
+          password: xxxxxxxx
+          driver-class-name: com.mysql.cj.jdbc.Driver
+  #redis 配置
+  redis:
+    database: 0
+    host: 127.0.0.1
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: -1ms
+        min-idle: 0
+      shutdown-timeout: 100ms
+    password: ''
+    port: 6379
+
+mybatis-plus:
+  mapper-locations: classpath*:org/jeecg/modules/**/xml/*Mapper.xml
+  global-config:
+    banner: false
+    db-config:
+      id-type: ASSIGN_ID
+      table-underline: true
+  configuration:
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    call-setters-on-nulls: true
+
+jeecg :
+  uploadType: alioss
+  path :
+    upload: /opt/upload
+    webapp: /opt/webapp
+  shiro:
+     excludeUrls: /test/jeecgDemo/demo3,/test/jeecgDemo/redisDemo/**,/category/**,/visual/**,/map/**,/jmreport/bigscreen2/**,/sys/loginThird,/KM/EsMgnt/**
+
+  oss:
+    accessKey: ??
+    secretKey: ??
+    endpoint: oss-cn-beijing.aliyuncs.com
+    bucketName: ??
+    staticDomain: https://static.jeecg.com
+  minio:
+    minio_url: http://minio.jeecg.com
+    minio_name: ??
+    minio_pass: ??
+    bucketName: ??
+  xxljob:
+    enabled: false
+    adminAddresses: http://127.0.0.1:9080/xxl-job-admin
+    appname: ${spring.application.name}
+    accessToken: ''
+    address: 127.0.0.1:30007
+    ip: 127.0.0.1
+    port: 30007
+    logPath: logs/jeecg/job/jobhandler/
+    logRetentionDays: 30
+  route:
+    config:
+      data-id: jeecg-gateway-router
+      group: DEFAULT_GROUP
+      data-type: yml
+  redisson:
+    address: 127.0.0.1:6379
+    password:
+    type: STANDALONE
+    enabled: true
+cas:
+  prefixUrl: http://cas.example.org:8443/cas
+logging:
+  level:
+    org.jeecg.modules.system.mapper : info
+knife4j:
+  production: false
+  basic:
+    enable: true
+    username: jeecg
+    password: jeecg1314

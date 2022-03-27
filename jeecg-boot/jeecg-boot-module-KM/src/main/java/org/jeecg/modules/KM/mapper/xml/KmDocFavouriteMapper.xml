@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.KM.mapper.KmDocFavouriteMapper">
+
+    <select id="getPageList" parameterType="org.jeecg.modules.KM.VO.KmDocParamVO" resultType="org.jeecg.modules.KM.VO.KmDocVO">
+        SELECT km_doc.*,kdbt.business_types,kdv.versions,kmtopic.topic_ids AS topic_ids FROM km_doc
+        LEFT JOIN
+        (SELECT doc_id,
+        <if test="dbType == 'MYSQL' ">
+            CONVERT( group_concat(business_type) USING utf8)
+        </if>
+        <if test="dbType == 'ORACLE' ">
+            wm_concat(to_char(business_type))
+        </if>
+        AS business_types
+        FROM KM_DOC_BUSINESS_TYPE
+        GROUP BY doc_id) kdbt
+        ON kdbt.doc_id=km_doc.id
+        LEFT JOIN
+        (SELECT DOC_ID,
+        <if test="dbType == 'MYSQL' ">
+            CONVERT( group_concat(version) USING utf8)
+        </if>
+        <if test="dbType == 'ORACLE' ">
+            wm_concat(to_char(version))
+        </if>
+        AS versions
+        FROM KM_DOC_VERSION
+        GROUP BY DOC_ID) kdv
+        ON kdv.doc_id=km_doc.id
+        LEFT JOIN
+        (SELECT doc_id,
+        <if test="dbType == 'MYSQL' ">
+            CONVERT( group_concat(sys_category.id) USING utf8)
+        </if>
+        <if test="dbType == 'ORACLE' ">
+            wm_concat(to_char(sys_category.id))
+        </if>
+        AS topic_ids
+        FROM sys_category JOIN km_doc_topic_type kdtt
+        ON sys_category.id=kdtt.topic_id
+        GROUP BY doc_id) kmtopic
+        ON kmtopic.doc_id=km_doc.id
+        JOIN km_doc_favourite kdf
+        on km_doc.id=kdf.doc_id
+        <where>
+            kdf.user_id='${userId}'
+            <if test="kmDocParamVO!=null  and kmDocParamVO.releaseFlag!=null">
+                release_flag = #{kmDocParamVO.releaseFlag}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.publicFlag!=null">
+                and public_flag = #{kmDocParamVO.publicFlag}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.createBy!=null">
+                and create_by = #{kmDocParamVO.createBy}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.serialNumber!=null">
+                and serial_number = #{kmDocParamVO.serialNumber}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.fileNo!=null">
+                and file_no like
+                <if test="dbType == 'MYSQL' ">
+                    concat('%', #{kmDocParamVO.fileNo} , '%')
+                </if>
+                <if test="dbType == 'ORACLE' ">
+                    concat(concat('%', #{kmDocParamVO.fileNo} ),'%')
+                </if>
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.category!=null">
+                and category = #{kmDocParamVO.category}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.title!=null">
+                and title like
+                <if test="dbType == 'MYSQL' ">
+                    concat('%', #{kmDocParamVO.title} , '%')
+                </if>
+                <if test="dbType == 'ORACLE' ">
+                    concat(concat('%', #{kmDocParamVO.title} ),'%')
+                </if>
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.sourceList!=null">
+                and source in
+                <foreach collection="kmDocParamVO.sourceList" item="source" index="index" open="(" close=")" separator=",">
+                    #{source}
+                </foreach>
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.keywords!=null">
+                and keywords like
+                <if test="dbType == 'MYSQL' ">
+                    concat('%',#{kmDocParamVO.keywords},'%')
+                </if>
+                <if test="dbType == 'ORACLE' ">
+                    concat(concat('%',#{kmDocParamVO.keywords}),'%')
+                </if>
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.fileType!=null">
+                and file_type = #{kmDocParamVO.fileType}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.pubTimeEnd!=null">
+                and pub_time <![CDATA[ <= ]]>  #{kmDocParamVO.pubTimeEnd}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.pubTimeStart!=null">
+                and pub_time <![CDATA[ >= ]]>  #{kmDocParamVO.pubTimeStart}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.createTimeEnd!=null">
+                and create_time <![CDATA[ <= ]]>  #{kmDocParamVO.createTimeEnd}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.createTimeStart!=null">
+                and create_time <![CDATA[ >= ]]>  #{kmDocParamVO.createTimeStart}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.statusList!=null">
+                and km_doc.status in
+                <foreach collection="kmDocParamVO.statusList" item="status" index="index" open="(" close=")" separator=",">
+                    #{status}
+                </foreach>
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.businessTypeList!=null">
+                and EXISTS(
+                SELECT 0 FROM km_doc_business_type kbt WHERE kbt.doc_id=km_doc.id AND kbt.business_type IN
+                <foreach collection="kmDocParamVO.businessTypeList" item="businessType" index="index" open="(" close=")" separator=",">
+                    #{businessType}
+                </foreach>
+                )
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.versionList!=null">
+                AND EXISTS(
+                SELECT 0 FROM km_doc_version kdv WHERE kdv.doc_id=km_doc.id AND kdv.version IN
+                <foreach collection="kmDocParamVO.versionList" item="version" index="index" open="(" close=")"
+                         separator=",">
+                    #{version}
+                </foreach>
+                )
+            </if>
+        </where>
+        <choose>
+            <when test="orderBy !=null and orderBy != 'ORDER BY create_time DESC'">
+                ${orderBy}
+            </when>
+            <otherwise>
+                order by kdf.add_time desc
+            </otherwise>
+        </choose>
+
+    </select>
+
+</mapper>

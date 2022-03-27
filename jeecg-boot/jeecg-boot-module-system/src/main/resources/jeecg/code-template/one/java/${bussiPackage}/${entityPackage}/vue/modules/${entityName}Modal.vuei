@@ -1,0 +1,130 @@
+<template>
+  <j-modal
+    :title="title"
+    :width="800"
+    :visible="visible"
+    :confirmLoading="confirmLoading"
+    switchFullscreen
+    @ok="handleOk"
+    @cancel="handleCancel"
+    cancelText="关闭">
+    
+    <a-spin :spinning="confirmLoading">
+      <a-form-model ref="form" :model="model" :rules="validatorRules">
+      
+<#list columns as po><#rt/>
+<#if po.fieldName !='id'><#rt/>
+        <a-form-model-item :labelCol="labelCol" :wrapperCol="wrapperCol" prop="${po.fieldName}" label="${po.filedComment}">
+          <#if po.fieldType =='date'>
+          <a-date-picker v-model="model.${po.fieldName}"/>
+          <#elseif po.fieldType =='datetime'>
+          <a-date-picker showTime valueFormat='YYYY-MM-DD HH:mm:ss' v-model="model.${po.fieldName}" />
+          <#elseif "int,decimal,double,"?contains(po.fieldType)>
+          <a-input-number v-model="model.${po.fieldName}"/>
+          <#else>
+          <a-input placeholder="请输入${po.filedComment}" v-model="model.${po.fieldName}" />
+          </#if>
+        </a-form-model-item>
+</#if>
+</#list>
+		
+      </a-form-model>
+    </a-spin>
+  </j-modal>
+</template>
+
+<script>
+  import { httpAction } from '@/api/manage'
+  import moment from "moment"
+
+  export default {
+    name: "${entityName}Modal",
+    data () {
+      return {
+        title:"操作",
+        visible: false,
+        model: {},
+        labelCol: {
+          xs: { span: 24 },
+          sm: { span: 5 },
+        },
+        wrapperCol: {
+          xs: { span: 24 },
+          sm: { span: 16 },
+        },
+
+        confirmLoading: false,
+        validatorRules:{
+        <#list columns as po>
+        <#if po.fieldName !='id'>
+        <#if po.nullable =='N'>
+        ${po.fieldName}:[{ required: true, message: '请输入${po.filedComment}!' }],
+        </#if>
+        </#if>
+	    </#list>
+        },
+        url: {
+          add: "/${entityPackage}/${entityName?uncap_first}/add",
+          edit: "/${entityPackage}/${entityName?uncap_first}/edit",
+        },
+      }
+    },
+    created () {
+    },
+    methods: {
+      add () {
+        //初始化默认值
+        this.edit({});
+      },
+      edit (record) {
+        this.model = Object.assign({}, record);
+        this.visible = true;
+      },
+      close () {
+        this.$emit('close');
+        this.visible = false;
+        this.$refs.form.clearValidate();
+      },
+      handleOk () {
+        const that = this;
+        // 触发表单验证
+         this.$refs.form.validate(valid => {
+          if (valid) {
+            that.confirmLoading = true;
+            let httpurl = '';
+            let method = '';
+            if(!this.model.id){
+              httpurl+=this.url.add;
+              method = 'post';
+            }else{
+              httpurl+=this.url.edit;
+               method = 'put';
+            }
+            httpAction(httpurl,this.model,method).then((res)=>{
+              if(res.success){
+                that.$message.success(res.message);
+                that.$emit('ok');
+              }else{
+                that.$message.warning(res.message);
+              }
+            }).finally(() => {
+              that.confirmLoading = false;
+              that.close();
+            })
+          }else{
+             return false;
+          }
+        })
+      },
+      handleCancel () {
+        this.close()
+      },
+
+
+    }
+  }
+</script>
+
+<style lang="less" scoped>
+
+</style>

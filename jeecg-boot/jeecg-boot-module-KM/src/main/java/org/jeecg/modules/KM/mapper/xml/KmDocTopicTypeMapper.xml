@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.KM.mapper.KmDocTopicTypeMapper">
+
+    <select id="getDocTopicCodes" resultType="java.lang.String">
+        SELECT sc.code FROM  km_doc_topic_type kdtt
+        JOIN sys_category sc ON sc.id = kdtt.topic_id
+        WHERE kdtt.doc_id=#{docId}
+    </select>
+</mapper>

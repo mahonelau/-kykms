@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.KM.mapper.KmDocMapper">
+
+    <select id="getKmDocByFileId" resultType="org.jeecg.modules.KM.entity.KmDoc">
+        select * from km_doc where file_id=#{fileId} limit 0,1
+    </select>
+
+    <select id="getPageList" parameterType="org.jeecg.modules.KM.VO.KmDocParamVO" resultType="org.jeecg.modules.KM.VO.KmDocVO">
+        SELECT km_doc.*,kdbt.business_types,kdv.versions,kmtopic.topic_ids AS topic_ids,
+        <if test="dbType == 'MYSQL' ">
+            !isnull(kdf.id ) as favourite
+        </if>
+        <if test="dbType == 'ORACLE' ">
+            DECODE(kdf.id,null,0,1 )  as favourite
+        </if>
+        FROM km_doc
+        LEFT JOIN
+        (SELECT doc_id,
+        <if test="dbType == 'MYSQL' ">
+            CONVERT( group_concat(business_type) USING utf8)
+        </if>
+        <if test="dbType == 'ORACLE' ">
+            wm_concat(to_char(business_type))
+        </if>
+        AS business_types
+        FROM KM_DOC_BUSINESS_TYPE
+        GROUP BY doc_id) kdbt
+        ON kdbt.doc_id=km_doc.id
+        LEFT JOIN
+        (SELECT DOC_ID,
+        <if test="dbType == 'MYSQL' ">
+            CONVERT( group_concat(version) USING utf8)
+        </if>
+        <if test="dbType == 'ORACLE' ">
+            wm_concat(to_char(version))
+        </if>
+        AS versions
+        FROM KM_DOC_VERSION
+        GROUP BY DOC_ID) kdv
+        ON kdv.doc_id=km_doc.id
+        LEFT JOIN
+        (SELECT doc_id,
+        <if test="dbType == 'MYSQL' ">
+            CONVERT( group_concat(sys_category.id) USING utf8)
+        </if>
+        <if test="dbType == 'ORACLE' ">
+            wm_concat(to_char(sys_category.id))
+        </if>
+        AS topic_ids
+        FROM sys_category JOIN km_doc_topic_type kdtt
+        ON sys_category.id=kdtt.topic_id
+        GROUP BY doc_id) kmtopic
+        ON kmtopic.doc_id=km_doc.id
+        left JOIN km_doc_favourite kdf
+        on km_doc.id=kdf.doc_id and kdf.user_id='${userId}'
+        <where>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.releaseFlag!=null">
+                release_flag = #{kmDocParamVO.releaseFlag}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.publicFlag!=null">
+                and public_flag = #{kmDocParamVO.publicFlag}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.createBy!=null">
+                and create_by = #{kmDocParamVO.createBy}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.serialNumber!=null">
+                and serial_number = #{kmDocParamVO.serialNumber}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.fileNo!=null">
+                and file_no like
+                <if test="dbType == 'MYSQL' ">
+                    concat('%', #{kmDocParamVO.fileNo} , '%')
+                </if>
+                <if test="dbType == 'ORACLE' ">
+                    concat(concat('%', #{kmDocParamVO.fileNo} ),'%')
+                </if>
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.category!=null">
+                and category = #{kmDocParamVO.category}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.title!=null">
+                and title like
+                <if test="dbType == 'MYSQL' ">
+                    concat('%', #{kmDocParamVO.title} , '%')
+                </if>
+                <if test="dbType == 'ORACLE' ">
+                    concat(concat('%', #{kmDocParamVO.title} ),'%')
+                </if>
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.sourceList!=null">
+                and source in
+                <foreach collection="kmDocParamVO.sourceList" item="source" index="index" open="(" close=")" separator=",">
+                    #{source}
+                </foreach>
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.keywords!=null">
+                and keywords like
+                <if test="dbType == 'MYSQL' ">
+                    concat('%',#{kmDocParamVO.keywords},'%')
+                </if>
+                <if test="dbType == 'ORACLE' ">
+                    concat(concat('%',#{kmDocParamVO.keywords}),'%')
+                </if>
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.fileType!=null">
+                and file_type = #{kmDocParamVO.fileType}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.pubTimeEnd!=null">
+                and pub_time <![CDATA[ <= ]]>  #{kmDocParamVO.pubTimeEnd}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.pubTimeStart!=null">
+                and pub_time <![CDATA[ >= ]]>  #{kmDocParamVO.pubTimeStart}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.createTimeEnd!=null">
+                and create_time <![CDATA[ <= ]]>  #{kmDocParamVO.createTimeEnd}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.createTimeStart!=null">
+                and create_time <![CDATA[ >= ]]>  #{kmDocParamVO.createTimeStart}
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.statusList!=null">
+                and km_doc.status in
+                <foreach collection="kmDocParamVO.statusList" item="status" index="index" open="(" close=")" separator=",">
+                    #{status}
+                </foreach>
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.businessTypeList!=null">
+                and EXISTS(
+                SELECT 0 FROM km_doc_business_type kbt WHERE kbt.doc_id=km_doc.id AND kbt.business_type IN
+                <foreach collection="kmDocParamVO.businessTypeList" item="businessType" index="index" open="(" close=")" separator=",">
+                    #{businessType}
+                </foreach>
+                )
+            </if>
+            <if test="kmDocParamVO!=null  and kmDocParamVO.versionList!=null">
+                AND EXISTS(
+                SELECT 0 FROM km_doc_version kdv WHERE kdv.doc_id=km_doc.id AND kdv.version IN
+                <foreach collection="kmDocParamVO.versionList" item="version" index="index" open="(" close=")"
+                         separator=",">
+                    #{version}
+                </foreach>
+                )
+            </if>
+        </where>
+        ${permissionSql}
+        <choose>
+            <when test="orderBy !=null and orderBy != ' ORDER BY create_time DESC'">
+                ${orderBy}
+            </when>
+            <otherwise>
+                order by km_doc.last_update_time desc, km_doc.create_time desc
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="queryTopicPageList" resultType = "org.jeecg.modules.KM.entity.KmDoc">
+        select kd.* from km_doc kd
+        join km_doc_topic_type kdtt on kd.id = kdtt.doc_id
+        join sys_category sc on sc.id = kdtt.topic_id
+        where sc.id = #{topicId}
+    </select>
+
+    <select id="queryKmDocStatistics" resultType="org.jeecg.modules.KM.VO.KmDocStatisticsVO">
+        SELECT sd.item_text,COUNT(0) AS amount,
+        CASE
+        <if test="dbType == 'MYSQL' ">
+            WHEN SUM(file_size) >1024*1024*1024  THEN CONCAT(CONVERT(SUM(file_size)/(1024*1024*1024) , DECIMAL(5,0)),' G')
+            WHEN SUM(file_size) >1024*1024  THEN CONCAT(CONVERT(SUM(file_size)/(1024*1024) , DECIMAL(5,0)),' M')
+            WHEN SUM(file_size) >1024  THEN CONCAT(CONVERT(SUM(file_size)/1024 , DECIMAL(5,0)),' K')
+            ELSE  CONCAT(CONVERT(SUM(file_size) , DECIMAL(5,0)),' B')
+        </if>
+        <if test="dbType == 'ORACLE' ">
+            WHEN SUM(file_size) >1024*1024*1024  THEN CONCAT(CAST(SUM(file_size)/(1024*1024*1024) as DECIMAL(5,0)),' G')
+            WHEN SUM(file_size) >1024*1024  THEN CONCAT(CAST(SUM(file_size)/(1024*1024) as DECIMAL(5,0)),' M')
+            WHEN SUM(file_size) >1024  THEN CONCAT(CAST(SUM(file_size)/1024 as DECIMAL(5,0)),' K')
+            ELSE  CONCAT(CAST(SUM(file_size) as DECIMAL(5,0)),' B')
+        </if>
+        END
+        AS fileSize
+        FROM km_doc kd
+        <if test = "statisticsType == 1">
+            JOIN (SELECT sdi.item_text,sdi.item_value FROM sys_dict_item sdi JOIN sys_dict sd ON sdi.dict_id=sd.id WHERE sd.dict_code='km_dict_category') sd ON kd.category=sd.item_value
+        </if>
+        <if test = "statisticsType == 2">
+            JOIN (SELECT sdi.item_text,sdi.item_value FROM sys_dict_item sdi JOIN sys_dict sd ON sdi.dict_id=sd.id WHERE sd.dict_code='km_dict_source') sd ON kd.source=sd.item_value
+        </if>
+        <if test = "statisticsType == 3">
+            JOIN (SELECT sdi.item_text,sdi.item_value FROM sys_dict_item sdi JOIN sys_dict sd ON sdi.dict_id=sd.id WHERE sd.dict_code='doc_dict_status') sd ON
+            <if test="dbType == 'MYSQL' ">
+                kd.status=sd.item_value
+            </if>
+            <if test="dbType == 'ORACLE' ">
+                to_char(kd.status)=sd.item_value
+            </if>
+        </if>
+        <if test = "statisticsType == 4">
+            JOIN km_doc_business_type kdbt ON kdbt.doc_id=kd.id
+            JOIN (SELECT sdi.item_text,sdi.item_value FROM sys_dict_item sdi JOIN sys_dict sd ON sdi.dict_id=sd.id WHERE sd.dict_code='km_dict_business') sd
+            ON kdbt.business_type=sd.item_value
+        </if>
+        <if test = "statisticsType == 5">
+            JOIN km_doc_version kdv ON kdv.doc_id=kd.id
+            JOIN (SELECT sdi.item_text,sdi.item_value FROM sys_dict_item sdi JOIN sys_dict sd ON sdi.dict_id=sd.id WHERE sd.dict_code='km_dict_versions') sd
+            ON kdv.version=sd.item_value
+        </if>
+        <if test = "statisticsType == 6">
+        JOIN km_doc_topic_type kdtt ON kdtt.doc_id=kd.id
+        JOIN (SELECT id, sc.name AS item_text,sc.code AS item_value FROM sys_category sc WHERE pid=0) sd
+        ON kdtt.topic_id = sd.id
+        </if>
+        GROUP BY sd.item_text
+        ORDER BY amount DESC
+    </select>
+</mapper>
