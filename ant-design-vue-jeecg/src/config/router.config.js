@@ -62,12 +62,6 @@ export const constantRouterMap = [
     component: () => import('@/views/km/search/DocSearch')
   },
   {
-    path:'/RecommendTopicList',
-    name:'recommendTopicList',
-    meta: { title: '知识专题' },
-    component: () => import('@/views/km/search/RecommendTopicList')
-  },
-  {
     path:'/login',
     component: () => import('@/views/km/search/Login')
   }

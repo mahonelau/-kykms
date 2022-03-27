@@ -25,10 +25,7 @@
           </a>
           <a-divider type="vertical"/>
           <a @click="editDictItem(record)"><a-icon type="setting"/> 属性配置</a>
-          <!--<a-divider type="vertical"/>-->
-          <!--<a-popconfirm title="确定删除吗?" @confirm="() =>handleDelete(record.id)">-->
-            <!--<a>删除</a>-->
-          <!--</a-popconfirm>-->
+
         </span>
       </a-table>
 
@@ -44,7 +41,6 @@
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import DictModal from './modules/DictModal'
   import DictItemList from './DictItemList'
-  import DictDeleteList from './DictDeleteList'
   import { getAction } from '@/api/manage'
   import { UI_CACHE_DB_DICT_DATA } from "@/store/mutation-types"
   import Vue from 'vue'

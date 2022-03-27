@@ -21,21 +21,6 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row>
-            <a-col :span="4"
-                   style="text-align: left;background-color: #fafafa;height: 470px;overflow:auto;min-width: 200px">
-              <div>
-                <h3 style="margin-left: 20px;margin-top: 10px"><b>知识专题</b></h3>
-
-              </div>
-              <a-tree
-                checkStrictly
-                checkable
-                v-model="topicCodesTree"
-                :tree-data="treeData"
-                @check="onCheck"
-                :selectable="boolSelect"
-              />
-            </a-col>
 
             <a-col :span="18" style="margin-left: 80px;margin-top: 30px">
               <a-form layout="inline">

@@ -20,22 +20,7 @@
                 <div style="float: left">
                   <a-input style="width: 800px;" size="large" placeholder="标题、关键字、全文" v-model="content"
                            @pressEnter="pressEnterFun">
-                      <a-dropdown slot="addonBefore" >
-                        <span>
-                          {{knowledgeTitle}}
-                          <a-icon type="down" />
-                        </span>
-                        <a-menu slot="overlay" style="margin-top: 8px;margin-left: -12px;min-width: 200px">
-                            <a-tree
-                              checkStrictly
-                              checkable
-                              v-model="topicCodesTree"
-                              @check="onCheck"
-                              :selectable="boolSelect"
-                              :tree-data="treeData"
-                            />
-                        </a-menu>
-                      </a-dropdown>
+
                     <a-icon slot="suffix" @click="searchDocFun" type="search" style="color:#1890FF;fontSize:22px"/>
                   </a-input>
                   <div class="checkbox" style="width: 750px;text-align: center;margin-top: 10px;margin-left: 20px">
@@ -631,20 +616,6 @@
             }
           });
         }
-      },
-
-      //访问专题-首页的推荐专题入口
-      searchTopic(item){
-        let halfCheckedIds = this.familyTree(this.treeData, item.id);
-        let checkedIds = new Array();
-        checkedIds.push(item.id);
-        let topicCodeTree = {checked:checkedIds,halfChecked:halfCheckedIds}
-        let params={};
-        params["topicCodes"]=item.code;
-        params["topicCodesTree"]=topicCodeTree;
-        this.$router.push({name: 'recommendTopicList',params:params});
-        //this.knowledgeTitleFunknowledgeTitleFun(item.code,topicCodeTree,item.name)
-        //this.$router.push({name: 'docSearch', params: params});
       },
 
       //访问业务类型

@@ -20,22 +20,7 @@
                 <div style="float: left">
                   <a-input style="width: 800px;" size="large" placeholder="标题、关键字、全文" v-model="content"
                            @pressEnter="pressEnterFun">
-                    <a-dropdown slot="addonBefore">
-                        <span>
-                          {{knowledgeTitle}}
-                          <a-icon type="down"/>
-                        </span>
-                      <a-menu slot="overlay" style="margin-top: 8px;margin-left: -12px;min-width: 200px">
-                        <a-tree
-                          checkStrictly
-                          checkable
-                          v-model="topicCodesTree"
-                          @check="onCheck"
-                          :selectable="boolSelect"
-                          :tree-data="treeData"
-                        />
-                      </a-menu>
-                    </a-dropdown>
+
                     <a slot="addonAfter" style="color: #303133" @click="searchDocFun('1')">结果中检索</a>
                     <a-icon slot="suffix" @click="searchDocFun('0')" type="search" style="color:#1890FF;fontSize:22px"/>
                   </a-input>
