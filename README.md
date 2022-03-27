@@ -36,7 +36,7 @@
 
 为什么选择KY KMS?
 -----------------------------------
-![KY KMS](http://www.kykms.cn/url/advantage_kms.png)
+![KY KMS](./Docs/Pics/advantage_kms.png)
  
 
 技术架构：
@@ -124,22 +124,22 @@
 
 ##### 公共检索
 检索首页
-![检索首页](http://www.kykms.cn/url/search_home.png)
+![检索首页](./Docs/Pics/search_home.png)
 检索结果
-![检索结果](http://www.kykms.cn/url/search_result.png)
+![检索结果](./Docs/Pics/search_result.png)
 高级检索
-![高级检索](http://www.kykms.cn/url/search_advance.png)
+![高级检索](./Docs/Pics/search_advance.png)
 知识专题
-![知识专题](http://www.kykms.cn/url/km_topic.png)
+![知识专题](./Docs/Pics/km_topic.png)
 
 
 ##### 管理后台
 热词统计
-![](http://www.kykms.cn/url/home.png)
+![](./Docs/Pics/home.png)
 批量上传
-![](http://www.kykms.cn/url/upload.png)
+![](./Docs/Pics/upload.png)
 编辑
-![知识专题](http://www.kykms.cn/url/edit.png)
+![知识专题](./Docs/Pics/edit.png)
 
 
 附属文档
@@ -156,6 +156,6 @@
 ## 捐赠 
 
 如果觉得还不错，请作者喝杯咖啡鼓励一下吧，敲代码不容易 ☺
-![](http://www.kykms.cn/url/QR_pay.jpg)
+![](./Docs/Pics/QR_pay.jpg)
 
 
