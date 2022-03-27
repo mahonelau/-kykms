@@ -4,11 +4,17 @@
 当前最新版本： V0.0.1（发布日期：20220322）
 
 Overview
-----
+---- 
 
-基于 [Ant Design of Vue](https://vuecomponent.github.io/ant-design-vue/docs/vue/introduce-cn/) 实现的 Ant Design Pro  Vue 版
-Jeecg-boot 的前端UI框架，采用前后端分离方案，提供强大代码生成器的低代码平台。
-前端页面代码和后端功能代码一键生成，不需要写任何代码，保持jeecg一贯的强大！！
+<h3 align="center">基于常用文档的知识库管理系统</h3>
+
+科亿知识库 KY KMS 是一款面向常用文档的`文档型知识库管理系统`！
+
+在信息化时代，我们日常工作中产生大量的文档。同时，存储技术的进步，使得存储文件的成本越来越低。最终，几乎所有的文档，都被积累下来，这些文档，有些非常有价值，我们随时都可能需要调出某个历史文档。
+
+我们积累下来的文档，是一笔巨大的财富，但文档越多，我们在其中找到我们所需要文档的时间成本越高，以至于我们常常面对大量的文档一筹莫展，就好像面前座立着一金山，但我们却不知道如何开采金子。
+
+`科亿知识库宗旨是:` 文档简单整理，知识创造价值
 
 
 
@@ -30,8 +36,6 @@ Jeecg-boot 的前端UI框架，采用前后端分离方案，提供强大代码�
 附属文档
 ----
 - [Ant Design Vue](https://vuecomponent.github.io/ant-design-vue/docs/vue/introduce-cn)
-
-- [报表 viser-vue](https://viserjs.github.io/demo.html#/viser/bar/basic-bar)
 
 - [Vue](https://cn.vuejs.org/v2/guide)
 
