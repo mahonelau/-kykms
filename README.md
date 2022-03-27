@@ -1,5 +1,5 @@
 
-![KYKMS](http://www.kykms.cn/url/logo_keyi.png "科亿文档知识库管理系统")
+![KYKMS](./Docs/Pics/logo_keyi.png "科亿文档知识库管理系统")
 
 科亿知识库 KY KMS
 ===============
