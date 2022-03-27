@@ -124,7 +124,7 @@
 
 ##### 公共检索
 检索首页
-![检索首页](http://www.kykms.cn/url/default.png)
+![检索首页](http://www.kykms.cn/url/search_home.png)
 检索结果
 ![检索结果](http://www.kykms.cn/url/search_result.png)
 高级检索
