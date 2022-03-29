@@ -27,10 +27,10 @@ base:
 
 ##ElasticSearch服务配置 for highLevelRestClient
 esclient:
-  master-host: 119.29.145.199
+  master-host: 127.0.0.1
   master-port: 9200
   master-user-name: elastic
-  master-user-pwd: d1nyX77wMN4SrCpfYTrG
+  master-user-pwd: xxxxxxxxxxxxx
 
 spring:
   servlet:
@@ -111,9 +111,9 @@ spring:
         connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
       datasource:
         master:
-          url: jdbc:mysql://119.29.145.199:6033/km_dev?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          url: jdbc:mysql://127.0.0.1:3306/km?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
           username: root
-          password: kyxxjs@2tencent
+          password: xxxxxxxxxx
           driver-class-name: com.mysql.cj.jdbc.Driver
   #redis 配置
   redis:
