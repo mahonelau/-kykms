@@ -34,9 +34,13 @@
 - 微信 ：  1-7-7-0-2-0-7-4-0-5-4
 - QQ ： 22247537
 - Mail : hnliuwx@tom.com
+- github: [https://github.com/mahonelau/kykms](https://github.com/mahonelau/kykms)
+- gitee: [https://gitee.com/kyxxjs/km_community](https://gitee.com/kyxxjs/km_community)
+
 
 为什么选择KY KMS?
 -----------------------------------
+科亿知识库基于强大的Elasticsearch检索引擎技术构建，检索能力强大，支持最全面的检索特性，同时检索性能卓越，可以无限可能的集群扩展，支持高达百亿级别的记录数量。
 ![KY KMS](./Docs/Pics/advantage_kms.png)
  
 
