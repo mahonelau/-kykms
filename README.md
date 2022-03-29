@@ -29,8 +29,8 @@
 交流互动
 -----------------------------------
 
-- 官网 ：  [http://www.kykms.cn 账号：admin/123456](http://www.kykms.cn)
-- 在线演示 ：  [http://www.kykms.cn:90](http://www.kykms.cn:90)
+- 官网 ：  [http://www.kykms.cn](http://www.kykms.cn)
+- 在线演示 ：  [http://www.kykms.cn:90](http://www.kykms.cn:90) 账号：admin/123456
 - 微信 ：  1-7-7-0-2-0-7-4-0-5-4
 - QQ ： 22247537
 - Mail : hnliuwx@tom.com
