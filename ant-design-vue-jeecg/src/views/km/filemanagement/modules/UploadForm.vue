@@ -73,7 +73,7 @@
           if (info.file.status === 'done') {
             if(info.file.response.code===200){
               this.$message.success(`${info.file.name} 文件上传成功`);
-              this.$emit('nd');
+              // this.$emit('nd');
             }else{
               this.fileList.forEach((item,index)=>{
                 if(item.uid===info.file.uid){

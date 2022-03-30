@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import javax.annotation.PreDestroy;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -12,26 +13,30 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class ThreadPoolExecutorService implements IThreadPoolExecutorService {
     private ThreadPoolExecutor poolExecutor;
-    private ThreadPoolExecutor singleExecutor;
+
+    private static LinkedBlockingDeque<Runnable> deque = new LinkedBlockingDeque<Runnable>(10000);
+    private static ThreadPoolExecutor singleExecutor =new ThreadPoolExecutor(
+            5,10000, 20, TimeUnit.SECONDS,deque);;
+
     private Logger logger= LoggerFactory.getLogger(ThreadPoolExecutorService.class);
     public ThreadPoolExecutorService(){
-        LinkedBlockingDeque<Runnable> deque = new LinkedBlockingDeque<Runnable>();
+        ArrayBlockingQueue<Runnable> poolQeque = new ArrayBlockingQueue<Runnable>(10);
         poolExecutor=new ThreadPoolExecutor(
-                4,4, 5, TimeUnit.SECONDS,deque);
+                5,20, 5, TimeUnit.SECONDS,poolQeque);
         poolExecutor.allowCoreThreadTimeOut(true);
         singleExecutor =new ThreadPoolExecutor(
-                1,1, 5, TimeUnit.SECONDS,deque);
+                1,10000, 20, TimeUnit.SECONDS,deque);
         singleExecutor.allowCoreThreadTimeOut(true);
     }
 
     @Override
     public void singleExecute(Runnable runnable){
         singleExecutor.execute(() -> {
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                Thread.sleep(300);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
             runnable.run();
         });
     }
@@ -39,11 +44,11 @@ public class ThreadPoolExecutorService implements IThreadPoolExecutorService {
     @Override
     public void execute(Runnable runnable){
         poolExecutor.execute(() -> {
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                Thread.sleep(3000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
             runnable.run();
         });
     }

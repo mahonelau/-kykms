@@ -130,7 +130,7 @@ public class KmFileServiceImpl extends ServiceImpl<KmFileMapper, KmFile> impleme
         KmFile KmFile=getKmFile(fileId);
         if(KmFile!=null){
             String filePath=KmFile.getPhysicalPath();
-            File f=new File(filePath);
+            File f=new File(baseConfig.getUploadDir(),filePath);
             if(f.exists()){
                 f.delete();
             }

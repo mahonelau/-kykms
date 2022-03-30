@@ -265,7 +265,7 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
 
     @Override
     public void indexDocSyncBatch(List<String> idList) {
-        executorService.execute(() -> indexDocBatch(idList));
+        executorService.singleExecute(() -> indexDocBatch(idList));
     }
 
     private void indexDocBatch(List<String> idList) {
@@ -279,7 +279,7 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
 
     @Override
     public void indexDocSync(KmDoc kmDoc) {
-        executorService.execute(() -> ftiIndexDoc(kmDoc));
+        executorService.singleExecute(() -> ftiIndexDoc(kmDoc));
     }
 
     //KmDoc对象分析内容并入库ES
