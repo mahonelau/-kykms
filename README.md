@@ -29,13 +29,13 @@
 交流互动
 -----------------------------------
 
-- 官网 ：  [http://www.kykms.cn](http://www.kykms.cn)
 - 在线演示 ：  [http://www.kykms.cn:90](http://www.kykms.cn:90) 账号：admin/123456
 - QQ ： 22247537
-- Mail : hnliuwx@tom.com
+- Mail : hnliuwx#tom.com
 - github: [https://github.com/mahonelau/kykms](https://github.com/mahonelau/kykms)
 - gitee: [https://gitee.com/kyxxjs/km_community](https://gitee.com/kyxxjs/km_community)
 - 微信 ： 如果你有任何产品上的想法、意见或建议，或商务上的合作需求，请扫码添加我们微信进一步沟通：
+
 ![微信](./Docs/Pics/wechat.jpg)
 
 为什么选择KY KMS?
@@ -43,6 +43,8 @@
 科亿知识库基于强大的Elasticsearch检索引擎技术构建，检索能力强大，支持最全面的检索特性，同时检索性能卓越，可以无限可能的集群扩展，支持高达百亿级别的记录数量。
 ![KY KMS](./Docs/Pics/advantage_kms.png)
  
+ - 更多 ：  [http://www.kykms.cn](http://www.kykms.cn)
+
 
 技术架构：
 -----------------------------------
