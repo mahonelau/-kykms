@@ -31,12 +31,12 @@
 
 - 官网 ：  [http://www.kykms.cn](http://www.kykms.cn)
 - 在线演示 ：  [http://www.kykms.cn:90](http://www.kykms.cn:90) 账号：admin/123456
-- 微信 ：  1-7-7-0-2-0-7-4-0-5-4
 - QQ ： 22247537
 - Mail : hnliuwx@tom.com
 - github: [https://github.com/mahonelau/kykms](https://github.com/mahonelau/kykms)
 - gitee: [https://gitee.com/kyxxjs/km_community](https://gitee.com/kyxxjs/km_community)
-
+- 微信 ： 如果你有任何产品上的想法、意见或建议，或商务上的合作需求，请扫码添加我们微信进一步沟通：
+![微信](./Docs/Pics/wechat.jpg)
 
 为什么选择KY KMS?
 -----------------------------------
