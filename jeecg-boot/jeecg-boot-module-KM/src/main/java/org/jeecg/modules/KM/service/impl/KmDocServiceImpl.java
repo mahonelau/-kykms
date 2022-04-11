@@ -1213,6 +1213,7 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         if(kmDocOrig == null)
             return Result.error("找不到文档");
         if(kmDocOrig.getStatus() != DocStatusEnum.Draft.getCode()
+                && kmDocOrig.getStatus() != DocStatusEnum.Passed.getCode()
                 && kmDocOrig.getStatus() != DocStatusEnum.WaitAudit.getCode()
                 && kmDocOrig.getStatus() != DocStatusEnum.Reject.getCode() )
             return Result.error("文档状态不允许修改");
