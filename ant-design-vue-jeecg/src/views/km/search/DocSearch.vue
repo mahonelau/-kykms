@@ -231,6 +231,7 @@
           {
             title: '标题',
             align: "left",
+            dataIndex: 'title',
             scopedSlots: {customRender: 'docTitle'}
           },
           {
