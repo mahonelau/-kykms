@@ -28,7 +28,7 @@ tar zxvf elasticsearch-7.6.1-linux-x86_64.tar.gz
         sysctl -p
         　　执行命令sysctl -p生效
 
-## 安装ik分词器(可能需要科学上网)
+## 安装ik分词器(可能需要访问外网)
 cd  /usr/local/elasticsearch-7.6.1/bin
 ./elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.6.1/elasticsearch-analysis-ik-7.6.1.zip
     
@@ -59,7 +59,7 @@ cd  /usr/local/elasticsearch-7.6.1/bin
         -Xms8g 
         -Xmx8g  
 
-## 安装ik分词器(可能需要科学上网)
+## 安装ik分词器(可能需要访问外网)
 下载 [IK分词器](https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.6.1/elasticsearch-analysis-ik-7.6.1.zip)，
 解压到 C:\software\elasticsearch-7.6.1\config\analysis-ik
     

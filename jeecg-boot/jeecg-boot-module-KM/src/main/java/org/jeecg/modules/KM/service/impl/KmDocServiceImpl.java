@@ -212,7 +212,7 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
 
     @Override
     public void convertDocSync(KmDoc kmDoc) {
-        kmDoc = super.getById(kmDoc.getId());
+        //kmDoc = super.getById(kmDoc.getId());
         if (kmDoc.getConvertFlag() != null && !kmDoc.getConvertFlag().equals(DocConvertFlagEnum.WaitConvert.getCode())) {
             return;
         }
@@ -1225,8 +1225,16 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return Result.error(result.getMessage());
         }
-        else
+        else {
+            //保存到ES
+            result = saveDocToEs(kmdocTarget);
+            if (result.getCode() != CommonConstant.SC_OK_200) {
+                //事务回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return Result.error(result.getMessage());
+            }
             return Result.OK("修改成功");
+        }
     }
 
     //editAndRelease
