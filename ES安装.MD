@@ -61,7 +61,7 @@ cd  /usr/local/elasticsearch-7.6.1/bin
 
 ## 安装ik分词器
 下载 [IK分词器](https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.6.1/elasticsearch-analysis-ik-7.6.1.zip)，
-解压到 C:\software\elasticsearch-7.6.1\config\analysis-ik
+解压到 C:\software\elasticsearch-7.6.1\plugins\analysis-ik
     
 ## 启动es：
     cd C:\software\elasticsearch-7.6.1\config\bin
