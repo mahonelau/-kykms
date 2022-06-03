@@ -43,7 +43,7 @@
 科亿知识库基于强大的Elasticsearch检索引擎技术构建，检索能力强大，支持最全面的检索特性，同时检索性能卓越，可以无限可能的集群扩展，支持高达百亿级别的记录数量。
 在关系数据库方面支持mysql与oracle，更多的数据库支持在开发中。
 ![KY KMS](./Docs/Pics/advantage_kms.png)
- 
+![KY KMS](http://www.kykms.cn/url/process.png)
  - 更多 ：  [http://www.kykms.cn](http://www.kykms.cn)
 
 
