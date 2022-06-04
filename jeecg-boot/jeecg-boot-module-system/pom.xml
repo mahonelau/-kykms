@@ -9,7 +9,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>jeecg-boot-module-system</artifactId>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 
 	<repositories>
 		<repository>
@@ -59,16 +59,16 @@
 		<!--</dependency>-->
 	</dependencies>
 
-	<!--<build>-->
-		<!--<plugins>-->
-			<!--<plugin>-->
-				<!--<groupId>org.springframework.boot</groupId>-->
-				<!--<artifactId>spring-boot-maven-plugin</artifactId>-->
-				<!--<configuration>-->
-					<!--&lt;!&ndash;微服务模式下修改为true,跳过此打包插件，否则微服务模块无法引用&ndash;&gt;-->
-					<!--<skip>false</skip>-->
-				<!--</configuration>-->
-			<!--</plugin>-->
-		<!--</plugins>-->
-	<!--</build>-->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<!--微服务模式下修改为true,跳过此打包插件，否则微服务模块无法引用-->
+					<skip>false</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

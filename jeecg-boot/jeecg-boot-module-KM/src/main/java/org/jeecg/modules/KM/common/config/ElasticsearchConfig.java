@@ -63,9 +63,9 @@ public class ElasticsearchConfig {
 
         HttpHost host=new HttpHost(masterHost, masterPort, HttpHost.DEFAULT_SCHEME_NAME);
         RestClientBuilder builder=RestClient.builder(host);
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(masterUserName, masterUserPwd));
-        builder.setHttpClientConfigCallback(f -> f.setDefaultCredentialsProvider(credentialsProvider));
+//        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+//        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(masterUserName, masterUserPwd));
+//        builder.setHttpClientConfigCallback(f -> f.setDefaultCredentialsProvider(credentialsProvider));
         RestHighLevelClient restClient = new RestHighLevelClient( builder);
 
         return restClient;

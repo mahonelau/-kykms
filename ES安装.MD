@@ -15,7 +15,6 @@ tar zxvf elasticsearch-7.6.1-linux-x86_64.tar.gz
 ## 配置ES
        cd /usr/local/elasticsearch-7.6.1/config
        vi elasticsearch.yml 增加配置：
-       xpack.security.enabled: true
        discovery.type: single-node
        network.host: 0.0.0.0
        indices.query.bool.max_clause_count: 102400
@@ -35,11 +34,8 @@ cd  /usr/local/elasticsearch-7.6.1/bin
 ## 启动es：
     cd /usr/local/elasticsearch-7.6.1/bin
     su elasticsearch
- ./elasticsearch -d
+    ./elasticsearch -d
    
-## 创建elastic 的Elastic用户
-./elasticsearch-setup-passwords auto
-拷贝用户elastic的密码，配置到application.yml文件
 
 - # **Windows环境安装**
 
@@ -49,8 +45,7 @@ cd  /usr/local/elasticsearch-7.6.1/bin
 
 ## 配置ES
        cd C:\software\elasticsearch-7.6.1\config
-###        编辑 elasticsearch.yml 增加配置：
-       xpack.security.enabled: true
+###        编辑 elasticsearch.yml 增加配置： 
        discovery.type: single-node
        network.host: 0.0.0.0
        indices.query.bool.max_clause_count: 102400
@@ -67,6 +62,3 @@ cd  /usr/local/elasticsearch-7.6.1/bin
     cd C:\software\elasticsearch-7.6.1\config\bin
     执行 elasticsearch.bat
     
-## 创建elastic 的Elastic用户
-执行 elasticsearch-setup-passwords.bat auto
-拷贝用户elastic的密码，配置到application.yml文件

@@ -22,17 +22,16 @@ management:
 ##文件上传和转换工具的配置
 base:
   #上传文件保存的路径
-  upload-dir: /opt/KmDocs
+  upload-dir: /kykms/KmDocs
   # libreOffice安装路径
-  soffice-path: /opt/libreoffice7.0/program/soffice
+  soffice-path: /usr/bin/soffice
+#  soffice-path: /opt/libreoffice7.0/program/soffice
   one-system-url:
 
 ##ElasticSearch服务配置 for highLevelRestClient
 esclient:
-  master-host: 127.0.0.1
+  master-host: kykms-ES
   master-port: 9200
-  master-user-name: elastic
-  master-user-pwd: xxxxxxxx
 
 spring:
   servlet:
@@ -97,14 +96,14 @@ spring:
       datasource:
         # 数据库登录信息配置
         master:
-          url: jdbc:mysql://127.0.0.1:3306/km?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          url: jdbc:mysql://kykms-mysql:3306/km?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
           username: root
-          password: xxxxxxxx
+          password: root
           driver-class-name: com.mysql.cj.jdbc.Driver
   #redis 配置
   redis:
     database: 0
-    host: 127.0.0.1
+    host: kykms-redis
     lettuce:
       pool:
         max-active: 8
