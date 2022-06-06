@@ -41,7 +41,7 @@ spring:
  
  docker-compose up -d
 ```
-4.  访问后台项目（注意要开启swagger）http://localhost:8080/jeecg-boot/doc.html
+4.  访问后台项目（注意要开启swagger）http://localhost:8080/ky/doc.html
 
 - # 构建前端
 1. 修改前端项目的后台域名
@@ -65,6 +65,6 @@ docker build -t nginx:kykms .
 4. 启动镜像
 
 ```
-docker run --name kykms-nginx -p 80:80 -d nginx:kykms
+docker run --name kykms-nginx -p 3000:3000 -d nginx:kykms
 ```
-5. 访问前台项目 http://localhost:80
+5. 访问前台项目 http://localhost:3000

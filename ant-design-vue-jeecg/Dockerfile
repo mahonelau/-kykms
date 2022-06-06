@@ -3,7 +3,7 @@ MAINTAINER hnliuwx@gmail.com
 VOLUME /tmp
 ENV LANG en_US.UTF-8
 RUN echo "server {  \
-                      listen       81; \
+                      listen       3000; \
                       location ^~ /ky { \
                       proxy_pass              http://localhost:8080/ky/; \
                       proxy_set_header        Host localhost; \
