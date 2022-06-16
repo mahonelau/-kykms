@@ -285,33 +285,41 @@
           {
             title: '标题',
             align: "left",
+            dataIndex: 'title',
             scopedSlots: {customRender: 'docTitle'}
           },
           {
-            title: '文档来源',
+            title: '分类',
             align: "left",
-            dataIndex: 'source_dictText'
-          },
-
-          {
-            title: '发文时间',
-            align: "left",
-            sorter: true,
+            dataIndex: 'category_dictText',
+            width: 100,
+            filters: [],
             customCell: () => {
               return {
                 style: {
-                  'min-width': '8em',
-                  'max-width': '15em',
+                  'max-width': '6em',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis'
                 },
               };
             },
-            dataIndex: 'pubTimeTxt'
           },
-          // {
-          //   title: '涉及业务',
-          //   align: "center",
-          //   dataIndex: 'businessType_dictText'
-          // },
+          {
+            title: '标签',
+            align: "left",
+            dataIndex: 'businessType_dictText',
+            customCell: () => {
+              return {
+                style: {
+                  'max-width': '6em',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  textOverflow:'ellipsis'
+                },
+              };
+            },
+          },
           {
             title: '操作',
             dataIndex: 'action',

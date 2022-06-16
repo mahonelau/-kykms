@@ -163,7 +163,7 @@
         validatorRules:{
           username:[{required: true, message: '请输入用户账号!'},
                     {validator: this.validateUsername,}],
-          password: [{required: true,pattern:/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[~!@#$%^&*()_+`\-={}:";'<>?,./]).{8,}$/,message: '密码由8位数字、大小写字母和特殊符号组成!'},
+          password: [{required: false,pattern:/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[~!@#$%^&*()_+`\-={}:";'<>?,./]).{8,}$/,message: '密码由8位数字、大小写字母和特殊符号组成!'},
                      {validator: this.validateToNextPassword,trigger: 'change'}],
           confirmpassword: [{required: true, message: '请重新输入登录密码!',},
                             { validator: this.compareToFirstPassword,}],
