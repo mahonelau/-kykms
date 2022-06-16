@@ -2,7 +2,14 @@
 
 **Docker环境请自行准备
 
-- # 构建后台
+- # 用官方镜像运行
+```
+ 运行CMD，进入jeecg-boot根路径下面命令启动镜像容器组
+ 
+ docker-compose -f ./docker-compose-official.yml up 
+```
+
+- # 本地打包构建后台
 
 1. yml配置文件请确保每一项下面按正确配置
 ```
@@ -37,13 +44,13 @@ spring:
 2.  通过jeecg-boot-parent项目 maven打包，执行install
 3.  打包Docker容器
 ```
- 进入jeecg-boot根路径下面命令、启动镜像容器组
+ 运行CMD，进入jeecg-boot根路径下面命令启动镜像容器组
  
  docker-compose up -d
 ```
 4.  访问后台项目（注意要开启swagger）http://localhost:8080/ky/doc.html
 
-- # 构建前端
+- # 本地打包构建前端
 1. 修改前端项目的后台域名
 .env.production
 
