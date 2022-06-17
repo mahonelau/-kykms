@@ -1,13 +1,16 @@
-**支持Linux和Windows下运行
+**官方镜像支持本机运行
+
+**如需在服务器运行则需要自行构建前端镜像或运行前端服务，并修改配置文件将服务端ip指向服务器真实ip
 
 **Docker环境请自行准备
 
 - # 用官方镜像运行
 ```
- 运行CMD，进入jeecg-boot根路径下面命令启动镜像容器组
+ windows下运行CMD，进入jeecg-boot根路径下面命令启动镜像容器组
  
  docker-compose -f ./docker-compose-official.yml up 
 ```
+访问 http://localhost:3000
 
 - # 本地打包构建后台
 
