@@ -28,7 +28,7 @@
 
 交流互动
 -----------------------------------
-
+- 官方站点 ：  [http://www.kykms.cn](http://www.kykms.cn)
 - 在线演示 ：  [http://www.kykms.cn:90](http://www.kykms.cn:90) 账号：admin/123456
 - QQ ： 22247537
 - Mail : hnliuwx#tom.com
@@ -44,7 +44,7 @@
 在关系数据库方面支持mysql与oracle，更多的数据库支持在开发中。
 ![KY KMS](./Docs/Pics/advantage_kms.png)
 ![KY KMS](./Docs/Pics/process.png)
- - 更多 ：  [http://www.kykms.cn](http://www.kykms.cn)
+
 
 
 技术架构：
