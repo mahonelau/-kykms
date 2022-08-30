@@ -26,7 +26,7 @@
 交流互动
 -----------------------------------
 - 官方站点 ：  [http://www.kykms.cn](http://www.kykms.cn)
-- 在线演示 ：  [http://www.kykms.cn:90](http://www.kykms.cn:90) 账号：admin/123456
+- 在线演示 ：  [http://test.kykms.cn](http://test.kykms.cn) 账号：admin/123456
 - QQ ： 22247537
 - Mail : hnliuwx#tom.com
 - github: [https://github.com/mahonelau/kykms](https://github.com/mahonelau/kykms)
