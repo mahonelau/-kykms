@@ -53,4 +53,4 @@ services:
     restart: always
     container_name: kykms-nginx
     ports:
-    - 3000:3000
+    - 3000:81
