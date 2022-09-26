@@ -1,5 +1,5 @@
 
-version: '2'
+version: '2.1'
 services:
   kykms-mysql:
     image: mahonelau/kykms-mysql:latest
