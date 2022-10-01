@@ -1,8 +1,7 @@
-
-version: '2.1'
+version: '2'
 services:
-  kykms-mysql:
-    image: mahonelau/kykms-mysql:latest
+  kymks-mysql:
+    image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_ROOT_HOST: '%'
@@ -18,49 +17,50 @@ services:
       --lower_case_table_names=1
       --max_allowed_packet=128M
     ports:
-    - 3306:3306
+      - 3306:3306
 
-  kykms-redis:
+  kymks-redis:
     image: redis:5.0
     ports:
-    - 6379:6379
+      - 6379:6379
     restart: always
     container_name: kykms-redis
 
-  kykms-ES:
-    image: mahonelau/kykms-es:latest
+  kymks-ES:
+    image: elasticsearch:7.6.1
     restart: always
     hostname: kykms-ES
     container_name: kykms-ES
     volumes:
       - /home/docker/data/elasticsearch:/usr/share/elasticsearch/data
     ports:
-    - 9200:9200
-    - 9300:9300
+      - 9200:9200
+      - 9300:9300
     environment:
       discovery.type: single-node
       ES_JAVA_OPTS: "-Xms512m -Xmx512m"
       cpuset-cpus: 1
       m: 2G
 
-  kykms:
-    image: mahonelau/kykms:latest
-    restart: always
-    container_name: kykms
-    volumes:
-    - /data/config:/kykms/config
-    ports:
-    - 8080:8080
-
   kykms-nginx:
-    image: mahonelau/kykms-nginx:latest
+    image: local-nginx:latest
     restart: always
-    container_name: kykms-nginx
+    container_name: local-nginx
     volumes:
-      - /home/docker/data/nginx/conf:/etc/nginx/
+      - /home/docker/data/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
       - /home/docker/data/nginx/html:/usr/share/nginx/html
     ports:
-    - 3000:3000
+      - 3000:3000
 
-
-
+  kykms:
+    image: kykms:latest
+    restart: always
+    privileged: true
+    container_name: kykms
+    hostname: kykms
+    volumes:
+      - /home/docker/data/kykms:/kykms
+      - /sys/fs/cgroup:/sys/fs/cgroup
+    command: /bin/bash -c "java -jar /kykms/jeecg-boot-module-system-2.4.5.jar"
+    ports:
+      - 8080:8080

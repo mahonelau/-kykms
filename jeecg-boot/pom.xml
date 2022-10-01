@@ -4,7 +4,7 @@
   <artifactId>jeecg-boot-parent</artifactId>
   <version>2.4.5</version>
   <packaging>pom</packaging>
-  
+
   	<parent>
 	    <groupId>org.springframework.boot</groupId>
 	    <artifactId>spring-boot-starter-parent</artifactId>
@@ -399,5 +399,24 @@
                 <discovery.server-addr>127.0.0.1:8848</discovery.server-addr>
             </properties>
         </profile>
-    </profiles>
+<!--		docker-->
+		<profile>
+			<id>docker</id>
+			<properties>
+				<!--当前环境-->
+				<profile.name>docker</profile.name>
+				<!--配置文件前缀-->
+				<prefix.name>jeecg</prefix.name>
+				<!--Nacos配置中心地址-->
+				<config.server-addr>127.0.0.1:8848</config.server-addr>
+				<!--Nacos配置中心命名空间,用于支持多环境.这里必须使用ID，不能使用名称,默认为空-->
+				<config.namespace></config.namespace>
+				<!--Nacos配置分组名称-->
+				<config.group>DEFAULT_GROUP</config.group>
+				<!--Nacos服务发现地址-->
+				<discovery.server-addr>127.0.0.1:8848</discovery.server-addr>
+			</properties>
+		</profile>
+
+	</profiles>
 </project>

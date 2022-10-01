@@ -627,7 +627,8 @@
 
       // 显示预览窗口，初始化
       previewKmDoc(record) {
-        this.PDFurl = window._CONFIG['domianURL'] + this.url.previewKmDoc + "?docId=" + record.id;
+        //this.PDFurl = window._CONFIG['domianURL'] + this.url.previewKmDoc + "?docId=" + record.id;
+        this.PDFurl =  this.url.previewKmDoc + "?docId=" + record.id;
         this.title ='预览 - ' + record.title;
         this.visible = true;
         this.pdfLoading = true;

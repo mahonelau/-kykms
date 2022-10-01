@@ -53,6 +53,7 @@ services:
   kykms-nginx:
     image: mahonelau/kykms-nginx:business
     restart: always
+    depends_on:
     - kykms-mysql
     - kykms-redis
     - kykms

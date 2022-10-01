@@ -553,7 +553,8 @@
         this.versions = this.model.versions;
         this.formDisabled = boolFormDisabled;
         this.businessTypes = this.model.businessTypes;
-        this.PDFurl = window._CONFIG['domianURL'] + this.url.previewKmDoc + "?docId=" + record.id;
+        // this.PDFurl = window._CONFIG['domianURL'] + this.url.previewKmDoc + "?docId=" + record.id;
+        this.PDFurl =  this.url.previewKmDoc + "?docId=" + record.id;
         this.pdfLoading = true;
         this.pdfShow = true;
         if (this.model.previewFileId != this.model.originalPreviewFileId) {

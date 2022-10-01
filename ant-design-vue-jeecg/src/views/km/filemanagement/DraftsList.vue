@@ -747,7 +747,8 @@
       showPreviewKmDoc(id,title) {
         this.showTitlePDF=true;
         this.title=" ";
-        this.TitlePDFurl = window._CONFIG['domianURL'] + this.url.previewKmDoc + '?docId=' + id
+        //this.TitlePDFurl = window._CONFIG['domianURL'] + this.url.previewKmDoc + '?docId=' + id
+        this.PDFurl =  this.url.previewKmDoc + "?docId=" + record.id;
 
       },
 
@@ -908,7 +909,8 @@
         this.versions = this.model.versions;
         this.formDisabled = boolFormDisabled;
         this.businessTypes = this.model.businessTypes;
-        this.PDFurl = window._CONFIG['domianURL'] + this.url.previewKmDoc + "?docId=" + record.id;
+        // this.PDFurl = window._CONFIG['domianURL'] + this.url.previewKmDoc + "?docId=" + record.id;
+        this.PDFurl =  this.url.previewKmDoc + "?docId=" + record.id;
 
         this.pdfLoading = true;
         this.pdfShow = true;
