@@ -18,3 +18,19 @@
 
 `科亿知识库宗旨是:` 文档简单整理，知识创造价值
 
+
+适用项目
+-----------------------------------
+科亿知识库，可以应用在任何需要进行常用文档整理、分类、归集、检索的地方，尤其适合知识密集型单位/历史文档丰富的单位。
+
+交流互动
+-----------------------------------
+- 官方站点 ：  [http://www.kykms.cn](http://www.kykms.cn)
+- 在线演示 ：  [http://test.kykms.cn](http://test.kykms.cn) 账号：admin/123456
+- QQ ： 22247537
+- Mail : hnliuwx#tom.com
+- github: [https://github.com/mahonelau/kykms](https://github.com/mahonelau/kykms)
+- gitee: [https://gitee.com/kyxxjs/km_community](https://gitee.com/kyxxjs/km_community)
+- 微信 ： 如果你有任何产品上的想法、意见或建议，或商务上的合作需求，请扫码添加我们微信进一步沟通：
+
+![微信](./Docs/Pics/wechat.jpg)
