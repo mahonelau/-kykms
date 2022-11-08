@@ -27,7 +27,7 @@
 -----------------------------------
 - 官方站点 ：  [http://www.kykms.cn](http://www.kykms.cn)
 - 在线演示 ：  [http://test.kykms.cn](http://test.kykms.cn) 账号：admin/123456
-- QQ ： 22247537
+- QQ群 ： 782686853
 - Mail : hnliuwx#tom.com
 - github: [https://github.com/mahonelau/kykms](https://github.com/mahonelau/kykms)
 - gitee: [https://gitee.com/kyxxjs/km_community](https://gitee.com/kyxxjs/km_community)
