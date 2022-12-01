@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 public class SysCategoryController {
 	@Autowired
 	private ISysCategoryService sysCategoryService;
-	
+
 	/**
 	  * 分页列表查询
 	 * @param sysCategory
@@ -63,7 +63,7 @@ public class SysCategoryController {
 			sysCategory.setPid("0");
 		}
 		Result<IPage<SysCategory>> result = new Result<IPage<SysCategory>>();
-		
+
 		//--author:os_chengtgen---date:20190804 -----for: 分类字典页面显示错误,issues:377--------start
 		//QueryWrapper<SysCategory> queryWrapper = QueryGenerator.initQueryWrapper(sysCategory, req.getParameterMap());
 		QueryWrapper<SysCategory> queryWrapper = new QueryWrapper<SysCategory>();
@@ -112,8 +112,8 @@ public class SysCategoryController {
 		result.setResult(list);
 		return result;
 	}
-	
-	
+
+
 	/**
 	  *   添加
 	 * @param sysCategory
@@ -123,7 +123,7 @@ public class SysCategoryController {
 	public Result<?> add(@RequestBody SysCategory sysCategory) {
 		Result<SysCategory> result = new Result<SysCategory>();
 		try {
-			if(!sysCategory.getPid().isEmpty() && !sysCategory.getPid().equals("0") &&
+			if(oConvertUtils.isNotEmpty(sysCategory.getPid()) && !sysCategory.getPid().equals("0") &&
 					sysCategory.getRecommend() != null
 					&& sysCategory.getRecommend() == true)
 				return Result.error("只允许推荐根节点的专题");
@@ -136,7 +136,7 @@ public class SysCategoryController {
 		}
 		return result;
 	}
-	
+
 	/**
 	  *  编辑
 	 * @param sysCategory
@@ -156,7 +156,7 @@ public class SysCategoryController {
 		}
 		return result;
 	}
-	
+
 	/**
 	  *   通过id删除
 	 * @param id
@@ -172,10 +172,10 @@ public class SysCategoryController {
 			this.sysCategoryService.deleteSysCategory(id);
 			result.success("删除成功!");
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	  *  批量删除
 	 * @param ids
@@ -192,7 +192,7 @@ public class SysCategoryController {
 		}
 		return result;
 	}
-	
+
 	/**
 	  * 通过id查询
 	 * @param id
@@ -291,9 +291,9 @@ public class SysCategoryController {
       }
       return Result.error("文件导入失败！");
   }
-  
-  
-  
+
+
+
   /**
      * 加载单个数据 用于回显
    */
@@ -301,7 +301,7 @@ public class SysCategoryController {
  	public Result<SysCategory> loadOne(@RequestParam(name="field") String field,@RequestParam(name="val") String val) {
  		Result<SysCategory> result = new Result<SysCategory>();
  		try {
- 			
+
  			QueryWrapper<SysCategory> query = new QueryWrapper<SysCategory>();
  			query.eq(field, val);
  			List<SysCategory> ls = this.sysCategoryService.list(query);
@@ -322,7 +322,7 @@ public class SysCategoryController {
  		}
  		return result;
  	}
-   
+
     /**
           * 加载节点的子数据
      */
@@ -340,7 +340,7 @@ public class SysCategoryController {
 		}
 		return result;
 	}
-    
+
     /**
          * 加载一级节点/如果是同步 则所有数据  -- 知识库专题
      */
