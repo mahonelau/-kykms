@@ -1,0 +1,11 @@
+version: '2'
+services:
+  kykms-redis:
+    build:
+      context: ./Redis
+    image: redis:5.0
+    ports:
+      - 6379:6379
+    restart: always
+    hostname: kykms-redis
+    container_name: kykms-redis

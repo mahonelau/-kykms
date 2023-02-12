@@ -1,0 +1,15 @@
+version: '2'
+services:
+  kykms:
+    build:
+      context: ./jeecg-boot-module-system
+    restart: always
+    privileged: true
+    container_name: kykms
+    image: kykms
+    volumes:
+      - /home/docker/data/kykms:/kykms
+      - /sys/fs/cgroup:/sys/fs/cgroup
+    hostname: kykms
+    ports:
+      - 8080:8080
