@@ -13,6 +13,11 @@ yum install libreoffice.x86_64 -y;
 
 WORKDIR /kykms
 
+ADD ./target/jeecg-boot-module-system-2.4.5.jar ./
 ADD ./simsun.ttc /usr/share/fonts
+
+CMD /usr/sbin/init;\
+sleep 5;\
+java -Djava.security.egd=file:/dev/./urandom -jar jeecg-boot-module-system-2.4.5.jar
 
 EXPOSE 8080
