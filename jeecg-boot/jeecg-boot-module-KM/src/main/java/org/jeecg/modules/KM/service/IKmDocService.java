@@ -23,7 +23,7 @@ public interface IKmDocService extends IService<KmDoc> {
 
     //首页最新发布文档列表
     Page<KmDocVO> queryPublicPageList(Page<KmDocVO> page, KmDocParamVO kmDocParamVO,String orderBy);
-    
+
     void convertDocSync(KmDoc doc);
 
     void indexDocSync(KmDoc doc);
@@ -58,4 +58,6 @@ public interface IKmDocService extends IService<KmDoc> {
     Result<?> deleteDoc(String docId,HttpServletRequest req);
 
     KmDocEsVO getEsDocByDocId(String indexId);
+
+    void initESIndex();
 }

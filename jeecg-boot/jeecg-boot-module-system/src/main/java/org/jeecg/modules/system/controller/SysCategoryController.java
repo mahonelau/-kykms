@@ -123,9 +123,11 @@ public class SysCategoryController {
 	public Result<?> add(@RequestBody SysCategory sysCategory) {
 		Result<SysCategory> result = new Result<SysCategory>();
 		try {
-			if(oConvertUtils.isNotEmpty(sysCategory.getPid()) && !sysCategory.getPid().equals("0") &&
-					sysCategory.getRecommend() != null
-					&& sysCategory.getRecommend() == true)
+			if(sysCategory.getPid() != null
+					&& oConvertUtils.isNotEmpty(sysCategory.getPid())
+					&& !sysCategory.getPid().equals("0")
+					&& sysCategory.getRecommend() != null
+					&& sysCategory.getRecommend())
 				return Result.error("只允许推荐根节点的专题");
 
 			sysCategoryService.addSysCategory(sysCategory);

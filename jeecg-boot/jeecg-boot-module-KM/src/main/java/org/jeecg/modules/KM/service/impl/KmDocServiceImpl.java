@@ -44,7 +44,6 @@ import org.jeecg.common.system.vo.KmSearchResultObjVO;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.CommonUtils;
 import org.jeecg.common.util.DateUtils;
-import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.UUIDGenerator;
 import org.jeecg.modules.KM.VO.*;
 import org.jeecg.modules.KM.common.config.BaseConfig;
@@ -1656,4 +1655,20 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         return  kmDocMapper.queryKmDocStatistics(page,statisticsType,dbType);
     }
 
+    @Override
+    public void initESIndex(){
+        KmDocEsVO kmEsVO = new KmDocEsVO();
+        kmEsVO.setTitle("for init");
+        kmEsVO.setDocId("1");
+        Result<?> result = saveDocToEs(kmEsVO, "");
+        if (result.isSuccess()) {
+            String indexId = (String) result.getResult();
+            if (indexId != null && !indexId.isEmpty()) {
+                Result<?> result1 = deleteDocFromEs(indexId);
+                if (result1.isSuccess()) {
+                    log.info("init index success!");
+                }
+            }
+        }
+    }
 }

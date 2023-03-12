@@ -24,6 +24,8 @@ public class KmEsMgntServiceImpl  implements IKmEsMgntService {
 
     @Autowired
     private RestHighLevelClient restHighLevelClient;
+    @Autowired
+    private IKmDocService docService;
 
 
     private  boolean checkTemplateExists(String templateName)throws IOException {
@@ -42,6 +44,7 @@ public class KmEsMgntServiceImpl  implements IKmEsMgntService {
                 log.error(result.getMessage());
                 return result;
             }
+            docService.initESIndex();
         }
         if(!checkTemplateExists(KMConstant.KMSearchRecordIndexName)){
             result = initKmSearchRecordTemplate();
