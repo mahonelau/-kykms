@@ -1,0 +1,43 @@
+version: '2'
+services:
+  kymks-mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_HOST: '%'
+      TZ: Asia/Shanghai
+    restart: always
+    container_name: kykms-mysql
+    volumes:
+      - /home/docker/data/mysql:/var/lib/mysql
+    command:
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --explicit_defaults_for_timestamp=true
+      --lower_case_table_names=1
+      --max_allowed_packet=128M
+    ports:
+      - 3306:3306
+
+  kymks-redis:
+    image: redis:5.0
+    ports:
+      - 6379:6379
+    restart: always
+    container_name: kykms-redis
+
+  kymks-ES:
+    image: elasticsearch:7.6.1
+    restart: always
+    hostname: kykms-ES
+    container_name: kykms-ES
+    volumes:
+    - /elasticsearch/data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      cpuset-cpus: 1
+      m: 2G
