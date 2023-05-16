@@ -26,7 +26,9 @@
 交流互动
 -----------------------------------
 - 官方站点 ：  [http://www.kykms.cn](http://www.kykms.cn)
-- 在线演示 ：  [http://test.kykms.cn](http://test.kykms.cn) 账号：admin/123456
+- 本产品有三个版本([版本功能比较](http://www.kykms.cn/edition))：开源版、商业版、旗舰版
+- 商业在线演示 ：  [http://test.kykms.cn](http://test.kykms.cn) 账号：admin/123456
+- 旗舰版在线演示 ：  [http://kg.kykms.cn](http://test.kykms.cn) 账号：admin/123456
 - QQ群 ： 782686853
 - Mail : hnliuwx#tom.com
 - github: [https://github.com/mahonelau/kykms](https://github.com/mahonelau/kykms)

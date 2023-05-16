@@ -1,5 +1,8 @@
+mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup;
+wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo;
+wget -O /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo;
 yum install unzip -y;
-wget http://qntest.weisi168.com/KM_community.zip
+wget https://qntest.sihualuo.cn/KM_community.zip
 unzip KM_community.zip;
 
 systemctl stop firewalld;
