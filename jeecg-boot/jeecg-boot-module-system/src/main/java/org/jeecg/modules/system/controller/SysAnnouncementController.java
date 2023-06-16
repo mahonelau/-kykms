@@ -400,7 +400,7 @@ public class SysAnnouncementController {
 					}
                     sysAnnouncementService.save(sysAnnouncementExcel);
                 }
-                return Result.ok("文件导入成功！数据行数：" + listSysAnnouncements.size());
+                return Result.OK("文件导入成功！数据行数：" + listSysAnnouncements.size());
             } catch (Exception e) {
                 log.error(e.getMessage(),e);
                 return Result.error("文件导入失败！");

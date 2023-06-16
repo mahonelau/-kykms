@@ -286,8 +286,8 @@
       float: left;
       cursor: pointer;
       margin-right: 8px;
-      padding-left: 0px;
-      padding-right: 0px;
+      padding-left: 0;
+      padding-right: 0;
       text-align: center;
       color: #fff;
       font-weight: 700;

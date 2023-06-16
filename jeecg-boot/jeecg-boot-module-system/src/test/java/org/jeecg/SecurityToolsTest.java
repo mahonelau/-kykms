@@ -11,12 +11,12 @@ public class SecurityToolsTest {
         MyKeyPair mkeyPair = SecurityTools.generateKeyPair();
 
         JSONObject msg = new JSONObject();
-        msg.put("name", "党政辉");
-        msg.put("age", 50);
+        msg.set("name", "党政辉");
+        msg.set("age", 50);
         JSONObject identity = new JSONObject();
-        identity.put("type", "01");
-        identity.put("no", "210882165896524512");
-        msg.put("identity", identity);
+        identity.set("type", "01");
+        identity.set("no", "210882165896524512");
+        msg.set("identity", identity);
 
         // 签名加密部分
         SecuritySignReq signReq = new SecuritySignReq();

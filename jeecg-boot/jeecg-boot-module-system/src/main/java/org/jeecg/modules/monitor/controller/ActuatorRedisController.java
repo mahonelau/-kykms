@@ -36,7 +36,7 @@ public class ActuatorRedisController {
     public Result<?> getRedisInfo() throws Exception {
         List<RedisInfo> infoList = this.redisService.getRedisInfo();
         log.info(infoList.toString());
-        return Result.ok(infoList);
+        return Result.OK(infoList);
     }
 
     @GetMapping("/keysSize")
@@ -77,7 +77,7 @@ public class ActuatorRedisController {
     public Map<String, Object> getMemoryInfo() throws Exception {
         return redisService.getMemoryInfo();
     }
-    
+
   //update-begin--Author:zhangweijian  Date:20190425 for：获取磁盘信息
   	/**
   	 * @功能：获取磁盘信息
@@ -95,7 +95,7 @@ public class ActuatorRedisController {
   	        File[] fs = File.listRoots();
   	        log.info("查询磁盘信息:"+fs.length+"个");
   	        List<Map<String,Object>> list = new ArrayList<>();
-  	        
+
   	        for (int i = 0; i < fs.length; i++) {
   	        	if(fs[i].getTotalSpace()==0) {
   	        		continue;

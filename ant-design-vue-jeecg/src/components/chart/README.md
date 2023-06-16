@@ -102,7 +102,7 @@ import BarMultid from '@/components/chart/BarMultid'
 ```json
 [
     {
-        "type": "Jeecg", // 列名
+        "type": "Jeecg", 
         "Jan.": 18.9,
         "Feb.": 28.8,
         "Mar.": 39.3,
@@ -227,7 +227,7 @@ import LineChartMultid from '@/components/chart/LineChartMultid'
 ```json
 [
     {
-        "type": "Jan", // 列名
+        "type": "Jan", 
         "jeecg": 7,
         "jeebt": 3.9
     },
@@ -264,7 +264,6 @@ import Pie from '@/components/chart/Pie'
 
 ```json
 [
-    // 所有的 percent 相加等于 100
     { "item": "一月", "percent": 40 },
     { "item": "二月", "percent": 21 },
     { "item": "三月", "percent": 17 },
@@ -292,7 +291,6 @@ import Radar from '@/components/chart/Radar'
 
 ```json
 [
-    // score 最小值为 0，最大值为 100
     { "item": "一月", "score": 40 },
     { "item": "二月", "score": 20 },
     { "item": "三月", "score": 67 },

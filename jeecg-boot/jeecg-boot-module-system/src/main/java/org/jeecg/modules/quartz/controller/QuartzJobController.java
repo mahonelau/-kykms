@@ -52,7 +52,7 @@ public class QuartzJobController {
 
 	/**
 	 * 分页列表查询
-	 * 
+	 *
 	 * @param quartzJob
 	 * @param pageNo
 	 * @param pageSize
@@ -65,13 +65,13 @@ public class QuartzJobController {
 		QueryWrapper<QuartzJob> queryWrapper = QueryGenerator.initQueryWrapper(quartzJob, req.getParameterMap());
 		Page<QuartzJob> page = new Page<QuartzJob>(pageNo, pageSize);
 		IPage<QuartzJob> pageList = quartzJobService.page(page, queryWrapper);
-        return Result.ok(pageList);
+        return Result.OK(pageList);
 
 	}
 
 	/**
 	 * 添加定时任务
-	 * 
+	 *
 	 * @param quartzJob
 	 * @return
 	 */
@@ -79,12 +79,12 @@ public class QuartzJobController {
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	public Result<?> add(@RequestBody QuartzJob quartzJob) {
 		quartzJobService.saveAndScheduleJob(quartzJob);
-		return Result.ok("创建定时任务成功");
+		return Result.OK("创建定时任务成功");
 	}
 
 	/**
 	 * 更新定时任务
-	 * 
+	 *
 	 * @param quartzJob
 	 * @return
 	 */
@@ -97,12 +97,12 @@ public class QuartzJobController {
 			log.error(e.getMessage(),e);
 			return Result.error("更新定时任务失败!");
 		}
-	    return Result.ok("更新定时任务成功!");
+	    return Result.OK("更新定时任务成功!");
 	}
 
 	/**
 	 * 通过id删除
-	 * 
+	 *
 	 * @param id
 	 * @return
 	 */
@@ -114,13 +114,13 @@ public class QuartzJobController {
 			return Result.error("未找到对应实体");
 		}
 		quartzJobService.deleteAndStopJob(quartzJob);
-        return Result.ok("删除成功!");
+        return Result.OK("删除成功!");
 
 	}
 
 	/**
 	 * 批量删除
-	 * 
+	 *
 	 * @param ids
 	 * @return
 	 */
@@ -134,12 +134,12 @@ public class QuartzJobController {
 			QuartzJob job = quartzJobService.getById(id);
 			quartzJobService.deleteAndStopJob(job);
 		}
-        return Result.ok("删除定时任务成功!");
+        return Result.OK("删除定时任务成功!");
 	}
 
 	/**
 	 * 暂停定时任务
-	 * 
+	 *
 	 * @param id
 	 * @return
 	 */
@@ -152,12 +152,12 @@ public class QuartzJobController {
 			return Result.error("定时任务不存在！");
 		}
 		quartzJobService.pause(job);
-		return Result.ok("暂停定时任务成功");
+		return Result.OK("暂停定时任务成功");
 	}
 
 	/**
 	 * 启动定时任务
-	 * 
+	 *
 	 * @param id
 	 * @return
 	 */
@@ -171,24 +171,24 @@ public class QuartzJobController {
 		}
 		quartzJobService.resumeJob(job);
 		//scheduler.resumeJob(JobKey.jobKey(job.getJobClassName().trim()));
-		return Result.ok("恢复定时任务成功");
+		return Result.OK("恢复定时任务成功");
 	}
 
 	/**
 	 * 通过id查询
-	 * 
+	 *
 	 * @param id
 	 * @return
 	 */
 	@RequestMapping(value = "/queryById", method = RequestMethod.GET)
 	public Result<?> queryById(@RequestParam(name = "id", required = true) String id) {
 		QuartzJob quartzJob = quartzJobService.getById(id);
-        return Result.ok(quartzJob);
+        return Result.OK(quartzJob);
 	}
 
 	/**
 	 * 导出excel
-	 * 
+	 *
 	 * @param request
 	 * @param quartzJob
 	 */
@@ -209,7 +209,7 @@ public class QuartzJobController {
 
 	/**
 	 * 通过excel导入数据
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 * @return
@@ -265,6 +265,6 @@ public class QuartzJobController {
 			log.info("定时任务 立即执行失败>>"+e.getMessage());
 			return Result.error("执行失败!");
 		}
-		return Result.ok("执行成功!");
+		return Result.OK("执行成功!");
 	}
 }

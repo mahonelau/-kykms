@@ -184,7 +184,7 @@
     margin-bottom: 18px;
   }
   .anty-row-operator button{margin: 0 5px}
-  .ant-btn-danger{background-color: #ffffff}z
+  .ant-btn-danger{background-color: #ffffff}
 
   .ant-modal-cust-warp{height: 100%}
   .ant-modal-cust-warp .ant-modal-body{height:calc(100% - 110px) !important;overflow-y: auto}

@@ -122,6 +122,6 @@
     margin-top: 48px;
   }
   .page-header[data-v-6740ec88] {
-    margin: 0px 24px 0;
+    margin: 0 24px 0;
   }
 </style>

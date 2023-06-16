@@ -34,9 +34,9 @@ public interface IKmDocService extends IService<KmDoc> {
 
     KmDoc getDocByFileId(String fileId);
 
-    void downloadKmDoc(String docId, HttpServletResponse response, HttpServletRequest req) throws IOException, ParseException;
+    void downloadKmDoc(String docId, HttpServletResponse response, HttpServletRequest req) throws IOException;
 
-    void viewKmDoc( String docId, HttpServletResponse response,HttpServletRequest req) throws IOException;
+    void viewKmDoc( String docId, HttpServletResponse response,HttpServletRequest req);
 
     Result<?> editDraft(KmDocParamVO kmDocParamVO);
 

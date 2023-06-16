@@ -22,8 +22,7 @@ public interface SysAnnouncementSendMapper extends BaseMapper<SysAnnouncementSen
 	/**
 	 * @功能：获取我的消息
 	 * @param announcementSendModel
-	 * @param pageSize 
-	 * @param pageNo 
+	 * @param page
 	 * @return
 	 */
 	public List<AnnouncementSendModel> getMyAnnouncementSendList(Page<AnnouncementSendModel> page,@Param("announcementSendModel") AnnouncementSendModel announcementSendModel);

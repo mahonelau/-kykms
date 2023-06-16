@@ -46,7 +46,7 @@
       <a-form layout="inline">
         <a-row>
           <a-col :xl="17" :lg="15" :md="14" :sm="24" style="background-color: #f2f2f2;padding: 15px">
-            <div style="padding: 0px; box-shadow:1px 2px 3px 2px #ccc">
+            <div style="padding: 0; box-shadow:1px 2px 3px 2px #ccc">
               <!--<a-col style="background-color: #108ee9">-->
               <!--<h3 style="color: white;margin-left: 20px;padding:5px"><b>新入库文档</b></h3>-->
               <!--</a-col>-->
@@ -104,7 +104,7 @@
             </div>
           </a-col>
           <a-col :xl="7" :lg="9" :md="10" :sm="24" style="background-color: #f2f2f2;padding: 15px;min-width: 350px">
-            <div style="background-color: white;padding: 0px; box-shadow:1px 2px 3px 2px #ccc">
+            <div style="background-color: white;padding: 0; box-shadow:1px 2px 3px 2px #ccc">
               <a-form layout="inline" style="min-height: 10px">
                 <a-row>
                   <a-col style="background-color: #108ee9">
@@ -139,7 +139,7 @@
         </div>
       </b-j-modal>
 
-      <a-layout-footer style="padding: 0px">
+      <a-layout-footer style="padding: 0">
         <global-footer/>
       </a-layout-footer>
 

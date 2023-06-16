@@ -177,7 +177,7 @@ public class JeecgController<T, S extends IService<T>> {
                 //1200条  saveBatch消耗时间3687毫秒 循环插入消耗时间5212毫秒
                 log.info("消耗时间" + (System.currentTimeMillis() - start) + "毫秒");
                 //update-end-author:taoyan date:20190528 for:批量插入数据
-                return Result.ok("文件导入成功！数据行数：" + list.size());
+                return Result.OK("文件导入成功！数据行数：" + list.size());
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 return Result.error("文件导入失败:" + e.getMessage());

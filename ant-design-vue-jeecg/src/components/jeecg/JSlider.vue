@@ -2,7 +2,7 @@
   <div class="drag" ref="dragDiv">
     <div class="drag_bg"></div>
     <div class="drag_text">{{confirmWords}}</div>
-    <div ref="moveDiv" @mousedown="mousedownFn($event)" :class="{'handler_ok_bg':confirmSuccess}" class="handler handler_bg" style="border: 0.5px solid #fff;height: 34px;position: absolute;top: 0px;left: 0px;"></div>
+    <div ref="moveDiv" @mousedown="mousedownFn($event)" :class="{'handler_ok_bg':confirmSuccess}" class="handler handler_bg" style="border: 0.5px solid #fff;height: 34px;position: absolute;top: 0;left: 0;"></div>
   </div>
 </template>
 
@@ -101,11 +101,11 @@
   .drag_bg{
     background-color: #7ac23c;
     height: 34px;
-    width: 0px;
+    width: 0;
   }
   .drag_text{
     position: absolute;
-    top: 0px;
+    top: 0;
     width: 100%;text-align: center;
     -moz-user-select: none;
     -webkit-user-select: none;

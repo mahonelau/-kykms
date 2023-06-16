@@ -23,7 +23,7 @@ public class AesEncryptUtil {
      * @return 加密的结果
      * @throws Exception
      */
-    public static String encrypt(String data, String key, String iv) throws Exception {
+    public static String encrypt(String data, String key, String iv)  {
         try {
 
             Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");//"算法/模式/补码方式"NoPadding PkcsPadding
@@ -60,7 +60,7 @@ public class AesEncryptUtil {
      * @return 解密的结果
      * @throws Exception
      */
-    public static String desEncrypt(String data, String key, String iv) throws Exception {
+    public static String desEncrypt(String data, String key, String iv)  {
         try {
 			byte[] encrypted1 = Base64.decode(data);
 

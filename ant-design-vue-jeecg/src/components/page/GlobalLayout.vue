@@ -74,7 +74,7 @@
       </a-layout-content>
 
       <!-- layout footer -->
-      <a-layout-footer style="padding: 0px">
+      <a-layout-footer style="padding: 0">
         <global-footer/>
       </a-layout-footer>
     </a-layout>
@@ -555,7 +555,7 @@
     // 内容区
     .layout-content {
 
-      margin: 24px 24px 0px;
+      margin: 24px 24px 0;
       height: 64px;
       padding: 0 12px 0 0;
     }
@@ -663,7 +663,7 @@
 
     .ant-dropdown-menu-item > .anticon:first-child,
     .ant-dropdown-menu-item > a > .anticon:first-child,
-    .ant-dropdown-menu-submenu-title > .anticon:first-child
+    .ant-dropdown-menu-submenu-title > .anticon:first-child,
     .ant-dropdown-menu-submenu-title > a > .anticon:first-child {
       min-width: 12px;
       margin-right: 8px;

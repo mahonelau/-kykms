@@ -31,7 +31,7 @@
   position: absolute;
   white-space: pre;
   cursor: text;
-  transform-origin: 0% 0%;
+  transform-origin: 0 0;
 }
 
 .textLayer .highlight {
@@ -1132,7 +1132,7 @@ html[dir="rtl"] #outerContainer.sidebarOpen #loadingBar {
   position: absolute;
   top: 0;
   left: 0;
-  width: 0%;
+  width: 0;
   height: 100%;
   background-color: var(--progressBar-color);
   overflow: hidden;

@@ -159,5 +159,5 @@
     margin-top: 20px;
   }
 
-  @import '../../../assets/less/index.less';
+  @import '@/assets/less/index.less';
 </style>

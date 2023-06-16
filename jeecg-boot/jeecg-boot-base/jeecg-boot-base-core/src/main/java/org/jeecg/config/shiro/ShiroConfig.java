@@ -183,9 +183,9 @@ public class ShiroConfig {
     public DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator() {
         DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator = new DefaultAdvisorAutoProxyCreator();
         defaultAdvisorAutoProxyCreator.setProxyTargetClass(true);
-        /**
-         * 解决重复代理问题 github#994
-         * 添加前缀判断 不匹配 任何Advisor
+        /*
+          解决重复代理问题 github#994
+          添加前缀判断 不匹配 任何Advisor
          */
         defaultAdvisorAutoProxyCreator.setUsePrefix(true);
         defaultAdvisorAutoProxyCreator.setAdvisorBeanNamePrefix("_no_advisor");

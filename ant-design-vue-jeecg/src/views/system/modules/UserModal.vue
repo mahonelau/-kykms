@@ -13,7 +13,7 @@
       <div style="width: 100%;">
         <span>{{ title }}</span>
         <span style="display:inline-block;width:calc(100% - 51px);padding-right:10px;text-align: right">
-          <a-button @click="toggleScreen" icon="appstore" style="height:20px;width:20px;border:0px"></a-button>
+          <a-button @click="toggleScreen" icon="appstore" style="height:20px;width:20px;border:0"></a-button>
         </span>
       </div>
 

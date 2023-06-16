@@ -1528,7 +1528,7 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
 
     //下载文件
     @SuppressWarnings("ALL")
-    public void downloadKmDoc(String docId, HttpServletResponse response, HttpServletRequest req) throws IOException, ParseException {
+    public void downloadKmDoc(String docId, HttpServletResponse response, HttpServletRequest req) throws IOException {
         KmDoc kmDoc = super.getById(docId);
         if(kmDoc == null) {
             response.sendError(HttpStatus.NOT_FOUND.value(),"无效的文档");
@@ -1561,7 +1561,7 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
 
     //预览文件
     @SuppressWarnings("ALL")
-    public void viewKmDoc( String docId, HttpServletResponse response,HttpServletRequest req) throws IOException {
+    public void viewKmDoc( String docId, HttpServletResponse response,HttpServletRequest req)  {
         try {
             KmDoc kmDoc = super.getById(docId);
             if(kmDoc == null) {

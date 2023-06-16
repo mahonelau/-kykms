@@ -20,7 +20,7 @@ public class YouBianCodeUtil {
 	/**
 	 * 根据前一个code，获取同级下一个code
 	 * 例如:当前最大code为D01A04，下一个code为：D01A05
-	 * 
+	 *
 	 * @param code
 	 * @return
 	 */
@@ -67,11 +67,11 @@ public class YouBianCodeUtil {
 
 	/**
 	 * 根据父亲code,获取下级的下一个code
-	 * 
+	 *
 	 * 例如：父亲CODE:A01
 	 *       当前CODE:A01B03
 	 *       获取的code:A01B04
-	 *       
+	 *
 	 * @param parentCode   上级code
 	 * @param localCode    同级code
 	 * @return
@@ -88,11 +88,11 @@ public class YouBianCodeUtil {
 		return parentCode;
 	}
 
-	
+
 
 	/**
 	 * 将数字前面位数补零
-	 * 
+	 *
 	 * @param num
 	 * @return
 	 */
@@ -102,7 +102,7 @@ public class YouBianCodeUtil {
 
 	/**
 	 * 将数字前面位数补零
-	 * 
+	 *
 	 * @param num
 	 * @return
 	 */
@@ -113,7 +113,7 @@ public class YouBianCodeUtil {
 
 	/**
 	 * 递增获取下个数字
-	 * 
+	 *
 	 * @param num
 	 * @return
 	 */
@@ -124,8 +124,8 @@ public class YouBianCodeUtil {
 
 	/**
 	 * 递增获取下个字母
-	 * 
-	 * @param num
+	 *
+	 * @param zimu
 	 * @return
 	 */
 	private static char getNextZiMu(char zimu) {
@@ -135,7 +135,7 @@ public class YouBianCodeUtil {
 		zimu++;
 		return zimu;
 	}
-	
+
 	/**
 	 * 根据数字位数获取最大值
 	 * @param length
@@ -163,7 +163,7 @@ public class YouBianCodeUtil {
 			}
 			return cutcode;
 		}
-		
+
 	}
 //	public static void main(String[] args) {
 //		// org.jeecgframework.core.util.LogUtil.info(getNextZiMu('C'));

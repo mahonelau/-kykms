@@ -848,7 +848,7 @@
           .ant-tabs-tab {
             padding: 0 24px!important;
             background-color: #f5f7fa!important;
-            margin-right: 0px!important;
+            margin-right: 0!important;
             border-radius: 0;
             line-height: 38px;
             border: 1px solid transparent!important;

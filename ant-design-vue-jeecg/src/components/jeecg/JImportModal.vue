@@ -6,7 +6,7 @@
     :confirmLoading="uploading"
     @cancel="handleClose">
 
-    <div style="margin: 0px 0px 5px 1px" v-if="online">
+    <div style="margin: 0 0 5px 1px" v-if="online">
       <span style="display: inline-block;height: 32px;line-height: 32px;vertical-align: middle;">是否开启校验:</span>
       <span style="display: inline-block;height: 32px;margin-left: 6px">
          <a-switch :checked="validateStatus==1" @change="handleChangeValidateStatus" checked-children="是" un-checked-children="否" size="small"/>

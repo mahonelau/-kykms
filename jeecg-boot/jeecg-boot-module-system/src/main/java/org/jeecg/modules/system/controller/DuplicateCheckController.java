@@ -34,7 +34,7 @@ public class DuplicateCheckController {
 
 	/**
 	 * 校验数据是否在系统中是否存在
-	 * 
+	 *
 	 * @return
 	 */
 	@RequestMapping(value = "/check", method = RequestMethod.GET)
@@ -57,7 +57,7 @@ public class DuplicateCheckController {
 
 		if (num == null || num == 0) {
 			// 该值可用
-			return Result.ok("该值可用！");
+			return Result.OK("该值可用！");
 		} else {
 			// 该值不可用
 			log.info("该值不可用，系统中已存在！");
