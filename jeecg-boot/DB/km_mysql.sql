@@ -1,7 +1,20 @@
+/*
+ Navicat Premium Data Transfer
+
+ Source Server         : ky_tencent
+ Source Server Type    : MySQL
+ Source Server Version : 80027
+ Source Host           : 119.29.145.199:6033
+ Source Schema         : km
+
+ Target Server Type    : MySQL
+ Target Server Version : 80027
+ File Encoding         : 65001
+
+ Date: 23/06/2023 14:16:12
+*/
 CREATE database if NOT EXISTS `km` default character set utf8mb4 collate utf8mb4_unicode_ci;
 use `km`;
-
-
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -46,6 +59,12 @@ CREATE TABLE `km_doc`  (
   `public_remark` smallint(0) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of km_doc
+-- ----------------------------
+INSERT INTO `km_doc` VALUES ('402881ec88cd51160188cd5116db0001', '402881ec88cd51160188cd51168b0000', NULL, NULL, 15057, 'Redis存储说明 - 副本.docx', 'Redis存储说明 - 副本', 'Z23061815034348', 'docx', 9, NULL, NULL, NULL, 1, -1, 1, 0, 0, NULL, NULL, 'admin', '2023-06-18 15:03:44', '[convertDocSync] 文档转换成pdf预览文件失败，路径:\\2023-06-18\\402881ec88cd51160188cd51168b0000.docx', 'blZRzYgBN6FtzZTbHK13', NULL, NULL, NULL, NULL, 1, 1, NULL, NULL, NULL, NULL);
+INSERT INTO `km_doc` VALUES ('402881ec88cd52500188cd5266680002', '402881ec88cd52500188cd5266240001', '402881ec88cd52500188cd5275a70004', '402881ec88cd52500188cd5275a70004', 21061, '槽边往事-7.2三叔十年.docx', '槽边往事-7.2三叔十年', 'Z23061815050947', 'docx', 2, NULL, NULL, NULL, 1, 1, 1, 0, 3, NULL, NULL, 'admin', '2023-06-18 15:05:09', NULL, 'c1ZSzYgBN6FtzZTbeq0U', NULL, NULL, NULL, NULL, 1, 1, NULL, NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for km_doc_business_type
@@ -105,6 +124,16 @@ CREATE TABLE `km_doc_visit_record`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Records of km_doc_visit_record
+-- ----------------------------
+INSERT INTO `km_doc_visit_record` VALUES ('402881ec88cd51160188cd51176c0002', '402881ec88cd51160188cd5116db0001', 0, '', '', '0:0:0:0:0:0:0:1', 'admin', '2023-06-18 15:03:44');
+INSERT INTO `km_doc_visit_record` VALUES ('402881ec88cd52500188cd5250ce0000', '402881ec88cd51160188cd5116db0001', 7, '', '', '0:0:0:0:0:0:0:1', 'admin', '2023-06-18 15:05:04');
+INSERT INTO `km_doc_visit_record` VALUES ('402881ec88cd52500188cd5266bb0003', '402881ec88cd52500188cd5266680002', 0, '', '', '0:0:0:0:0:0:0:1', 'admin', '2023-06-18 15:05:10');
+INSERT INTO `km_doc_visit_record` VALUES ('402881ec88cd52500188cd5285320005', '402881ec88cd52500188cd5266680002', 5, '', '', '0:0:0:0:0:0:0:1', 'admin', '2023-06-18 15:05:17');
+INSERT INTO `km_doc_visit_record` VALUES ('402881e888e6e29f0188e6e29fe30000', '402881ec88cd52500188cd5266680002', 5, '', '', '127.0.0.1', 'admin', '2023-06-23 14:13:12');
+INSERT INTO `km_doc_visit_record` VALUES ('402881e888e6e29f0188e6e2ec9d0001', '402881ec88cd52500188cd5266680002', 5, '', '', '0:0:0:0:0:0:0:1', 'admin', '2023-06-23 14:13:31');
+
+-- ----------------------------
 -- Table structure for km_file
 -- ----------------------------
 DROP TABLE IF EXISTS `km_file`;
@@ -115,6 +144,12 @@ CREATE TABLE `km_file`  (
   `url` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
   `original_name` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of km_file
+-- ----------------------------
+INSERT INTO `km_file` VALUES ('402881ec88cd52500188cd5266240001', '16c255987128afcc25aa713695e5b964b38ff97b839d1aedf79a0a6fcf25697e', '\\2023-06-18\\402881ec88cd52500188cd5266240001.docx', NULL, '槽边往事-7.2三叔十年.docx');
+INSERT INTO `km_file` VALUES ('402881ec88cd52500188cd5275a70004', NULL, '\\2023-06-18\\pdf\\402881ec88cd52500188cd5266240001.pdf', NULL, '402881ec88cd52500188cd5266240001.pdf');
 
 -- ----------------------------
 -- Table structure for km_search_record
@@ -131,6 +166,13 @@ CREATE TABLE `km_search_record`  (
   `create_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'createBy',
   `create_time` datetime(0) NULL DEFAULT NULL COMMENT 'createTime'
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of km_search_record
+-- ----------------------------
+INSERT INTO `km_search_record` VALUES ('1670316191024734210', '知识', '知识', '知识', NULL, '知识,知识,知识', '0:0:0:0:0:0:0:1', 'admin', '2023-06-18 14:23:08');
+INSERT INTO `km_search_record` VALUES ('1670326831994974209', '往事', '往事', '往事', NULL, '往事,往事,往事', '0:0:0:0:0:0:0:1', 'admin', '2023-06-18 15:05:25');
+INSERT INTO `km_search_record` VALUES ('1672125611878723585', '往事', '往事', '往事', NULL, '往事,往事,往事', '0:0:0:0:0:0:0:1', 'admin', '2023-06-23 14:13:07');
 
 -- ----------------------------
 -- Table structure for km_sys_config
@@ -1114,6 +1156,20 @@ CREATE TABLE `sys_log`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '系统日志表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Records of sys_log
+-- ----------------------------
+INSERT INTO `sys_log` VALUES ('1670316130794528769', 1, '用户名: admin,登录成功！', NULL, 'admin', '管理员', '0:0:0:0:0:0:0:1', NULL, NULL, NULL, NULL, NULL, NULL, '2023-06-18 14:22:53', NULL, NULL);
+INSERT INTO `sys_log` VALUES ('1670324216057880577', 2, 'km_doc-文件上传', 1, 'admin', '管理员', '0:0:0:0:0:0:0:1', 'org.jeecg.modules.KM.controller.KmDocController.uploadDoc()', NULL, '[null,null]', NULL, 133, NULL, '2023-06-18 14:55:01', NULL, NULL);
+INSERT INTO `sys_log` VALUES ('1670324591968182274', 2, 'km_doc-文件上传', 1, 'admin', '管理员', '0:0:0:0:0:0:0:1', 'org.jeecg.modules.KM.controller.KmDocController.uploadDoc()', NULL, '[null,null]', NULL, 30796, NULL, '2023-06-18 14:56:31', NULL, NULL);
+INSERT INTO `sys_log` VALUES ('1670326409272037378', 2, 'km_doc-文件上传', 1, 'admin', '管理员', '0:0:0:0:0:0:0:1', 'org.jeecg.modules.KM.controller.KmDocController.uploadDoc()', NULL, '[null,null]', NULL, 278, NULL, '2023-06-18 15:03:44', NULL, NULL);
+INSERT INTO `sys_log` VALUES ('1670326745558757378', 2, 'km_doc-通过id删除', 4, 'admin', '管理员', '0:0:0:0:0:0:0:1', 'org.jeecg.modules.KM.controller.KmDocController.delete()', NULL, '  id: 402881ec88cd51160188cd5116db0001  req: org.apache.shiro.web.servlet.ShiroHttpServletRequest@41a8f62e', NULL, 660, NULL, '2023-06-18 15:05:04', NULL, NULL);
+INSERT INTO `sys_log` VALUES ('1670326769520816130', 2, 'km_doc-文件上传', 1, 'admin', '管理员', '0:0:0:0:0:0:0:1', 'org.jeecg.modules.KM.controller.KmDocController.uploadDoc()', NULL, '[null,null]', NULL, 189, NULL, '2023-06-18 15:05:10', NULL, NULL);
+INSERT INTO `sys_log` VALUES ('1672124946553057282', 1, '用户名: admin,登录成功！', NULL, 'admin', '管理员', '127.0.0.1', NULL, NULL, NULL, NULL, NULL, NULL, '2023-06-23 14:10:28', NULL, NULL);
+INSERT INTO `sys_log` VALUES ('1672125012772728834', 2, 'km_sys_config-分页列表查询', 1, 'admin', '管理员', '127.0.0.1', 'org.jeecg.modules.KM.controller.KmSysConfigController.queryPageList()', NULL, '  kmSysConfig: KmSysConfig(id=null, itemCode=null, itemValue=null, itemName=null)  pageNo: 1  pageSize: 10  req: org.apache.shiro.web.servlet.ShiroHttpServletRequest@465d65af', NULL, 58, NULL, '2023-06-23 14:10:44', NULL, NULL);
+INSERT INTO `sys_log` VALUES ('1672125052597645314', 2, 'km_sys_config-分页列表查询', 1, 'admin', '管理员', '0:0:0:0:0:0:0:1', 'org.jeecg.modules.KM.controller.KmSysConfigController.queryPageList()', NULL, '  kmSysConfig: KmSysConfig(id=null, itemCode=null, itemValue=null, itemName=null)  pageNo: 2  pageSize: 10  req: org.apache.shiro.web.servlet.ShiroHttpServletRequest@526e73d7', NULL, 40, NULL, '2023-06-23 14:10:54', NULL, NULL);
+INSERT INTO `sys_log` VALUES ('1672125062345207810', 2, 'km_sys_config-分页列表查询', 1, 'admin', '管理员', '127.0.0.1', 'org.jeecg.modules.KM.controller.KmSysConfigController.queryPageList()', NULL, '  kmSysConfig: KmSysConfig(id=null, itemCode=null, itemValue=null, itemName=null)  pageNo: 1  pageSize: 10  req: org.apache.shiro.web.servlet.ShiroHttpServletRequest@bee47a0', NULL, 38, NULL, '2023-06-23 14:10:56', NULL, NULL);
+
+-- ----------------------------
 -- Table structure for sys_permission
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_permission`;
@@ -1150,16 +1206,9 @@ CREATE TABLE `sys_permission`  (
 -- Records of sys_permission
 -- ----------------------------
 INSERT INTO `sys_permission` VALUES ('9502685863ab87f0ad1134142788a385', NULL, '首页', '/dashboard/analysis', 'dashboard/Analysis', NULL, NULL, 0, NULL, NULL, 0.00, 0, 'home', 1, 1, NULL, 0, NULL, NULL, '2018-12-25 20:34:38', 'admin', '2019-03-29 11:04:13', 0, 0, NULL, NULL);
-INSERT INTO `sys_permission` VALUES ('97c8629abc7848eccdb6d77c24bb3ebb', '700b7f95165c46cc7a78bf227aa8fed3', '磁盘监控', '/monitor/Disk', 'modules/monitor/DiskMonitoring', NULL, NULL, 1, NULL, NULL, 6.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-25 14:30:06', 'admin', '2019-05-05 14:37:14', 0, 0, NULL, NULL);
 INSERT INTO `sys_permission` VALUES ('9cb91b8851db0cf7b19d7ecc2a8193dd', '1939e035e803a99ceecb6f5563570fb2', '我的任务表单', '/modules/bpm/task/form/FormModule', 'modules/bpm/task/form/FormModule', NULL, NULL, 1, NULL, NULL, 1.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-03-08 16:49:05', 'admin', '2019-03-08 18:37:56', 0, 0, NULL, NULL);
-INSERT INTO `sys_permission` VALUES ('b1cb0a3fedf7ed0e4653cb5a229837ee', '08e6b9dc3c04489c8e1ff2ce6f105aa4', '定时任务', '/isystem/QuartzJobList', 'system/QuartzJobList', NULL, NULL, 1, NULL, NULL, 1.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, '2019-01-03 09:38:52', 'admin', '2020-09-09 14:48:16', 0, 0, NULL, 0);
 INSERT INTO `sys_permission` VALUES ('b6bcee2ccc854052d3cc3e9c96d90197', '71102b3b87fb07e5527bbd2c530dd90a', '加班申请', '/modules/extbpm/joa/JoaOvertimeList', 'modules/extbpm/joa/JoaOvertimeList', NULL, NULL, 1, NULL, NULL, 1.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-03 15:33:10', 'admin', '2019-04-03 15:34:48', 0, 0, NULL, NULL);
-INSERT INTO `sys_permission` VALUES ('d07a2c87a451434c99ab06296727ec4f', '700b7f95165c46cc7a78bf227aa8fed3', 'JVM信息', '/monitor/JvmInfo', 'modules/monitor/JvmInfo', NULL, NULL, 1, NULL, NULL, 4.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-01 23:07:48', 'admin', '2019-04-02 11:37:16', 0, 0, NULL, NULL);
 INSERT INTO `sys_permission` VALUES ('d7d6e2e4e2934f2c9385a623fd98c6f3', NULL, '系统管理', '/isystem', 'layouts/RouteView', NULL, NULL, 0, NULL, NULL, 7.00, 0, 'setting', 1, 0, 0, 0, NULL, NULL, '2018-12-25 20:34:38', 'admin', '2021-07-14 01:50:27', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('e41b69c57a941a3bbcce45032fe57605', '', '在线开发', '/online', 'layouts/RouteView', NULL, NULL, 0, NULL, NULL, 6.00, 0, 'cloud', 1, 0, 0, 0, NULL, 'admin', '2019-03-08 10:43:10', 'ceshi', '2021-12-15 22:21:51', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('024f1fd1283dc632458976463d8984e1', '700b7f95165c46cc7a78bf227aa8fed3', 'Tomcat信息', '/monitor/TomcatInfo', 'modules/monitor/TomcatInfo', NULL, NULL, 1, NULL, NULL, 4.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-02 09:44:29', 'admin', '2019-05-07 15:19:10', 0, 0, NULL, NULL);
-INSERT INTO `sys_permission` VALUES ('08e6b9dc3c04489c8e1ff2ce6f105aa4', NULL, '系统监控', '/dashboard3', 'layouts/RouteView', NULL, NULL, 0, NULL, NULL, 6.00, 0, 'dashboard', 1, 0, 0, 1, NULL, NULL, '2018-12-25 20:34:38', 'ceshi', '2021-10-14 15:05:03', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('109c78a583d4693ce2f16551b7786786', 'e41b69c57a941a3bbcce45032fe57605', 'Online报表配置', '/online/cgreport', 'modules/online/cgreport/OnlCgreportHeadList', NULL, NULL, 1, NULL, NULL, 2.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2019-03-08 10:51:07', 'ceshi', '2021-12-15 22:21:31', 0, 0, NULL, 0);
 INSERT INTO `sys_permission` VALUES ('1415139394194399233', NULL, '文件管理', '/km/filemanagement', 'layouts/RouteView', NULL, NULL, 0, NULL, '1', 1.00, 0, 'folder', 1, 0, 0, 0, NULL, 'admin', '2021-07-13 21:41:38', 'admin', '2021-07-14 01:40:06', 0, 0, '1', 0);
 INSERT INTO `sys_permission` VALUES ('1415145872468893697', '1415139394194399233', '知识文件管理', '/km/filemanagement/draftslist', 'km/filemanagement/DraftsList', NULL, NULL, 1, NULL, '1', 1.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2021-07-13 22:07:23', 'admin', '2022-03-28 00:11:34', 0, 0, '1', 0);
 INSERT INTO `sys_permission` VALUES ('1415156984451063809', NULL, '配置管理', '/km/datasetting', 'layouts/RouteView', NULL, NULL, 0, NULL, '1', 2.00, 0, 'cluster', 1, 0, 0, 0, NULL, 'admin', '2021-07-13 22:51:32', 'admin', '2021-07-29 17:28:49', 0, 0, '1', 0);
@@ -1172,15 +1221,10 @@ INSERT INTO `sys_permission` VALUES ('3f915b2769fc80648e92d04e84ca059d', 'd7d6e2
 INSERT INTO `sys_permission` VALUES ('45c966826eeff4c99b8f8ebfe74511fc', 'd7d6e2e4e2934f2c9385a623fd98c6f3', '部门管理', '/isystem/depart', 'system/DepartList', NULL, NULL, 1, NULL, NULL, 1.40, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2019-01-29 18:47:40', 'admin', '2019-12-25 09:36:47', 0, 0, NULL, 0);
 INSERT INTO `sys_permission` VALUES ('54dd5457a3190740005c1bfec55b1c34', 'd7d6e2e4e2934f2c9385a623fd98c6f3', '菜单管理', '/isystem/permission', 'system/PermissionList', NULL, NULL, 1, NULL, NULL, 1.30, 0, NULL, 1, 1, 0, 0, NULL, NULL, '2018-12-25 20:34:38', 'admin', '2019-12-25 09:36:39', 0, 0, NULL, 0);
 INSERT INTO `sys_permission` VALUES ('58857ff846e61794c69208e9d3a85466', '1420569665158332418', '系统日志', '/isystem/log', 'system/LogList', NULL, NULL, 1, NULL, NULL, 2.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, '2018-12-26 10:11:18', 'admin', '2021-07-29 10:20:23', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('700b7f95165c46cc7a78bf227aa8fed3', '08e6b9dc3c04489c8e1ff2ce6f105aa4', '性能监控', '/monitor', 'layouts/RouteView', NULL, NULL, 1, NULL, NULL, 3.00, 0, NULL, 1, 0, 0, 0, NULL, 'admin', '2019-04-02 11:34:34', 'admin', '2020-09-09 14:48:51', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('841057b8a1bef8f6b4b20f9a618a7fa6', '08e6b9dc3c04489c8e1ff2ce6f105aa4', '数据日志', '/sys/dataLog-list', 'system/DataLogList', NULL, NULL, 1, NULL, NULL, 2.10, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2019-03-11 19:26:49', 'admin', '2020-09-09 14:48:32', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('8b3bff2eee6f1939147f5c68292a1642', '700b7f95165c46cc7a78bf227aa8fed3', '服务器信息', '/monitor/SystemInfo', 'modules/monitor/SystemInfo', NULL, NULL, 1, NULL, NULL, 4.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-02 11:39:19', 'admin', '2019-04-02 15:40:02', 0, 0, NULL, NULL);
-INSERT INTO `sys_permission` VALUES ('8d1ebd663688965f1fd86a2f0ead3416', '700b7f95165c46cc7a78bf227aa8fed3', 'Redis监控', '/monitor/redis/info', 'modules/monitor/RedisInfo', NULL, NULL, 1, NULL, NULL, 1.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-02 13:11:33', 'admin', '2019-05-07 15:18:54', 0, 0, NULL, NULL);
-INSERT INTO `sys_permission` VALUES ('9fe26464838de2ea5e90f2367e35efa0', 'e41b69c57a941a3bbcce45032fe57605', 'AUTO在线报表', '/online/cgreport/:code', 'modules/online/cgreport/auto/OnlCgreportAutoList', 'onlineAutoList', NULL, 1, NULL, NULL, 9.00, 0, NULL, 1, 1, 0, 1, NULL, 'admin', '2019-03-12 11:06:48', 'ceshi', '2021-12-15 22:21:35', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('841057b8a1bef8f6b4b20f9a618a7fa6', '1420569665158332418', '数据日志', '/sys/dataLog-list', 'system/DataLogList', NULL, NULL, 1, NULL, NULL, 2.10, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2019-03-11 19:26:49', 'admin', '2023-06-23 14:11:38', 0, 0, NULL, 0);
 INSERT INTO `sys_permission` VALUES ('1453933027082489858', '1415139394194399233', '收藏夹', '/km/filemanagement/KmDocFavouriteList', 'km/filemanagement/KmDocFavouriteList', NULL, NULL, 1, NULL, '1', 0.00, 0, NULL, 1, 1, 0, 0, NULL, 'ceshi', '2021-10-29 11:53:41', NULL, NULL, 0, NULL, '1', 0);
 INSERT INTO `sys_permission` VALUES ('1456909004028821505', '1415139394194399233', '检索列表', '/km/search/DoSearch', 'km/search/DoSearch', NULL, NULL, 1, NULL, '1', 9.00, 0, NULL, 1, 0, 0, 1, NULL, 'ceshi', '2021-11-06 16:59:09', NULL, NULL, 0, NULL, '1', 0);
 INSERT INTO `sys_permission` VALUES ('1456909292378832898', '1456909004028821505', '批量下载', '/km/search/DoSearch', NULL, NULL, NULL, 2, 'searchList:batchDownload', '1', NULL, 0, NULL, 1, 1, 0, 0, NULL, 'ceshi', '2021-11-06 17:00:18', NULL, NULL, 0, NULL, '1', 0);
-INSERT INTO `sys_permission` VALUES ('fc810a2267dd183e4ef7c71cc60f4670', '700b7f95165c46cc7a78bf227aa8fed3', '请求追踪', '/monitor/HttpTrace', 'modules/monitor/HttpTrace', NULL, NULL, 1, NULL, NULL, 4.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-02 09:46:19', 'admin', '2019-04-02 11:37:27', 0, 0, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for sys_permission_data_rule
@@ -1363,6 +1407,7 @@ INSERT INTO `sys_role_permission` VALUES ('1501891384830701574', '15018910968288
 INSERT INTO `sys_role_permission` VALUES ('1501891384830701575', '1501891096828817410', '1415156984451063809', NULL, '2022-03-10 20:03:05', '116.23.218.77');
 INSERT INTO `sys_role_permission` VALUES ('1501891384830701576', '1501891096828817410', '1415277817119023106', NULL, '2022-03-10 20:03:05', '116.23.218.77');
 INSERT INTO `sys_role_permission` VALUES ('1501891384830701578', '1501891096828817410', '1419574496959193090', NULL, '2022-03-10 20:03:05', '116.23.218.77');
+INSERT INTO `sys_role_permission` VALUES ('1672125560288784385', 'f6817f48af4fb3af11b9e8bf182f618b', '841057b8a1bef8f6b4b20f9a618a7fa6', NULL, '2023-06-23 14:12:55', '0:0:0:0:0:0:0:1');
 
 -- ----------------------------
 -- Table structure for sys_tenant
