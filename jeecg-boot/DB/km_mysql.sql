@@ -60,11 +60,6 @@ CREATE TABLE `km_doc`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
--- ----------------------------
--- Records of km_doc
--- ----------------------------
-INSERT INTO `km_doc` VALUES ('402881ec88cd51160188cd5116db0001', '402881ec88cd51160188cd51168b0000', NULL, NULL, 15057, 'Redis存储说明 - 副本.docx', 'Redis存储说明 - 副本', 'Z23061815034348', 'docx', 9, NULL, NULL, NULL, 1, -1, 1, 0, 0, NULL, NULL, 'admin', '2023-06-18 15:03:44', '[convertDocSync] 文档转换成pdf预览文件失败，路径:\\2023-06-18\\402881ec88cd51160188cd51168b0000.docx', 'blZRzYgBN6FtzZTbHK13', NULL, NULL, NULL, NULL, 1, 1, NULL, NULL, NULL, NULL);
-INSERT INTO `km_doc` VALUES ('402881ec88cd52500188cd5266680002', '402881ec88cd52500188cd5266240001', '402881ec88cd52500188cd5275a70004', '402881ec88cd52500188cd5275a70004', 21061, '槽边往事-7.2三叔十年.docx', '槽边往事-7.2三叔十年', 'Z23061815050947', 'docx', 2, NULL, NULL, NULL, 1, 1, 1, 0, 3, NULL, NULL, 'admin', '2023-06-18 15:05:09', NULL, 'c1ZSzYgBN6FtzZTbeq0U', NULL, NULL, NULL, NULL, 1, 1, NULL, NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for km_doc_business_type
