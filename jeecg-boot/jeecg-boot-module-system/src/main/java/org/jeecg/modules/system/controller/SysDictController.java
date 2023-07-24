@@ -23,6 +23,7 @@ import org.jeecg.modules.system.entity.SysDict;
 import org.jeecg.modules.system.entity.SysDictItem;
 import org.jeecg.modules.system.model.SysDictTree;
 import org.jeecg.modules.system.model.TreeSelectModel;
+import org.jeecg.modules.system.security.DictQueryBlackListHandler;
 import org.jeecg.modules.system.service.ISysDictItemService;
 import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.system.vo.SysDictPage;
@@ -64,6 +65,8 @@ public class SysDictController {
 	private ISysDictItemService sysDictItemService;
 	@Autowired
 	public RedisTemplate<String, Object> redisTemplate;
+	@Autowired
+	private DictQueryBlackListHandler dictQueryBlackListHandler;
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public Result<IPage<SysDict>> queryPageList(SysDict sysDict,@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
@@ -140,6 +143,9 @@ public class SysDictController {
 	public Result<List<DictModel>> getDictItems(@PathVariable String dictCode, @RequestParam(value = "sign",required = false) String sign,HttpServletRequest request) {
 		log.info(" dictCode : "+ dictCode);
 		Result<List<DictModel>> result = new Result<List<DictModel>>();
+		if(!dictQueryBlackListHandler.isPass(dictCode)){
+			return result.error500(dictQueryBlackListHandler.getError());
+		}
 		try {
 			List<DictModel> ls = sysDictService.getDictItems(dictCode);
 			if (ls == null) {
@@ -204,6 +210,9 @@ public class SysDictController {
 			@RequestParam(value = "pageSize", required = false) Integer pageSize) {
 		log.info(" 加载字典表数据,加载关键字: "+ keyword);
 		Result<List<DictModel>> result = new Result<List<DictModel>>();
+		if(!dictQueryBlackListHandler.isPass(dictCode)){
+			return result.error500(dictQueryBlackListHandler.getError());
+		}
 		try {
 			List<DictModel> ls = sysDictService.loadDict(dictCode, keyword, pageSize);
 			if (ls == null) {
@@ -274,6 +283,9 @@ public class SysDictController {
 	@RequestMapping(value = "/loadDictItem/{dictCode}", method = RequestMethod.GET)
 	public Result<List<String>> loadDictItem(@PathVariable String dictCode,@RequestParam(name="key") String keys, @RequestParam(value = "sign",required = false) String sign,@RequestParam(value = "delNotExist",required = false,defaultValue = "true") boolean delNotExist,HttpServletRequest request) {
 		Result<List<String>> result = new Result<>();
+		if(!dictQueryBlackListHandler.isPass(dictCode)){
+			return result.error500(dictQueryBlackListHandler.getError());
+		}
 		try {
 			if(dictCode.indexOf(",")!=-1) {
 				String[] params = dictCode.split(",");
@@ -318,6 +330,9 @@ public class SysDictController {
 		// SQL注入漏洞 sign签名校验(表名,label字段,val字段,条件)
 		String dictCode = tbname+","+text+","+code+","+condition;
         SqlInjectionUtil.filterContent(dictCode);
+		if(!dictQueryBlackListHandler.isPass(dictCode)){
+			return result.error500(dictQueryBlackListHandler.getError());
+		}
 		List<TreeSelectModel> ls = sysDictService.queryTreeList(query,tbname, text, code, pidField, pid,hasChildField);
 		result.setSuccess(true);
 		result.setResult(ls);
@@ -341,6 +356,9 @@ public class SysDictController {
 		// SQL注入漏洞 sign签名校验
 		String dictCode = query.getTable()+","+query.getText()+","+query.getCode();
         SqlInjectionUtil.filterContent(dictCode);
+		if(!dictQueryBlackListHandler.isPass(dictCode)){
+			return res.error500(dictQueryBlackListHandler.getError());
+		}
 		List<DictModel> ls = this.sysDictService.queryDictTablePageList(query,pageSize,pageNo);
 		res.setResult(ls);
 		res.setSuccess(true);

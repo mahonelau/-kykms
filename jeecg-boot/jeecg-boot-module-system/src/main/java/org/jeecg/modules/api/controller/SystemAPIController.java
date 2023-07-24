@@ -1,10 +1,13 @@
 package org.jeecg.modules.api.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.api.dto.message.*;
 import org.jeecg.common.api.dto.OnlineAuthDTO;
 import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.common.system.vo.*;
+import org.jeecg.common.util.SqlInjectionUtil;
+import org.jeecg.modules.system.security.DictQueryBlackListHandler;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +20,7 @@ import java.util.Set;
 /**
  * 服务化 system模块 对外接口请求类
  */
+@Slf4j
 @RestController
 @RequestMapping("/sys/api")
 public class SystemAPIController {
@@ -26,6 +30,8 @@ public class SystemAPIController {
 
     @Autowired
     private ISysUserService sysUserService;
+    @Autowired
+    private DictQueryBlackListHandler dictQueryBlackListHandler;
 
 
     /**
@@ -167,6 +173,11 @@ public class SystemAPIController {
      */
     @GetMapping("/queryTableDictItemsByCode")
     List<DictModel> queryTableDictItemsByCode(@RequestParam("table") String table, @RequestParam("text") String text, @RequestParam("code") String code){
+        String str = table+","+text+","+code;
+        if(!dictQueryBlackListHandler.isPass(str)){
+            log.error(dictQueryBlackListHandler.getError());
+            return null;
+        }
         return sysBaseAPI.queryTableDictItemsByCode(table, text, code);
     }
 
@@ -190,6 +201,14 @@ public class SystemAPIController {
      */
     @GetMapping("/queryFilterTableDictInfo")
     List<DictModel> queryFilterTableDictInfo(@RequestParam("table") String table, @RequestParam("text") String text, @RequestParam("code") String code, @RequestParam("filterSql") String filterSql){
+        String str = table+","+text+","+code;
+        if(!dictQueryBlackListHandler.isPass(str)){
+            log.error(dictQueryBlackListHandler.getError());
+            return null;
+        }
+        String[] arr = new String[]{table, text, code};
+        SqlInjectionUtil.filterContent(arr);
+        SqlInjectionUtil.specialFilterContentForDictSql(filterSql);
         return sysBaseAPI.queryFilterTableDictInfo(table, text, code, filterSql);
     }
 
@@ -204,6 +223,11 @@ public class SystemAPIController {
     @Deprecated
     @GetMapping("/queryTableDictByKeys")
     public List<String> queryTableDictByKeys(@RequestParam("table") String table, @RequestParam("text") String text, @RequestParam("code") String code, @RequestParam("keyArray") String[] keyArray){
+        String str = table+","+text+","+code;
+        if(!dictQueryBlackListHandler.isPass(str)){
+            log.error(dictQueryBlackListHandler.getError());
+            return null;
+        }
         return sysBaseAPI.queryTableDictByKeys(table, text, code, keyArray);
     }
 
@@ -457,6 +481,13 @@ public class SystemAPIController {
      */
     @GetMapping("/translateDictFromTable")
     public String translateDictFromTable(@RequestParam("table") String table, @RequestParam("text") String text, @RequestParam("code") String code, @RequestParam("key") String key){
+        String str = table+","+text+","+code;
+        if(!dictQueryBlackListHandler.isPass(str)){
+            log.error(dictQueryBlackListHandler.getError());
+            return null;
+        }
+        String[] arr = new String[]{table, text, code, key};
+        SqlInjectionUtil.filterContent(arr);
         return sysBaseAPI.translateDictFromTable(table, text, code, key);
     }
 
