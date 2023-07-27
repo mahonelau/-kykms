@@ -46,19 +46,19 @@ export const constantRouterMap = [
   {
     path: '/defaultDocSearch',
     name:'defaultDocSearch',
-    meta: { title: '首页' },
+    meta: { title: '首页' ,keepAlive: true },
     component: () => import('@/views/km/search/DefaultDocSearch')
   },
   {
     path:'/advancedSearch',
     name:'advancedSearch',
-    meta: { title: '高级检索' },
+    meta: { title: '高级检索' ,keepAlive: true },
     component: () => import('@/views/km/search/AdvancedSearch')
   },
   {
     path:'/docSearch',
     name:'docSearch',
-    meta: { title: '检索结果' },
+    meta: { title: '检索结果' ,keepAlive: true },
     component: () => import('@/views/km/search/DocSearch')
   },
   {
