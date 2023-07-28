@@ -58,7 +58,7 @@ export const constantRouterMap = [
   {
     path:'/docSearch',
     name:'docSearch',
-    meta: { title: '检索结果' ,keepAlive: true },
+    meta: { title: '检索结果' },
     component: () => import('@/views/km/search/DocSearch')
   },
   {
