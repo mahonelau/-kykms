@@ -50,12 +50,6 @@ export const constantRouterMap = [
     component: () => import('@/views/km/search/DefaultDocSearch')
   },
   {
-    path:'/advancedSearch',
-    name:'advancedSearch',
-    meta: { title: '高级检索' ,keepAlive: true },
-    component: () => import('@/views/km/search/AdvancedSearch')
-  },
-  {
     path:'/docSearch',
     name:'docSearch',
     meta: { title: '检索结果' },

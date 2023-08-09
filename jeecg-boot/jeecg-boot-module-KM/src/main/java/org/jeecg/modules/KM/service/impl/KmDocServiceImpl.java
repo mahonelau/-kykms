@@ -657,7 +657,7 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
             return  kmSearchResultObjVO;
         }
         KmSearchRecord kmSearchRecord = new KmSearchRecord();
-        //在结果中检索的条件处理
+
         HttpSession session = req.getSession();
 
         //最终条件

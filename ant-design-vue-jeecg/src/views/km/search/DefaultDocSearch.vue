@@ -28,7 +28,6 @@
                   </div>
                 </div>
                 <div style="float: left;width: 100px;text-align: left;margin-top: -2px">
-                  <a @click="advancedSearch" style="color: white;margin-left: 20px;">高级检索&nbsp;&nbsp;&nbsp;></a>
                   <span style="color: white;margin-left: 20px">
                    <span>全文检索</span>
                       <a-checkbox  class="checkbox" v-model="boolCheckChange" style="margin-left: 8px" @change="onCheckChange" />
@@ -682,9 +681,6 @@
         })
       },
 
-      advancedSearch() {
-        this.$router.push('/advancedSearch');
-      },
 
 
     }

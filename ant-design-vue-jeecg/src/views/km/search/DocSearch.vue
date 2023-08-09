@@ -21,7 +21,6 @@
                   <a-input style="width: 800px;" size="large" placeholder="标题、关键字、全文" v-model="content"
                            @pressEnter="pressEnterFun">
 
-                    <a slot="addonAfter" style="color: #303133" @click="searchDocFun('1')">结果中检索</a>
                     <a-icon slot="suffix" @click="searchDocFun('0')" type="search" style="color:#1890FF;fontSize:22px"/>
                   </a-input>
                   <div class="checkbox" style="width: 750px;text-align: center;margin-top: 10px;margin-left: 20px">
@@ -29,7 +28,6 @@
                   </div>
                 </div>
                 <div style="float: left;width: 100px;text-align: left;margin-top: -2px">
-                  <a @click="advancedSearch" style="color: white;margin-left: 20px;">高级检索&nbsp;&nbsp;&nbsp;></a>
                   <span style="color: white;margin-left: 20px">
                    <span>全文检索</span>
                    <a-checkbox class="checkbox" v-model="boolCheckChange" style="margin-left: 8px"
@@ -779,9 +777,6 @@
         downloadFileName(this.url.downloadKmDoc, {docId: record.id})
       },
 
-      advancedSearch() {
-        this.$router.push('/advancedSearch');
-      },
       // 返回
       backHomepage() {
         this.$router.push('/defaultDocSearch');

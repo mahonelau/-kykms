@@ -38,10 +38,7 @@
 - ### 本地部署安装
 手册(推荐)： [在线文档](http://docs.kykms.cn/docs/mindoc/mindoc-1eqploikpjlkc)
 
-- ### 一键运行脚本
-快速部署docker镜像，请使用Centos 7以上版本，最低配置2C/4G。下载一键运行脚本:http://www.kykms.cn/install_community.sh
 
-部署成功，访问：http://Your_IP:3000
 - ### 开发环境准备与运行
 请参考：[开发环境准备与运行](./开发环境准备与运行.MD)
 - 默认登录账号： admin/123456

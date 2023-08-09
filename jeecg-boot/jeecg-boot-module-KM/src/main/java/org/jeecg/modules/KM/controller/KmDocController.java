@@ -185,7 +185,7 @@ public class KmDocController extends JeecgController<KmDoc, IKmDocService> {
 	public Result<?> delete(@RequestParam(name="id",required=true) String id,HttpServletRequest req) {
 		return kmDocService.deleteDoc(id,req);
 	}
-	
+
 	/**
 	 *  批量删除
 	 *
@@ -221,7 +221,7 @@ public class KmDocController extends JeecgController<KmDoc, IKmDocService> {
 		else
 			return  Result.error("全部失败");
 	}
-	
+
 	/**
 	 * 通过id查询
 	 *
@@ -326,15 +326,6 @@ public class KmDocController extends JeecgController<KmDoc, IKmDocService> {
 		 catch (IOException e){
 		 	return Result.error(e.getMessage());
 		 }
-	 }
-
-	 @ApiOperation(value="km_doc-高级检索", notes="km_doc-高级检索")
-	 @GetMapping(value = "/advanceSearchDoc")
-	 public Result<?> advanceSearchDoc(KmDocEsParamVO kmDocEsParamVO,
-								  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
-								  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
-								  HttpServletRequest req){
-		 return searchDoc(kmDocEsParamVO,pageNo,pageSize,req);
 	 }
 
 	 /**
