@@ -22,7 +22,7 @@
 - 官方站点 ：  [http://www.kykms.cn](http://www.kykms.cn)
 - 本产品有三个版本：开源版、专业为版、旗舰版([版本功能比较](http://www.kykms.cn/edition))
 - 旗舰版在线演示 ：  [http://kg.kykms.cn](http://kg.kykms.cn)
-- 商业在线演示 ：  [http://test.kykms.cn](http://test.kykms.cn) 账号：admin/123456
+- 专业在线演示 ：  [http://test.kykms.cn](http://test.kykms.cn) 账号：admin/123456
 - QQ技术交流群 ： 782686853
 - Mail : hnliuwx#tom.com
 - github: [https://github.com/mahonelau/kykms](https://github.com/mahonelau/kykms)
