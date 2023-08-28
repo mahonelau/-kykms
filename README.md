@@ -60,11 +60,11 @@
 
 KMS功能思维导图
 -----------------------------------
-![KY KMS](http://cos.kykms.cn/旗舰版功能思维导图.png)
+![KY KMS](./Docs/Pics/旗舰版功能思维导图.png)
 
 KMS技术架构图
 -----------------------------------
-![KY KMS](http://cos.kykms.cn/系统架构设计.jpg)
+![KY KMS](./Docs/Pics/系统架构设计.jpg)
 
 
 
