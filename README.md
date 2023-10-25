@@ -9,7 +9,7 @@
 -----------------------------------
 - 如果您在寻找一款知识库系统，用来将文档整理归类，并在团队内受控共享以充分利用这些文档，或者将文档分享到外部，那么科亿知识库将是您的不二之选。
 - 科亿知识库，可以应用在需要对文件进行管理、分类、归集、检索、分享交流的地方，以及需要对大数据进行管理和检索的场景，尤其适合知识密集型单位和历史文档丰富的单位。 
-- 版本说明：开源版适合个人学习和自用，提供基础功能，无套路，可以完整运行；专业版与旗舰版则提供更强大的功能，并提供技术服务，如需要请联系商务。
+- 版本说明：开源版适合个人学习和自用，提供基础功能，无套路，可以完整运行；专业版与旗舰版则提供更强大的功能，并提供技术服务，如需要请联系商务；单机版为绿色软件，下载开箱即用，功能对标专业版。
 - 我们的发展策略：开源版让产品更快触达客户，方便更多的人；以高阶版本和技术服务获取收入，来维持开源版本。
 - 科亿知识库，助你快速完成文件到知识的升级。我们的宗旨是: `文件简单整理，知识创造价值`
 
@@ -27,12 +27,13 @@
 -----------------------------------
 - 官方站点 ：  [http://www.kykms.cn](http://www.kykms.cn)
 - 技术文档 ：  科亿知识库的使用、部署手册，技术说明，请访问 [技术文档大全](http://docs.kykms.cn/docs/mindoc/mindoc-1ephusv88b42s)
-- 本产品有三个版本：开源版、专业版、旗舰版 - [版本功能比较](http://www.kykms.cn/edition)
-- 旗舰版在线演示 ：  [http://kg.kykms.cn](http://kg.kykms.cn) 账号：admin/123456
-- 专业在线演示 ：  [http://test.kykms.cn](http://test.kykms.cn) 账号：admin/123456
+- 本产品有四个版本：开源版、绿色单机版、专业版、旗舰版 - [版本功能比较](http://www.kykms.cn/edition)
+- 旗舰版在线演示 ：  [旗舰版](http://kg.kykms.cn) 账号：admin/123456
+- 专业在线演示 ：  [专业版](http://test.kykms.cn) 账号：admin/123456
+- 单机版 ： [试用下载](http://service.kykms.cn/download-index)  -  [更多介绍](http://docs.kykms.cn/docs/greenDesktop/greenDesktop-1et33iuds3f68)
 - 开发环境准备与运行，请参考：[开发环境准备与运行](./开发环境准备与运行.MD)
-- QQ技术交流群 ： 782686853
-- Mail : hnliuwx#tom.com
+- 技术交流QQ技术 ： 782686853
+- Mail : service@kykms.cn
 - github: [https://github.com/mahonelau/kykms](https://github.com/mahonelau/kykms)
 - gitee: [https://gitee.com/kyxxjs/km_community](https://gitee.com/kyxxjs/km_community)
 - 微信 ： 如果你有任何产品上的想法、意见或建议，或商务上的合作需求，请扫码添加我们微信进一步沟通：
