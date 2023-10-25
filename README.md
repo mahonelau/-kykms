@@ -34,6 +34,7 @@
 - 开发环境准备与运行，请参考：[开发环境准备与运行](./开发环境准备与运行.MD)
 - 技术交流QQ技术 ： 782686853
 - Mail : service@kykms.cn
+- 有偿服务：[爱发电](https://afdian.net/a/kykms)
 - github: [https://github.com/mahonelau/kykms](https://github.com/mahonelau/kykms)
 - gitee: [https://gitee.com/kyxxjs/km_community](https://gitee.com/kyxxjs/km_community)
 - 微信 ： 如果你有任何产品上的想法、意见或建议，或商务上的合作需求，请扫码添加我们微信进一步沟通：
