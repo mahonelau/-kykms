@@ -26,12 +26,13 @@
 交流互动
 -----------------------------------
 - 官方站点 ：  [http://www.kykms.cn](http://www.kykms.cn)
-- 技术文档 ：  科亿知识库的使用、部署手册，技术说明，请访问 [技术文档大全](http://docs.kykms.cn/docs/mindoc/mindoc-1ephusv88b42s)
-- 本产品有四个版本：开源版、绿色单机版、专业版、旗舰版 - [版本功能比较](http://www.kykms.cn/edition)
+- 技术文档 ：  科亿知识库的使用、部署手册，技术说明，请访问 - [技术文档大全](http://docs.kykms.cn/docs/mindoc/mindoc-1ephusv88b42s)
+- 本产品有四个版本：开源版、绿色单机版、专业版、旗舰版 - [版本功能比较](http://www.kykms.cn/edition) 
 - 旗舰版在线演示 ：  [旗舰版](http://kg.kykms.cn) 账号：admin/123456
 - 专业在线演示 ：  [专业版](http://test.kykms.cn) 账号：admin/123456
-- 单机版 ： [试用下载](http://service.kykms.cn/download-index)  -  [更多介绍](http://docs.kykms.cn/docs/greenDesktop/greenDesktop-1et33iuds3f68)
+- 绿色单机版 ： [试用下载](http://service.kykms.cn/download-index)  -  [更多介绍](http://docs.kykms.cn/docs/greenDesktop/greenDesktop-1et33iuds3f68)
 - 开发环境准备与运行，请参考：[开发环境准备与运行](./开发环境准备与运行.MD)
+- 本地部署试用：提供多版本安装包直接下载 - [下载入口](http://service.kykms.cn/download-index)
 - 技术交流QQ技术 ： 782686853
 - Mail : service@kykms.cn
 - 有偿服务：[爱发电](https://afdian.net/a/kykms)
