@@ -30,8 +30,11 @@ base:
 
 ##ElasticSearch服务配置 for highLevelRestClient
 esclient:
-  master-host: kykms-ES
+  master-host: 127.0.0.1
   master-port: 9200
+  master-auth: false
+  master-user-name: elastic
+  master-user-pwd: xxxxxxxxxxxxxxxx
 
 spring:
   servlet:
