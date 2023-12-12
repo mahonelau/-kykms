@@ -1,65 +1,86 @@
-version: '2'
+#  先创建讯网络：
+#  docker network create --driver=bridge kykms_network
+
+version: '3'
+
 services:
   kykms-mysql:
-    build:
-      context: ./db
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_ROOT_HOST: '%'
       TZ: Asia/Shanghai
     restart: always
     container_name: kykms-mysql
-    hostname: kykms-mysql
-    image: mysql:5.7
+    image: registry.cn-guangzhou.aliyuncs.com/kyxxjs/kykms-mysql:comm
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+      - ./docker/mysql/log:/var/log/mysql
     command:
       --character-set-server=utf8mb4
       --collation-server=utf8mb4_general_ci
       --explicit_defaults_for_timestamp=true
       --lower_case_table_names=1
       --max_allowed_packet=128M
-#      --default-authentication-plugin=caching_sha2_password
     ports:
       - 3306:3306
+    networks:
+      kykms_network:
 
   kykms-redis:
-    image: redis:5.0
+    image: registry.cn-guangzhou.aliyuncs.com/kyxxjs/kykms-redis:6.0
     ports:
       - 6379:6379
     restart: always
-    hostname: kykms-redis
     container_name: kykms-redis
+    networks:
+      kykms_network:
 
   kykms-ES:
-    build:
-      context: ./ES
-    image: elasticsearch:7.6.1
-    volumes:
-      - /home/docker/data/elasticsearch:/usr/share/elasticsearch/data
+    image: registry.cn-guangzhou.aliyuncs.com/kyxxjs/kykms-es:7.6.1
     restart: always
-    hostname: kykms-ES
     container_name: kykms-ES
-    ports:
-      - 9200:9200
-      - 9300:9300
     environment:
       discovery.type: single-node
       ES_JAVA_OPTS: "-Xms512m -Xmx512m"
-      cpuset-cpus: 1
-      m: 2G
+      TZ: Asia/Shanghai
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      kykms_network:
 
   kykms:
-    build:
-      context: ./jeecg-boot-module-system
-    restart: on-failure
-    privileged: true
+    image: registry.cn-guangzhou.aliyuncs.com/kyxxjs/kykms:comm
+    container_name: kykms
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=en_US.UTF-8
     depends_on:
       - kykms-mysql
       - kykms-redis
       - kykms-ES
-    container_name: kykms
-    image: kykms
-    volumes:
-      - /home/docker/data/kykms:/kykms
-    hostname: kykms
     ports:
-      - 8080:8080
+      - "8080:8080"
+    networks:
+      kykms_network:
+    restart: always
+    command: java -jar ./jeecg-boot-module-system-2.4.5.jar 2>&1 &
+
+  kykms-nginx:
+    image: registry.cn-guangzhou.aliyuncs.com/kyxxjs/kykms-nginx:comm
+    depends_on:
+      - kykms
+    container_name: kykms-nginx
+    privileged: true
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+      - ./docker/nginx/log:/var/log/nginx
+    networks:
+      kykms_network:
+    restart: always
+
+networks:
+  kykms_network:
+    external: true
