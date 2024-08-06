@@ -39,7 +39,6 @@
 - 本地部署试用：强烈建议[docker方式部署](http://docs.kykms.cn/docs/mindoc/mindoc-1f80r7nnv763o)；此外提供多版本安装包直接下载 - [下载入口](http://service.kykms.cn/download-index)
 - 技术交流QQ技术 ： 782686853
 - Mail : service@mail.kykms.cn
-- 有偿服务：[爱发电](https://afdian.net/a/kykms)
 - github: [https://github.com/mahonelau/kykms](https://github.com/mahonelau/kykms)
 - gitee: [https://gitee.com/kyxxjs/km_community](https://gitee.com/kyxxjs/km_community)
 - 微信 ： 如果你有任何产品上的想法、意见或建议，或商务上的合作需求，请扫码添加我们微信进一步沟通：
