@@ -16,7 +16,7 @@ export const SYS_BUTTON_AUTH = 'SYS_BUTTON_AUTH'
 export const ENCRYPTED_STRING = 'ENCRYPTED_STRING'
 export const ENHANCE_PRE = 'enhance_'
 export const UI_CACHE_DB_DICT_DATA = 'UI_CACHE_DB_DICT_DATA'
-export const INDEX_MAIN_PAGE_PATH = '/defaultDocSearch'
+export const INDEX_MAIN_PAGE_PATH = '/front/defaultDocSearch'
 export const TENANT_ID = 'TENANT_ID'
 export const ONL_AUTH_FIELDS = 'ONL_AUTH_FIELDS'
 //路由缓存问题，关闭了tab页时再打开就不刷新 #842
@@ -25,3 +25,5 @@ export const CONTENT_WIDTH_TYPE = {
   Fluid: 'Fluid',
   Fixed: 'Fixed'
 }
+export const SITE_INFO = 'Site_Info'
+export const KM_ALL_CONFIG = 'KM_All_Config'

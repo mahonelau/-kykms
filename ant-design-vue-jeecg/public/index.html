@@ -5,16 +5,21 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>科亿知识库</title>
+  <title>首页</title>
   <link rel="icon" href="<%= BASE_URL %>logo.png">
+  <script src="<%= BASE_URL %>config.js"></script>
   <script src="<%= BASE_URL %>cdn/babel-polyfill/polyfill_7_2_5.js"></script>
+  <script>
+    window._CONFIG = {};
+  </script>
+
   <style>
     html,
     body,
     #app {
       height: 100%;
-      margin: 0;
-      padding: 0;
+      margin: 0px;
+      padding: 0px;
     }
     .chromeframe {
       margin: 0.2em 0;
@@ -240,9 +245,6 @@
     /* 滚动条优化 end */
   </style>
   <!-- 全局配置 -->
-  <script>
-    window._CONFIG = {};
-  </script>
 </head>
 
 <body>
@@ -251,12 +253,13 @@
     <div id="loader"></div>
     <div class="loader-section section-left"></div>
     <div class="loader-section section-right"></div>
-    <div class="load_title">正在加载 科亿知识库,首次加载会比较慢，请耐心等待
+    <div class="load_title">正在加载系统，首次加载会比较慢,请耐心等待
 
     </div>
   </div>
 </div>
 
 </body>
+<!--<script type="text/javascript" src= "{{Global_Config.ONLYOFFICE_SERVER_IP}} /web-apps/apps/api/documents/api.js"></script>-->
 
 </html>

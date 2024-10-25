@@ -8,11 +8,23 @@
               <a-input v-model="model.itemCode"  :disabled="true"  ></a-input>
             </a-form-model-item>
           </a-col>
-          <a-col :span="24">
+          <a-col v-if="model.valueType === 'text'" :span="24">
             <a-form-model-item label="参数值" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="itemValue">
               <a-input v-model="model.itemValue" placeholder="请输入itemValue"  ></a-input>
             </a-form-model-item>
           </a-col>
+          <a-col v-else-if="model.valueType === 'checkBox'" :span="24">
+            <a-form-model-item label="是否" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <a-switch @change="switchChange" v-model:checked="model.itemValue === '1'"/>
+            </a-form-model-item>
+          </a-col>
+
+          <a-col v-else-if="model.valueType === 'img'" :span="24">
+          <a-form-model-item label="logo" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <j-image-upload class="avatar-uploader" text="上传" v-model="model.itemValue" ></j-image-upload>
+          </a-form-model-item>
+          </a-col>
+
           <a-col :span="24">
             <a-form-model-item label="参数说明" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="itemName">
               <a-input v-model="model.itemName" :disabled="true"></a-input>
@@ -82,6 +94,14 @@
         this.model = Object.assign({}, record);
         this.visible = true;
       },
+      switchChange(value) {
+        console.log(value)
+        if (value) {
+          this.model.itemValue = '1'
+        } else {
+          this.model.itemValue = '0'
+        }
+      },
       submitForm () {
         const that = this;
         // 触发表单验证
@@ -108,7 +128,7 @@
               that.confirmLoading = false;
             })
           }
-         
+
         })
       },
     }

@@ -31,8 +31,16 @@ public class KmSysConfig implements Serializable {
 	@Excel(name = "itemValue", width = 15)
     @ApiModelProperty(value = "itemValue")
     private java.lang.String itemValue;
-	/**itemName*/
-	@Excel(name = "itemName", width = 15)
+    /**itemName*/
+    @Excel(name = "itemName", width = 15)
     @ApiModelProperty(value = "itemName")
     private java.lang.String itemName;
+    /**valueType*/
+    @Excel(name = "valueType", width = 15)
+    @ApiModelProperty(value = "valueType")
+    private java.lang.String valueType;
+    /**valueOptions*/
+    @Excel(name = "valueOptions", width = 15)
+    @ApiModelProperty(value = "valueOptions")
+    private java.lang.String valueOptions;
 }

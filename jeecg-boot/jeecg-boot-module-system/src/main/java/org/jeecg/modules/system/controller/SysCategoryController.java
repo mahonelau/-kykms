@@ -13,6 +13,7 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.KM.service.IKmDocService;
 import org.jeecg.modules.system.entity.SysCategory;
 import org.jeecg.modules.system.model.TreeSelectModel;
 import org.jeecg.modules.system.service.ISysCategoryService;
@@ -45,6 +46,8 @@ import java.util.stream.Collectors;
 public class SysCategoryController {
 	@Autowired
 	private ISysCategoryService sysCategoryService;
+	 @Autowired
+	 private IKmDocService kmDocService;
 
 	/**
 	  * 分页列表查询
@@ -123,12 +126,11 @@ public class SysCategoryController {
 	public Result<?> add(@RequestBody SysCategory sysCategory) {
 		Result<SysCategory> result = new Result<SysCategory>();
 		try {
-			if(sysCategory.getPid() != null
-					&& oConvertUtils.isNotEmpty(sysCategory.getPid())
-					&& !sysCategory.getPid().equals("0")
-					&& sysCategory.getRecommend() != null
-					&& sysCategory.getRecommend())
-				return Result.error("只允许推荐根节点的专题");
+			if(sysCategory.getPid()!=null
+					&& !sysCategory.getPid().isEmpty()
+					&& !sysCategory.getPid().equals("0"))
+				sysCategory.setRecommend(false);
+//				return Result.error("只允许推荐根节点的专题");
 
 			sysCategoryService.addSysCategory(sysCategory);
 			result.success("添加成功！");
@@ -151,8 +153,9 @@ public class SysCategoryController {
 		if(sysCategoryEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
-			if(!sysCategory.getPid().equals("0") && sysCategory.getRecommend() == true)
-				return Result.error("只允许推荐根节点的专题");
+			if(!sysCategory.getPid().equals("0") )
+				sysCategory.setRecommend(false);
+//			return Result.error("只允许推荐根节点的专题");
 			sysCategoryService.updateSysCategory(sysCategory);
 			result.success("修改成功!");
 		}
@@ -171,8 +174,12 @@ public class SysCategoryController {
 		if(sysCategory==null) {
 			result.error500("未找到对应实体");
 		}else {
-			this.sysCategoryService.deleteSysCategory(id);
-			result.success("删除成功!");
+			if (kmDocService.checkTopicOfDoc(id)) {
+				result.error500("专题下还有知识，请先清理知识");
+			}else {
+				this.sysCategoryService.deleteSysCategory(id);
+				result.success("删除成功!");
+			}
 		}
 
 		return result;

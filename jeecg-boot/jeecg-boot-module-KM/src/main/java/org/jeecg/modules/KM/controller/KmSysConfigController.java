@@ -1,6 +1,8 @@
 package org.jeecg.modules.KM.controller;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.ibatis.annotations.Param;
@@ -23,7 +25,7 @@ import io.swagger.annotations.ApiOperation;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import springfox.documentation.spring.web.json.Json;
 
-@Api(tags="配置管理")
+@Api(tags="km_sys_config")
 @RestController
 @RequestMapping("/KM/kmSysConfig")
 @Slf4j
@@ -52,7 +54,15 @@ public class KmSysConfigController extends JeecgController<KmSysConfig, IKmSysCo
 		IPage<KmSysConfig> pageList = kmSysConfigService.page(page, queryWrapper);
 		return Result.OK(pageList);
 	}
-	
+
+	@AutoLog(value = "km_sys_config-获取所有配置")
+	@ApiOperation(value="km_sys_config-获取所有配置", notes="km_sys_config-获取所有配置")
+	@GetMapping(value = "/listAllConfig")
+	public Result<?> queryAllConfigist() {
+		Map<String, String> allConfig = kmSysConfigService.queryAllConfig();
+		return Result.OK(allConfig);
+	}
+
 	/**
 	 *   添加
 	 *
@@ -66,7 +76,7 @@ public class KmSysConfigController extends JeecgController<KmSysConfig, IKmSysCo
 		kmSysConfigService.save(kmSysConfig);
 		return Result.OK("添加成功！");
 	}
-	
+
 	/**
 	 *  编辑
 	 *
@@ -81,7 +91,7 @@ public class KmSysConfigController extends JeecgController<KmSysConfig, IKmSysCo
 		kmSysConfigService.updateById(kmSysConfig);
 		return Result.OK("编辑成功!");
 	}
-	
+
 	/**
 	 *   通过id删除
 	 *
@@ -95,7 +105,7 @@ public class KmSysConfigController extends JeecgController<KmSysConfig, IKmSysCo
 		kmSysConfigService.removeById(id);
 		return Result.OK("删除成功!");
 	}
-	
+
 	/**
 	 *  批量删除
 	 *
@@ -109,7 +119,7 @@ public class KmSysConfigController extends JeecgController<KmSysConfig, IKmSysCo
 		this.kmSysConfigService.removeByIds(Arrays.asList(ids.split(",")));
 		return Result.OK("批量删除成功!");
 	}
-	
+
 	/**
 	 * 通过id查询
 	 *
@@ -126,8 +136,19 @@ public class KmSysConfigController extends JeecgController<KmSysConfig, IKmSysCo
 		}
 		return Result.OK(kmSysConfig);
 	}
+	@AutoLog(value = "km_sys_config-查询site信息")
+	@ApiOperation(value="km_sys_config-查询site信息", notes="km_sys_config-查询site信息")
+	@GetMapping(value = "/querySiteInfo")
+	public Result<?> querySiteInfo() {
+		List<KmSysConfig> kmSysConfigList = kmSysConfigService.querySiteInfo();
+//		KmSysConfig kmSysConfig = (KmSysConfig) kmSysConfigList
+		if(kmSysConfigList==null || kmSysConfigList.size() == 0) {
+			return Result.error("未找到对应数据");
+		}
+		return Result.OK(kmSysConfigList);
+	}
 
-    /**
+	/**
     * 导出excel
     *
     * @param request

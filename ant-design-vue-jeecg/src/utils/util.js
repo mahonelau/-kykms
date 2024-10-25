@@ -1,6 +1,6 @@
 import * as api from '@/api/api'
 import { isURL } from '@/utils/validate'
-import onlineCommons from '@jeecg/antd-online-mini'
+// import onlineCommons from '@jeecg/antd-online-mini'
 
 export function timeFix() {
   const time = new Date()
@@ -115,28 +115,29 @@ function  generateChildRouters (data) {
       item.meta.url = URL;
     }
 
-    let componentPath
-    if(item.component=="modules/online/cgform/OnlCgformHeadList"){
-      componentPath = onlineCommons.OnlCgformHeadList
-    }else if(item.component=="modules/online/cgform/OnlCgformCopyList"){
-      componentPath = onlineCommons.OnlCgformCopyList
-    }else if(item.component=="modules/online/cgform/auto/OnlCgformAutoList"){
-      componentPath = onlineCommons.OnlCgformAutoList
-    }else if(item.component=="modules/online/cgform/auto/OnlCgformTreeList"){
-      componentPath = onlineCommons.OnlCgformTreeList
-    }else if(item.component=="modules/online/cgform/auto/erp/OnlCgformErpList"){
-      componentPath = onlineCommons.OnlCgformErpList
-    }else if(item.component=="modules/online/cgform/auto/tab/OnlCgformTabList"){
-      componentPath = onlineCommons.OnlCgformTabList
-    }else if(item.component=="modules/online/cgform/auto/innerTable/OnlCgformInnerTableList"){
-      componentPath = onlineCommons.OnlCgformInnerTableList
-    }else if(item.component=="modules/online/cgreport/OnlCgreportHeadList"){
-      componentPath = onlineCommons.OnlCgreportHeadList
-    }else if(item.component=="modules/online/cgreport/auto/OnlCgreportAutoList"){
-      componentPath = onlineCommons.OnlCgreportAutoList
-    }else{
-      componentPath = resolve => require(['@/' + component+'.vue'], resolve)
-    }
+    let componentPath= resolve => require(['@/' + component+'.vue'], resolve)
+    // let componentPath
+    // if(item.component=="modules/online/cgform/OnlCgformHeadList"){
+    //   componentPath = onlineCommons.OnlCgformHeadList
+    // }else if(item.component=="modules/online/cgform/OnlCgformCopyList"){
+    //   componentPath = onlineCommons.OnlCgformCopyList
+    // }else if(item.component=="modules/online/cgform/auto/OnlCgformAutoList"){
+    //   componentPath = onlineCommons.OnlCgformAutoList
+    // }else if(item.component=="modules/online/cgform/auto/OnlCgformTreeList"){
+    //   componentPath = onlineCommons.OnlCgformTreeList
+    // }else if(item.component=="modules/online/cgform/auto/erp/OnlCgformErpList"){
+    //   componentPath = onlineCommons.OnlCgformErpList
+    // }else if(item.component=="modules/online/cgform/auto/tab/OnlCgformTabList"){
+    //   componentPath = onlineCommons.OnlCgformTabList
+    // }else if(item.component=="modules/online/cgform/auto/innerTable/OnlCgformInnerTableList"){
+    //   componentPath = onlineCommons.OnlCgformInnerTableList
+    // }else if(item.component=="modules/online/cgreport/OnlCgreportHeadList"){
+    //   componentPath = onlineCommons.OnlCgreportHeadList
+    // }else if(item.component=="modules/online/cgreport/auto/OnlCgreportAutoList"){
+    //   componentPath = onlineCommons.OnlCgreportAutoList
+    // }else{
+    //   componentPath = resolve => require(['@/' + component+'.vue'], resolve)
+    // }
 
     let menu =  {
       path: item.path,

@@ -1,26 +1,34 @@
 <template>
   <div class="footer">
     <div class="links">
-      <a href="http://www.kykms.cn" target="_blank">知识库首页</a>
+      <a :href= siteInfo.siteHomePageUrl target="_blank">{{ siteInfo.siteTitle }}首页</a>
     </div>
     <div class="copyright">
       Copyright
       <a-icon type="copyright"/>
-      2021 <span>科亿信息技术</span>
+      2019 <span>{{ siteInfo.siteCopyRight }}</span>
     </div>
   </div>
 </template>
 
 <script>
   export default {
-    name: "LayoutFooter"
+    name: "LayoutFooter",
+    data () {
+      return {
+        siteInfo:{}
+      }
+    },
+    created() {
+      this.siteInfo = this.$store.getters.siteInfo
+    },
   }
 </script>
 
 <style lang="less" scoped>
   .footer {
-    padding: 0 16px;
-    margin: 48px 0 24px;
+    padding: 16px;
+    margin: 20px 0 0 0;
     text-align: center;
 
     .links {
@@ -30,7 +38,7 @@
         color: rgba(0, 0, 0, .45);
 
         &:hover {
-          color: rgba(0, 0, 0, .65);
+          color: darkorange;
         }
 
         &:not(:last-child) {

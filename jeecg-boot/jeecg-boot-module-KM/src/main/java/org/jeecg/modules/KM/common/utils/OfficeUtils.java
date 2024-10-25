@@ -140,4 +140,74 @@ public class OfficeUtils {
             }
         }.start();
     }
+//
+//    public static boolean convertPdf(String sofficePath,File srcFile, File targetDir) {
+//        OutputStream outputStream = null;
+//        File targetFile  = new File(targetDir,
+//                StringUtils.getFileNameWithoutSuffix(srcFile.getName())+".pdf");
+//        if (!targetFile.exists()) {
+//            19             try {
+//                20                 // 如果文件找不到，就new一个
+//                21                 targetFile.createNewFile();
+//                22             } catch (IOException e) {
+//                23                 e.printStackTrace();
+//                24             }
+//            25         }
+//
+//        String content = fileToTxt(srcFile);
+//
+//        try {
+//            outputStream = new FileOutputStream(targetFile);
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//            log.error("文件不存在:" + srcFile.getAbsolutePath()+srcFile.getName());
+//            return false;
+//        }
+//        try {
+//            outputStream.write(content.getBytes());
+//            outputStream.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            log.error("文件操作异常:" + srcFile.getAbsolutePath()+srcFile.getName());
+//            return  false;
+//        }
+//        return true;
+//    }
+//
+//    private static String fileToTxt(File f) {
+//        //1、创建一个parser
+//        Parser parser = new AutoDetectParser();
+//        InputStream is = null;
+//        try {
+//            Metadata metadata = new Metadata();
+//            metadata.set(Metadata.RESOURCE_NAME_KEY, f.getName());
+//            is = new FileInputStream(f);
+//            ContentHandler handler = new BodyContentHandler();
+//            ParseContext context = new ParseContext();
+//            context.set(Parser.class,parser);
+//            //2、执行parser的parse()方法。
+//            parser.parse(is,handler, metadata,context);
+//            for(String name:metadata.names()) {
+//                System.out.println(name+":"+metadata.get(name));
+//            }
+//            return handler.toString();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (SAXException e) {
+//            e.printStackTrace();
+//        } catch (TikaException e) {
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                if(is!=null) is.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        return "";
+//    }
+
+
 }

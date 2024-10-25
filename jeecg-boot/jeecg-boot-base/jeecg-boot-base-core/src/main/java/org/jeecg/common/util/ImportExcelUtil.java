@@ -18,7 +18,7 @@ public class ImportExcelUtil {
 
     public static Result<?> imporReturnRes(int errorLines,int successLines,List<String> errorMessage) throws IOException {
         if (errorLines == 0) {
-            return Result.OK("共" + successLines + "行数据全部导入成功！");
+            return Result.ok("共" + successLines + "行数据全部导入成功！");
         } else {
             JSONObject result = new JSONObject(5);
             int totalCount = successLines + errorLines;
@@ -31,7 +31,7 @@ public class ImportExcelUtil {
             String fileName = fileUrl.substring(lastIndex + 1);
             result.put("fileUrl", "/sys/common/static/" + fileUrl);
             result.put("fileName", fileName);
-            Result res = Result.OK(result);
+            Result res = Result.ok(result);
             res.setCode(201);
             res.setMessage("文件导入成功，但有错误。");
             return res;

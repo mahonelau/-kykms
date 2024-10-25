@@ -7,7 +7,7 @@
     </div>
 
     <div style="color: #606266">
-      <iframe  :v-show="showPDFModal" :id="iframeID" :width="iframeWidth" :height="iframeHeight">
+      <iframe style="border-top: none"  :v-show="showPDFModal" :id="iframeID" :width="iframeWidth" :height="iframeHeight">
       </iframe>
     </div>
   </div>
@@ -67,11 +67,14 @@
         let iframeID = document.querySelector("#" + this.iframeID);
         getActionPDF(this.PDFurl).then((res) => {
           this.pdfLoading = false;
+          console.log("res:",res)
           // 重点
           let blobPDF = new Blob([res], {
             type: `application/pdf;charset-UTF-8` // word文档为msword,pdf文档为pdf
           });
           iframeID.src = "/pdfjs/web/viewer.html?file="+window.URL.createObjectURL(blobPDF);
+        }).finally(()=>{
+          this.pdfLoading = false
         })
 
       }

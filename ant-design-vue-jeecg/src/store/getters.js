@@ -1,6 +1,8 @@
 import Vue from 'vue'
-import { USER_INFO, ENHANCE_PRE } from "@/store/mutation-types"
+import {USER_INFO, ENHANCE_PRE, SITE_INFO} from "@/store/mutation-types"
 const getters = {
+  kmConfig: state => state.site.kmConfig,
+  siteInfo: state => state.site.siteInfo ,
   device: state => state.app.device,
   theme: state => state.app.theme,
   color: state => state.app.color,

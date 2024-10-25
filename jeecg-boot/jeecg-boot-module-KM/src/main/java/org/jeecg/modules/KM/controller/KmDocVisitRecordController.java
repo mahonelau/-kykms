@@ -10,6 +10,7 @@ import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
+import org.jeecg.modules.KM.common.utils.KMRedisUtils;
 import org.jeecg.modules.KM.entity.KmDoc;
 import org.jeecg.modules.KM.entity.KmDocVisitRecord;
 import org.jeecg.modules.KM.service.IKmDocService;
@@ -26,7 +27,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.jeecg.common.aspect.annotation.AutoLog;
 
-@Api(tags="知识文档访问记录")
+@Api(tags="km_doc_visit_record")
 @RestController
 @RequestMapping("/KM/kmDocVisitRecord")
 @Slf4j
@@ -35,6 +36,42 @@ public class KmDocVisitRecordController extends JeecgController<KmDocVisitRecord
 	private IKmDocVisitRecordService kmDocVisitRecordService;
 	@Autowired
 	private IKmDocService kmDocService;
+	@Autowired
+	private KMRedisUtils kmRedisUtils;
+
+
+	 @ApiOperation(value="km_doc_visit_record-最近访问档案", notes="km_doc_visit_record-最近访问档案")
+	 @GetMapping(value = "/recentlyVisitDocs")
+	 public Result<?> recentlyVisitDocs(){
+		 try {
+			 LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+			 if(sysUser != null) {
+				 String userId = sysUser.getUsername();
+
+				 List<String> recentlyDocIds = kmRedisUtils.getPersonalDocHistory(userId);
+				 if(recentlyDocIds.size() > 0) {
+					 LambdaQueryWrapper<KmDoc> queryWrapper = new LambdaQueryWrapper<>();
+					 queryWrapper.in(KmDoc::getId, recentlyDocIds);
+					 List<KmDoc> recentlyDocs = kmDocService.list(queryWrapper);
+					 List<KmDoc> result = new ArrayList<>();
+					 for (int i = 0; i < recentlyDocIds.size(); i++) {
+					 	String docId = recentlyDocIds.get(i);
+
+						 for (int j = 0; j < recentlyDocs.size(); j++) {
+						 	if(recentlyDocs.get(j).getId().equals(docId))
+						 		result.add(recentlyDocs.get(j));
+						 }
+					 }
+
+					 return Result.OK(result);
+				 }
+			 }
+		 } catch (Exception e) {
+			 e.printStackTrace();
+			 return Result.error("发生异常");
+		 }
+		 return Result.OK("空数据");
+	 }
 
 	 /**
 	 * 分页列表查询

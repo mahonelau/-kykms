@@ -1,7 +1,7 @@
 /** init domain config */
 import Vue from 'vue'
 //设置全局API_BASE_URL
-Vue.prototype.API_BASE_URL = process.env.VUE_APP_API_BASE_URL
+Vue.prototype.API_BASE_URL =   Global_Config.API_BASE_URL?  Global_Config.API_BASE_URL:process.env.VUE_APP_API_BASE_URL
 window._CONFIG['domianURL'] = Vue.prototype.API_BASE_URL
 //单点登录地址
 window._CONFIG['casPrefixUrl'] = process.env.VUE_APP_CAS_BASE_URL

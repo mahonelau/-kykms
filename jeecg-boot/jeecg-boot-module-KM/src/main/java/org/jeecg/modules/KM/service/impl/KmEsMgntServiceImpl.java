@@ -6,17 +6,21 @@ import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.IndexTemplatesExistRequest;
 import org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.modules.KM.VO.KmDocEsVO;
 import org.jeecg.modules.KM.common.rules.KMConstant;
+import org.jeecg.modules.KM.entity.KmDoc;
 import org.jeecg.modules.KM.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.*;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -24,8 +28,9 @@ public class KmEsMgntServiceImpl  implements IKmEsMgntService {
 
     @Autowired
     private RestHighLevelClient restHighLevelClient;
+
     @Autowired
-    private IKmDocService docService;
+    private KmDocServiceImpl kmDocService;
 
 
     private  boolean checkTemplateExists(String templateName)throws IOException {
@@ -35,8 +40,43 @@ public class KmEsMgntServiceImpl  implements IKmEsMgntService {
     }
 
 
+    private  boolean checkIndexExists(String indexName)throws IOException {
+        GetIndexRequest request = new GetIndexRequest(indexName);
+        boolean response = restHighLevelClient.indices().exists(request, RequestOptions.DEFAULT);
+        return response;
+    }
+
+    //为初始化索引
     @Override
-    public Result<?> initTemplate() throws IOException {
+    public void initEXIndex(){
+        KmDocEsVO kmEsVO = new KmDocEsVO();
+        kmEsVO.setTitle("for init");
+        kmEsVO.setDocId("1");
+        Result<?> result = kmDocService.saveDocToEs(kmEsVO, "");
+        if (result.isSuccess()) {
+            String indexId = (String) result.getResult();
+            if (indexId != null && !indexId.isEmpty()) {
+                Result<?> result1 = kmDocService.deleteDocFromEs(indexId);
+                if (result1.isSuccess()) {
+                    log.info("init index success!");
+                }
+            }
+        }
+    }
+
+    @Override
+    public Result<?> syncReleasedDocToES(){
+        Result result = Result.OK("初始化:同步发布文档到ES");;
+
+        List<KmDoc> releasedDocs = kmDocService.getReleasedDocs();
+        for (KmDoc releasedDoc : releasedDocs) {
+            kmDocService.indexDocSync(releasedDoc);
+        }
+        return result;
+    }
+
+    @Override
+    public Result<?> initTemplateAndSyncDocs() throws IOException {
         Result result = Result.OK("创建模版");;
         if(!checkTemplateExists(KMConstant.DocIndexName)){
             result = initKmDocTemplate();
@@ -44,7 +84,13 @@ public class KmEsMgntServiceImpl  implements IKmEsMgntService {
                 log.error(result.getMessage());
                 return result;
             }
-            docService.initESIndex();
+            //首次建索引
+            initEXIndex();
+        }
+        if (!checkIndexExists(KMConstant.DocIndexName)) {
+            log.info("start sync docs record to ES...");
+            //for手工删索引，重新对知识入库
+            syncReleasedDocToES();
         }
         if(!checkTemplateExists(KMConstant.KMSearchRecordIndexName)){
             result = initKmSearchRecordTemplate();
@@ -93,17 +139,16 @@ public class KmEsMgntServiceImpl  implements IKmEsMgntService {
         jsonMapping.startObject().startObject("properties")
                 .startObject("id").field("type", "keyword").endObject()
                 .startObject("releaseFlag").field("type", "integer").endObject()
-                .startObject("publicFlag").field("type", "integer").endObject()
+                .startObject("publicRemark").field("type", "integer").endObject()
                 .startObject("category").field("type", "integer").endObject()
                 .startObject("fileNo").field("type", "keyword").endObject()
-                .startObject("source").field("type", "integer").endObject()
-                .startObject("pubTime").field("type", "integer").endObject()
-//                .startObject("pubTime").field("type", "date").field("format", DatePattern.NORM_DATE_PATTERN).endObject()
+                .startObject("orgCode").field("type", "keyword").endObject()
+                .startObject("createTime").field("type", "date").field("format", "yyyy-MM-dd").endObject()
                 //指定分词器
-                .startObject("title").field("type", "text").field("analyzer", "ik_max_word").endObject()
-                .startObject("content").field("type", "text").field("analyzer", "ik_max_word").endObject()
-                //多值array
-                .startObject("versions").field("type","integer").endObject()
+//                .startObject("title").field("type", "text").field("analyzer", "ik_max_word").endObject()
+                .startObject("title").field("type", "text").field("term_vector", "with_positions_offsets").field("analyzer", "ik_max_word").endObject()
+                .startObject("content").field("type", "text").field("term_vector", "with_positions_offsets").field("analyzer", "ik_max_word").endObject()
+//                .startObject("content").field("type", "text").field("analyzer", "ik_max_word").endObject()
                 .startObject("businessTypes").field("type","integer").endObject()
                 .startObject("keywords").field("type","keyword").endObject()
                 .startObject("topicCodes").field("type","keyword").endObject()
@@ -113,8 +158,10 @@ public class KmEsMgntServiceImpl  implements IKmEsMgntService {
         request.create(false);
         AcknowledgedResponse response = restHighLevelClient.indices().putTemplate(request, RequestOptions.DEFAULT);
         if (response.isAcknowledged()) {
+            log.info(KMConstant.DocIndexName + "模版创建成功!");
             return  Result.OK("创建模版成功!");
         } else {
+            log.error(KMConstant.DocIndexName + "模版创建失败!");
             return  Result.error("创建模版失败!");
         }
     }
@@ -146,8 +193,10 @@ public class KmEsMgntServiceImpl  implements IKmEsMgntService {
         request.create(false);
         AcknowledgedResponse response = restHighLevelClient.indices().putTemplate(request, RequestOptions.DEFAULT);
         if (response.isAcknowledged()) {
+            log.info(KMConstant.DocVisitIndexName + "模版创建成功!");
             return  Result.OK("创建模版成功!");
         } else {
+            log.error(KMConstant.DocVisitIndexName + "模版创建失败!");
             return  Result.error("创建模版失败!");
         }
     }
@@ -179,8 +228,10 @@ public class KmEsMgntServiceImpl  implements IKmEsMgntService {
         request.create(false);
         AcknowledgedResponse response = restHighLevelClient.indices().putTemplate(request, RequestOptions.DEFAULT);
         if (response.isAcknowledged()) {
+            log.info(KMConstant.KMSearchRecordIndexName + "模版创建成功!");
             return  Result.OK("创建模版成功!");
         } else {
+            log.error(KMConstant.KMSearchRecordIndexName + "模版创建失败!");
             return  Result.error("创建模版失败!");
         }
     }

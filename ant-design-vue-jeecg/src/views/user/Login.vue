@@ -37,7 +37,7 @@
 <script>
   import Vue from 'vue'
   import { ACCESS_TOKEN ,ENCRYPTED_STRING} from "@/store/mutation-types"
-  import ThirdLogin from './third/ThirdLogin'
+  // import ThirdLogin from './third/ThirdLogin'
   import LoginSelectTenant from "./LoginSelectTenant"
   import TwoStepCaptcha from '@/components/tools/TwoStepCaptcha'
   import { encryption , getEncryptedString } from '@/utils/encryption/aesEncrypt'
@@ -50,15 +50,17 @@
     components: {
       LoginSelectTenant,
       TwoStepCaptcha,
-      ThirdLogin,
-      LoginAccount,
-      LoginPhone
+      // ThirdLogin,
+      LoginAccount
+      // LoginPhone
     },
     data () {
       return {
+        DefaultPageUseTopicList: false,
         customActiveKey: 'tab1',
         rememberMe: true,
         loginBtn: false,
+        kmConfig:{},
         requiredTwoStepCaptcha: false,
         stepCaptchaVisible: false,
         encryptedString:{
@@ -69,7 +71,7 @@
     },
     created() {
       Vue.ls.remove(ACCESS_TOKEN)
-      this.getRouterData();
+      this.getRouterData()
       this.rememberMe = true
     },
     methods:{
@@ -127,13 +129,25 @@
       },
       //登录成功
       loginSuccess () {
-        this.$router.push({ path: "/defaultDocSearch" }).catch(()=>{
-          console.log('登录跳转首页出错,这个错误从哪里来的')
+        let indexUrl = '/front/defaultDocSearch'
+        this.kmConfig = this.$store.getters.kmConfig
+        this.DefaultPageUseTopicList = this.kmConfig.DefaultPageUseTopicList === '1'
+        if(this.DefaultPageUseTopicList)
+          indexUrl = '/front/RecommendTopicList'
+
+        let routeData = this.$router.resolve({
+          path: indexUrl,
+          query: {}
         })
-        this.$notification.success({
-          message: '欢迎',
-          description: `${timeFix()}，欢迎回来`,
-        });
+        window.open(routeData.href, '_self')
+
+        // this.$router.push({ path: indexUrl }).catch(()=>{
+        //   console.log('登录跳转首页出错,这个错误从哪里来的')
+        // })
+        // this.$notification.success({
+        //   message: '欢迎',
+        //   description: `${timeFix()}，欢迎回来`,
+        // });
       },
 
       stepCaptchaSuccess () {

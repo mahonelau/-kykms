@@ -39,7 +39,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.jeecg.common.aspect.annotation.AutoLog;
 
-@Api(tags="知识文档管理")
+@Api(tags="km_doc")
 @RestController
 @RequestMapping("/KM/kmDoc")
 @Slf4j
@@ -63,37 +63,128 @@ public class KmDocController extends JeecgController<KmDoc, IKmDocService> {
 	@Autowired
 	private IKmSysConfigService kmSysConfigService;
 
+	@Autowired
+	private IKmDocTopicTypeService kmDocTopicTypeService;
+
 	@AutoLog(value = "km_doc-文件上传")
 	@ApiOperation(value = "km_doc-文件上传", notes = "km_doc-文件上传")
 	@PostMapping("/uploadDoc")
 	@ResponseBody
 	public Result<?> uploadDoc(@RequestParam(value = "file") MultipartFile file,HttpServletRequest req){
-		 try{
-		 	if(!commonConstant.isFileTypeSupport(StringUtils.getFileSuffix(file.getOriginalFilename()))){
-		 		return  Result.error("不支持的文件格式");
+		try{
+			if(!commonConstant.isFileTypeSupport(StringUtils.getFileSuffix(file.getOriginalFilename()))){
+				return  Result.error("不支持的文件格式");
 			}
 
 			KmFile dupFile =kmFileService.getKmFileBySha256(HashUtil.sha256(file.getInputStream()));
-		 	if(dupFile != null){
-                return Result.error("该文件已经存在无需重复上传,源文件:"+ dupFile.getOriginalName());
+			if(dupFile != null){
+				return Result.error("该文件已经存在无需重复上传,源文件:"+ dupFile.getOriginalName());
+			}
+
+			Map<String, String[]> parameterMap = req.getParameterMap();
+//			Gson gson = new Gson();
+//			String json = gson.toJson(req.getParameterMap());
+
+			KmDocParamVO kmDocParamVO = new KmDocParamVO();
+			if (parameterMap.containsKey("category")){
+				kmDocParamVO.setCategory(parameterMap.get("category")[0]);
+			}
+			if (parameterMap.containsKey("businessTypes")){
+				kmDocParamVO.setBusinessTypeList(Arrays.asList(parameterMap.get("businessTypes")[0].split(",")));
+			}
+			if (parameterMap.containsKey("topicIds")){
+				kmDocParamVO.setAddTopicIdList(Arrays.asList(parameterMap.get("topicIds")[0].split(",")));
+			}
+			if (parameterMap.containsKey("depId")){
+				kmDocParamVO.setDepId(parameterMap.get("depId")[0]);
+			}
+			if (parameterMap.containsKey("keywords")){
+				kmDocParamVO.setKeywords(parameterMap.get("keywords")[0]);
+			}
+			if (parameterMap.containsKey("publicRemark")){
+				kmDocParamVO.setPublicRemark(Integer.parseInt(parameterMap.get("publicRemark")[0]));
 			}
 
 			KmFile kmFile = kmFileService.saveFile(file);
-		 	KmDoc kmDoc = kmDocService.saveDoc(kmFile);
 
-		 	kmDocService.indexDocSync(kmDoc);
+			KmDoc kmDoc = kmDocService.saveDoc(kmFile,kmDocParamVO);
 
-		 	kmDocVisitRecordService.logVisit(kmDoc.getId(),
-                    IpUtils.getIpAddr(req),
-                    DocVisitTypeEnum.Upload.getCode());
-
-         }catch (Exception e){
-			 log.error("uploadDoc",e);
-			 return Result.error(e.getMessage());
-		 }
-			 return Result.OK();
+			if(kmDoc != null && kmDoc.getId() != null) {
+				kmDocVisitRecordService.logVisit(kmDoc.getId(),
+						IpUtils.getIpAddr(req),
+						DocVisitTypeEnum.Upload.getCode());
+			}
+			else{
+				kmFileService.deleteKmFile(kmFile.getId());
+				return Result.error("保存文档数据发生错误");
+			}
+		}catch (Exception e){
+			log.error("uploadDoc",e);
+			return Result.error(e.getMessage());
+		}
+		return Result.OK();
 	 }
 
+	 /**
+	  *  提审
+	  *
+	  * @param id
+	  * @return
+	  */
+	 @AutoLog(value = "km_doc-提审")
+	 @ApiOperation(value="km_doc-提审", notes="km_doc-提审")
+	 @PutMapping(value = "/submitAudit")
+	 public Result<?> submitAudit(@RequestParam(name="id") String id) {
+		 KmDoc kmDoc = kmDocService.getById(id);
+		 if(kmDoc!= null && (kmDoc.getStatus().equals(DocStatusEnum.Draft.getCode())
+				 || kmDoc.getStatus().equals(DocStatusEnum.Reject.getCode()) )){
+			 kmDoc.setStatus(DocStatusEnum.WaitAudit.getCode());
+			 if(kmDocService.updateById(kmDoc)){
+				 return  Result.OK("提审成功");
+			 }
+			 else
+				 return  Result.error("全部失败");
+		 }
+		 else{
+			 return  Result.error("不允许提审");
+		 }
+	 }
+
+	 /**
+	  *  批量提审
+	  *
+	  * @param ids
+	  * @return
+	  */
+	 @AutoLog(value = "km_doc-批量提审")
+	 @ApiOperation(value="km_doc-批量提审", notes="km_doc-批量提审")
+	 @PutMapping(value = "/submitAuditBatch")
+	 public Result<?> submitAuditBatch(@RequestParam(name="ids",required=true) String ids) {
+		 Integer success = 0;
+		 List<String> failIds = new ArrayList<>();
+		 if(ids.length()>0) {
+	 		List<String> idList = Arrays.asList(ids.split(","));
+			for (String id : idList) {
+				KmDoc kmDoc = kmDocService.getById(id);
+				if(kmDoc!= null && (kmDoc.getStatus().equals(DocStatusEnum.Draft.getCode())
+				|| kmDoc.getStatus().equals(DocStatusEnum.Reject.getCode()) )){
+					kmDoc.setStatus(DocStatusEnum.WaitAudit.getCode());
+					if(kmDocService.updateById(kmDoc)){
+						success +=1;
+					}
+					else
+						failIds.add(id);
+				}
+				else{
+					failIds.add(id);
+				}
+			}
+		}
+		if(success >0)
+			return Result.OK(failIds);
+		else
+			return  Result.error("全部失败");
+	 }
 
 	 //取消文件收录
 	 @ApiOperation(value="km_doc-取消文件收录", notes="km_doc-取消文件收录")
@@ -117,7 +208,26 @@ public class KmDocController extends JeecgController<KmDoc, IKmDocService> {
 	 }
 
 	 /**
-	  * 分页文件列表
+	  * 分页查询专题文档
+	  *
+	  * @param topicId
+	  * @param pageNo
+	  * @param pageSize
+	  * @param topicId
+	  * @return
+	  */
+	 @ApiOperation(value="km_doc-分页查询专题文档", notes="km_doc-分页查询专题文档")
+	 @GetMapping(value = "/listTopicPageList")
+	 public Result<?> queryTopicPageList(@RequestParam(name="topicId",required = true) String topicId,
+										 @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+										 @RequestParam(name="pageSize", defaultValue="10") Integer pageSize) {
+		 Page<KmDoc> page = new Page<KmDoc>(pageNo, pageSize);
+		 IPage<KmDoc> pageList = kmDocService.queryTopicPageList(page,topicId);
+		 return Result.OK(pageList);
+	 }
+
+	 /**
+	  * 分页草稿列表
 	  *
 	  * @param kmDocParamVO
 	  * @param pageNo
@@ -125,7 +235,7 @@ public class KmDocController extends JeecgController<KmDoc, IKmDocService> {
 	  * @param req
 	  * @return
 	  */
-	 @ApiOperation(value="km_doc-分页文件列表", notes="km_doc-分页文件列表")
+	 @ApiOperation(value="km_doc-分页草稿列表", notes="km_doc-分页草稿列表")
 	 @GetMapping(value = "/listDraft")
 	 public Result<?> queryDraftPageList(KmDocParamVO kmDocParamVO,
 										 @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
@@ -133,7 +243,7 @@ public class KmDocController extends JeecgController<KmDoc, IKmDocService> {
 										 HttpServletRequest req) {
 		 QueryWrapper<KmDocParamVO> queryWrapper = QueryGenerator.initQueryWrapper(kmDocParamVO, req.getParameterMap());
 		 String orderBy = queryWrapper.getExpression().getOrderBy().getSqlSegment();
-	 	kmDocParamVO.setStatusList(Arrays.asList(2));
+	 	kmDocParamVO.setStatusList(Arrays.asList(0,3));
 		 LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 		 //草稿箱只看自己创建的
 		 if(sysUser != null) {
@@ -142,9 +252,58 @@ public class KmDocController extends JeecgController<KmDoc, IKmDocService> {
 		 else
 		 	return Result.error("当前登录用户信息异常");
 
-		 Page<KmDocVO> page = new Page<KmDocVO>(pageNo, pageSize);
+		 Page<KmDocVO> page = new Page<>(pageNo, pageSize);
 	 	IPage<KmDocVO> pageList = kmDocService.queryPageList(page,kmDocParamVO,orderBy);
 		return Result.OK(pageList);
+	 }
+
+	 /**
+	  * 分页待审核列表
+	  *
+	  * @param kmDocParamVO
+	  * @param pageNo
+	  * @param pageSize
+	  * @param req
+	  * @return
+	  */
+	 @ApiOperation(value="km_doc-分页待审核列表", notes="km_doc-分页待审核列表")
+	 @GetMapping(value = "/listWaitAudit")
+	 @PermissionData(pageComponent = "km/filemanagement/PendingReviewList")
+	 public Result<?> queryWaitAuditPageList(KmDocParamVO kmDocParamVO,
+										 @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+										 @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+										 HttpServletRequest req) {
+		 QueryWrapper<KmDocParamVO> queryWrapper = QueryGenerator.initQueryWrapper(kmDocParamVO, req.getParameterMap());
+		 String orderBy = queryWrapper.getExpression().getOrderBy().getSqlSegment();
+		 kmDocParamVO.setStatusList(Arrays.asList(1));
+		 Page<KmDocVO> page = new Page<KmDocVO>(pageNo, pageSize);
+		 IPage<KmDocVO> pageList = kmDocService.queryPageList(page,kmDocParamVO,orderBy);
+		 return Result.OK(pageList);
+	 }
+
+
+	 /**
+	  * 分页已审核列表
+	  *
+	  * @param kmDocParamVO
+	  * @param pageNo
+	  * @param pageSize
+	  * @param req
+	  * @return
+	  */
+	 @ApiOperation(value="km_doc-分页已审核列表", notes="km_doc-分页已审核列表")
+	 @GetMapping(value = "/listPassed")
+	 @PermissionData(pageComponent = "km/filemanagement/AuditedList")
+	 public Result<?> queryPassedPageList(KmDocParamVO kmDocParamVO,
+											 @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+											 @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+											 HttpServletRequest req) {
+		 QueryWrapper<KmDocParamVO> queryWrapper = QueryGenerator.initQueryWrapper(kmDocParamVO, req.getParameterMap());
+		 String orderBy = queryWrapper.getExpression().getOrderBy().getSqlSegment();
+		 kmDocParamVO.setStatusList(Arrays.asList(2));
+		 Page<KmDocVO> page = new Page<KmDocVO>(pageNo, pageSize);
+		 IPage<KmDocVO> pageList = kmDocService.queryPageList(page,kmDocParamVO,orderBy);
+		 return Result.OK(pageList);
 	 }
 
 	 @ApiOperation(value="km_doc-最新发布档案", notes="km_doc-最新发布档案")
@@ -173,6 +332,171 @@ public class KmDocController extends JeecgController<KmDoc, IKmDocService> {
 		 return result;
 	 }
 
+     @AutoLog(value = "km_doc-编辑并发布")
+     @ApiOperation(value="km_doc-编辑并发布", notes="km_doc-编辑并发布")
+     @PutMapping(value = "/editAndRelease")
+     @Transactional
+     public Result<?> editAndRelease(@RequestBody KmDocParamVO kmdDocTarget,HttpServletRequest req) {
+         Result<?> result = kmDocService.editAndRelease(kmdDocTarget,req);
+         if(result.isSuccess()){
+             kmDocVisitRecordService.logVisit(kmdDocTarget.getId(),IpUtils.getIpAddr(req),DocVisitTypeEnum.Edit.getCode());
+         }
+         return result;
+     }
+
+	 @AutoLog(value = "km_doc-编辑发布状态")
+	 @ApiOperation(value="km_doc-编辑发布状态", notes="km_doc-编辑发布状态")
+	 @PutMapping(value = "/editReleaseFlag")
+	 public Result<?> editReleaseFlag(@RequestBody KmDoc kmDoc,HttpServletRequest req) {
+		 Result<?> result =  kmDocService.editReleaseFlag(kmDoc);
+		 if(result.isSuccess()){
+			 kmDocVisitRecordService.logVisit(kmDoc.getId(),IpUtils.getIpAddr(req),DocVisitTypeEnum.Edit.getCode());
+		 }
+		 return result;
+	 }
+
+	 @AutoLog(value = "km_doc-编辑已审核")
+	 @ApiOperation(value="km_doc-编辑已审核", notes="km_doc-编辑已审核")
+	 @PutMapping(value = "/editRelease")
+	 @Transactional
+	 public Result<?> editAuditPassed(@RequestBody KmDocParamVO kmDocTarget,HttpServletRequest req) {
+		 Result<?> result =  kmDocService.editAuditPassed(kmDocTarget);
+		 if(result.isSuccess()){
+			 kmDocVisitRecordService.logVisit(kmDocTarget.getId(),IpUtils.getIpAddr(req),DocVisitTypeEnum.Edit.getCode());
+		 }
+		 return result;
+	 }
+
+	 /**
+	  *   审核驳回
+	  *
+	  * @param id
+	  * @return
+	  */
+	 @AutoLog(value = "km_doc-审核驳回")
+	 @ApiOperation(value="km_doc-审核驳回", notes="km_doc-审核驳回")
+	 @PutMapping(value = "/auditReject")
+	 public Result<?> auditReject(@RequestParam(name="id",required=true) String id,HttpServletRequest req) {
+		 KmDoc kmDoc = kmDocService.getById(id);
+		 if(kmDoc !=null && kmDoc.getStatus().equals(DocStatusEnum.WaitAudit.getCode())){
+			 kmDoc.setStatus(DocStatusEnum.Reject.getCode());
+			 if(kmDocService.updateById(kmDoc)) {
+			 	kmDocVisitRecordService.logVisit(kmDoc.getId(),IpUtils.getIpAddr(req),DocVisitTypeEnum.AuditReject.getCode());
+				 log.info("驳回文档成功:{}",kmDoc.getName());
+				return Result.OK("审核成功!");
+			 }
+		 }
+		 return Result.error("审核失败!");
+	 }
+
+	 /**
+	  *   批量审核驳回
+	  *
+	  * @param ids
+	  * @return
+	  */
+	 @AutoLog(value = "km_doc-批量审核驳回")
+	 @ApiOperation(value="km_doc-批量审核驳回", notes="km_doc-批量审核驳回")
+	 @PutMapping(value = "/auditRejectBatch")
+	 public Result<?> auditRejectBatch(@RequestParam(name="ids",required=true) String ids,HttpServletRequest req) {
+		 Integer success = 0;
+		 List<String> successIds = new ArrayList<>();
+		 List<String> failIds = new ArrayList<>();
+		 if(ids.length()>0) {
+			 List<String> idList = Arrays.asList(ids.split(","));
+			 for (String id : idList) {
+				 KmDoc kmDoc = kmDocService.getById(id);
+				 if(kmDoc!= null && kmDoc.getStatus().equals(DocStatusEnum.WaitAudit.getCode()) ){
+					 kmDoc.setStatus(DocStatusEnum.Reject.getCode());
+					 if(kmDocService.updateById(kmDoc)){
+						 kmDocVisitRecordService.logVisit(kmDoc.getId(),IpUtils.getIpAddr(req),DocVisitTypeEnum.AuditReject.getCode());
+						 log.info("驳回文档成功:{}",kmDoc.getName());
+						 successIds.add(id);
+						 success +=1;
+					 }
+					 else
+						 failIds.add(id);
+				 }
+				 else{
+					 failIds.add(id);
+				 }
+			 }
+		 }
+		 if(success >0) {
+			 return Result.OK(failIds);
+		 }
+		 else
+			 return  Result.error("全部失败");
+	 }
+
+	 /**
+	  *   审核通过
+	  *
+	  * @param id
+	  * @return
+	  */
+	 @AutoLog(value = "km_doc-审核通过")
+	 @ApiOperation(value="km_doc-审核通过", notes="km_doc-审核通过")
+	 @PutMapping(value = "/auditPass")
+	 public Result<?> auditPass(@RequestParam(name="id",required=true) String id,HttpServletRequest req) {
+	     return kmDocService.auditDoc(id,req);
+	 }
+
+	 /**
+	  *  批量审核通过
+	  *
+	  * @param ids
+	  * @return
+	  */
+	 @AutoLog(value = "km_doc-批量审核通过")
+	 @ApiOperation(value="km_doc-批量审核通过", notes="km_doc-批量审核通过")
+	 @PutMapping(value = "/auditPassBatch")
+	 public Result<?> auditPassBatch(@RequestParam(name="ids",required=true) String ids,HttpServletRequest req) {
+		 Integer success = 0;
+		 List<String> successIds = new ArrayList<>();
+		 List<String> failIds = new ArrayList<>();
+		 if(ids.length()>0) {
+		 	String ip = IpUtils.getIpAddr(req);
+		 	LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+			//String userId = "1";
+			if(sysUser == null)
+				return Result.error("用户信息异常");
+
+			String userId = sysUser.getUsername();
+
+			List<String> idList = Arrays.asList(ids.split(","));
+			 for (String id : idList) {
+				 KmDoc kmDoc = kmDocService.getById(id);
+				 if(kmDoc!= null && kmDoc.getStatus().equals(DocStatusEnum.WaitAudit.getCode()) ){
+					 kmDoc.setStatus(DocStatusEnum.Passed.getCode());
+					 kmDoc.setLastUpdateTime(DateUtils.getDate());
+					 kmDoc.setLastUpdateBy(userId);
+					 if(kmDocService.updateById(kmDoc)){
+						 kmDocService.indexDocSync(kmDoc);
+						 successIds.add(id);
+						 success +=1;
+
+						 log.info("审核文档成功:{}",kmDoc.getName());
+						 kmDocVisitRecordService.logVisit(id,
+								 IpUtils.getIpAddr(req),
+								 DocVisitTypeEnum.AuditPass.getCode());
+					 }
+					 else
+						 failIds.add(id);
+				 }
+				 else{
+					 failIds.add(id);
+				 }
+			 }
+		 }
+		 if(success >0) {
+			 //审核后才入库ES kmDocService.indexDocSyncBatch(successIds);
+			 return Result.OK(failIds);
+		 }
+		 else
+			 return  Result.error("全部失败");
+	 }
+
 	 /**
 	 *   通过id删除
 	 *
@@ -183,6 +507,10 @@ public class KmDocController extends JeecgController<KmDoc, IKmDocService> {
 	@ApiOperation(value="km_doc-通过id删除", notes="km_doc-通过id删除")
 	@DeleteMapping(value = "/delete")
 	public Result<?> delete(@RequestParam(name="id",required=true) String id,HttpServletRequest req) {
+//		if (!kmDocTopicTypeService.removeDocFromAllTopics(id)) {
+//			return Result.error("removeDocFromAllTopics fail:" + id);
+//		}
+		kmDocTopicTypeService.removeDocFromAllTopics(id);
 		return kmDocService.deleteDoc(id,req);
 	}
 
@@ -206,6 +534,7 @@ public class KmDocController extends JeecgController<KmDoc, IKmDocService> {
 				if(kmDoc!= null ){
 				    Result<?> result = kmDocService.deleteDoc(id,req);
 					if(result.isSuccess()){
+						kmDocTopicTypeService.removeDocFromAllTopics(id);
 					    success +=1;
 					}
 					else
@@ -231,11 +560,15 @@ public class KmDocController extends JeecgController<KmDoc, IKmDocService> {
 	@ApiOperation(value="km_doc-通过id查询", notes="km_doc-通过id查询")
 	@GetMapping(value = "/queryById")
 	public Result<?> queryById(@RequestParam(name="id",required=true) String id) {
-		KmDoc kmDoc = kmDocService.getById(id);
-		if(kmDoc==null) {
+//		KmDoc kmDoc = kmDocService.getById(id);
+		Page<KmDocVO> page = new Page<>(1, 1);
+		KmDocParamVO kmDocParamVO = new KmDocParamVO();
+		kmDocParamVO.setId(id);
+		IPage<KmDocVO> pageList = kmDocService.queryPageList(page,kmDocParamVO,"");
+		if(pageList.getSize()<=0) {
 			return Result.error("未找到对应数据");
 		}
-		return Result.OK(kmDoc);
+		return Result.OK(pageList);
 	}
 
     /**
@@ -265,7 +598,7 @@ public class KmDocController extends JeecgController<KmDoc, IKmDocService> {
 	 //以下是ES库综合检索api
 	 /**
 	  * @param docId     指想排重的docid
-	  * @param checkType
+	  * @param checkType   1-标题排重，2-文本内容排重
 	  * @功能描述 传入指定的indexid，列出相似的文档
 	  */
 	 @ApiOperation(value="km_doc-排重检索", notes="km_doc-排重检索")
@@ -275,12 +608,39 @@ public class KmDocController extends JeecgController<KmDoc, IKmDocService> {
 								@RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								HttpServletRequest req){
 		 try {
+		 	//KmDocEsVO kmDocEsVO = kmDocService.getEsDocByDocId(indexId);
 			 KmDocEsParamVO kmDocEsParamVO = new KmDocEsParamVO();
 			 kmDocEsParamVO.setColumn("_score");
 			 kmDocEsParamVO.setOrder("desc");
 			 KmDoc kmDoc = kmDocService.getById(docId);
 			 if(kmDoc != null ) {
 			 	String docTitle = kmDoc.getTitle();
+
+
+			 	if(checkType.equals("2") ){
+					KmFile kmFile = kmFileService.getKmFile(kmDoc.getFileId());
+					File file = baseConfig.getFile(kmFile.getPhysicalPath());
+					if (file != null && file.exists()) {
+						String content = TikaUtils.parseContent(file);
+						if (content != null &&  !content.isEmpty()) {
+							String maxContentSearchLength = kmSysConfigService.getSysConfigValue("MaxContentSearchLength");
+							if(maxContentSearchLength!= null && !maxContentSearchLength.isEmpty()) {
+								Integer intMaxContentSearchLength = 0;
+								try{
+									intMaxContentSearchLength = Integer.parseInt(maxContentSearchLength);
+								}
+								catch (NumberFormatException e){
+
+								}
+								if (intMaxContentSearchLength > 0 && content.length() > intMaxContentSearchLength)
+									content = content.substring(0, intMaxContentSearchLength-1);
+							}
+							kmDocEsParamVO.setContent(content);
+						} else {
+							return  Result.error("file not found");
+						}
+					}
+				}
 
 			 	if(checkType.equals("1") && docTitle != null && !docTitle.isEmpty())
 			 		kmDocEsParamVO.setTitle(docTitle);
@@ -303,21 +663,23 @@ public class KmDocController extends JeecgController<KmDoc, IKmDocService> {
 	 }
 
  	 @ApiOperation(value="km_doc-普通检索", notes="km_doc-普通检索")
-	 @GetMapping(value = "/searchDoc")
-	 public Result<?> searchDoc(KmDocEsParamVO kmDocEsParamVO,
-								@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
-								@RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+	 @PostMapping(value = "/searchDoc")
+	 public Result<?> searchDoc(@RequestBody(required = true) KmDocEsParamVO kmDocEsParamVO,
+//								@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+//								@RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								HttpServletRequest req){
 		 try {
-             if(kmDocEsParamVO.getKeywords() !=null && kmDocEsParamVO.getKeywords().size() >0) {
-                 kmDocEsParamVO.setKeywords(
-                         StringUtils.splitStrListToList(
-                                 kmDocEsParamVO.getKeywords()));
-             }
-             Page<KmSearchResultVO> page = new Page<KmSearchResultVO>(pageNo, pageSize);
-			 KmSearchResultObjVO kmSearchResultObjVO = kmDocService.searchESKmDoc(page, kmDocEsParamVO, req);
+//             if(kmDocEsParamVO.getKeywords() !=null && kmDocEsParamVO.getKeywords().size() >0) {
+//                 kmDocEsParamVO.setKeywords(
+//                         StringUtils.splitStrListToList(
+//                                 kmDocEsParamVO.getKeywords()));
+//             }
+			 kmDocEsParamVO.setPageNo(kmDocEsParamVO.getPageNo() == null ? 1:kmDocEsParamVO.getPageNo());
+			 kmDocEsParamVO.setPageSize(kmDocEsParamVO.getPageSize() == null ? 10:kmDocEsParamVO.getPageSize());
+             Page<KmSearchResultVO> page = new Page<KmSearchResultVO>(kmDocEsParamVO.getPageNo(), kmDocEsParamVO.getPageSize());
+			 KmSearchResultObjVO kmSearchResultObjVO = kmDocService.searchESKmDoc(page, kmDocEsParamVO,  req);
 			 if(kmSearchResultObjVO.isSuccess()) {
-				 dictUtils.parseDictText(kmSearchResultObjVO);
+//				 dictUtils.parseDictText(kmSearchResultObjVO);
 				 return Result.OK(kmSearchResultObjVO);
 			 }
 			 else
@@ -326,6 +688,15 @@ public class KmDocController extends JeecgController<KmDoc, IKmDocService> {
 		 catch (IOException e){
 		 	return Result.error(e.getMessage());
 		 }
+	 }
+
+	 @ApiOperation(value="km_doc-高级检索", notes="km_doc-高级检索")
+	 @GetMapping(value = "/advanceSearchDoc")
+	 public Result<?> advanceSearchDoc(KmDocEsParamVO kmDocEsParamVO,
+									   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+									   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+								  HttpServletRequest req){
+		 return searchDoc(kmDocEsParamVO,req);
 	 }
 
 	 /**

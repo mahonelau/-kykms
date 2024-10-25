@@ -27,24 +27,24 @@ public class BaseConfig {
 
     private String uploadDir;
     private String sofficePath;
-    private String oneSystemUrl;
-    private String oneMapUrl;
+//    private String oneSystemUrl;
+//    private String oneMapUrl;
 
-    public String getOneSystemUrl() {
-        return oneSystemUrl;
-    }
-
-    public void setOneSystemUrl(String oneSystemUrl) {
-        this.oneSystemUrl = oneSystemUrl;
-    }
-
-    public String getOneMapUrl() {
-        return oneMapUrl;
-    }
-
-    public void setOneMapUrl(String oneMapUrl) {
-        this.oneMapUrl = oneMapUrl;
-    }
+//    public String getOneSystemUrl() {
+//        return oneSystemUrl;
+//    }
+//
+//    public void setOneSystemUrl(String oneSystemUrl) {
+//        this.oneSystemUrl = oneSystemUrl;
+//    }
+//
+//    public String getOneMapUrl() {
+//        return oneMapUrl;
+//    }
+//
+//    public void setOneMapUrl(String oneMapUrl) {
+//        this.oneMapUrl = oneMapUrl;
+//    }
 
     public String getSofficePath() {
         return sofficePath;

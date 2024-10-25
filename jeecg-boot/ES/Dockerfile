@@ -1,5 +1,5 @@
 FROM elasticsearch:7.6.1
-MAINTAINER mahone<liuwenxiong@mail.kykms.cn>
 
-ADD elasticsearch.tar /usr/share/elasticsearch/plugins/analysis-ik
+MAINTAINER hnliuwx@gmail.com
 
+RUN /usr/share/elasticsearch/bin/elasticsearch-plugin install -b  https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.6.1/elasticsearch-analysis-ik-7.6.1.zip

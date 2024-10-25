@@ -30,7 +30,7 @@ import java.util.*;
  * <p>
  * 部门表 服务实现类
  * <p>
- *
+ * 
  * @Author Steve
  * @Since 2019-01-22
  */
@@ -130,14 +130,14 @@ public class SysDepartServiceImpl extends ServiceImpl<SysDepartMapper, SysDepart
 		}
 
 	}
-
+	
 	/**
 	 * saveDepartData 的调用方法,生成部门编码和部门类型（作废逻辑）
 	 * @deprecated
 	 * @param parentId
 	 * @return
 	 */
-	private String[] generateOrgCode(String parentId) {
+	private String[] generateOrgCode(String parentId) {	
 		//update-begin--Author:Steve  Date:20190201 for：组织机构添加数据代码调整
 				LambdaQueryWrapper<SysDepart> query = new LambdaQueryWrapper<SysDepart>();
 				LambdaQueryWrapper<SysDepart> query1 = new LambdaQueryWrapper<SysDepart>();
@@ -195,16 +195,16 @@ public class SysDepartServiceImpl extends ServiceImpl<SysDepartMapper, SysDepart
 				strArray[1] = orgType;
 				return strArray;
 		//update-end--Author:Steve  Date:20190201 for：组织机构添加数据代码调整
-	}
+	} 
 
-
-	/*
-	  removeDepartDataById 对应 delete方法 根据ID删除相关部门数据
-
+	
+	/**
+	 * removeDepartDataById 对应 delete方法 根据ID删除相关部门数据
+	 * 
 	 */
 	/*
 	 * @Override
-	 *
+	 * 
 	 * @Transactional public boolean removeDepartDataById(String id) {
 	 * System.out.println("要删除的ID 为=============================>>>>>"+id); boolean
 	 * flag = this.removeById(id); return flag; }
@@ -226,7 +226,7 @@ public class SysDepartServiceImpl extends ServiceImpl<SysDepartMapper, SysDepart
 		}
 
 	}
-
+	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void deleteBatchWithChildren(List<String> ids) {
@@ -342,13 +342,13 @@ public class SysDepartServiceImpl extends ServiceImpl<SysDepartMapper, SysDepart
 		}
 		return ok;
 	}
-
+	
 	/**
 	 * delete 方法调用
 	 * @param id
 	 * @param idList
 	 */
-	private void checkChildrenExists(String id, List<String> idList) {
+	private void checkChildrenExists(String id, List<String> idList) {	
 		LambdaQueryWrapper<SysDepart> query = new LambdaQueryWrapper<SysDepart>();
 		query.eq(SysDepart::getParentId,id);
 		List<SysDepart> departList = this.list(query);

@@ -13,7 +13,7 @@
       <div style="width: 100%;">
         <span>{{ title }}</span>
         <span style="display:inline-block;width:calc(100% - 51px);padding-right:10px;text-align: right">
-          <a-button @click="toggleScreen" icon="appstore" style="height:20px;width:20px;border:0"></a-button>
+          <a-button @click="toggleScreen" icon="appstore" style="height:20px;width:20px;border:0px"></a-button>
         </span>
       </div>
 
@@ -59,7 +59,7 @@
 
         <!--部门分配-->
         <a-form-model-item label="部门分配" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="!departDisabled">
-          <j-select-depart v-model="model.selecteddeparts" :multi="true" @back="backDepartInfo" :backDepart="true"></j-select-depart>
+          <j-select-depart v-model="model.selecteddeparts" :multi="false" @back="backDepartInfo" :backDepart="true"></j-select-depart>
         </a-form-model-item>
 
         <!--租户分配-->
@@ -87,9 +87,9 @@
           <!--</j-multi-select-tag>-->
         <!--</a-form-model-item>-->
 
-        <!--<a-form-model-item label="头像" :labelCol="labelCol" :wrapperCol="wrapperCol">-->
-          <!--<j-image-upload class="avatar-uploader" text="上传" v-model="model.avatar" ></j-image-upload>-->
-        <!--</a-form-model-item>-->
+        <a-form-model-item label="头像" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-image-upload class="avatar-uploader" text="上传" v-model="model.avatar" ></j-image-upload>
+        </a-form-model-item>
 
         <!--<a-form-model-item label="生日" :labelCol="labelCol" :wrapperCol="wrapperCol">-->
           <!--<a-date-picker-->
@@ -163,8 +163,14 @@
         validatorRules:{
           username:[{required: true, message: '请输入用户账号!'},
                     {validator: this.validateUsername,}],
-          password: [{required: false,pattern:/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[~!@#$%^&*()_+`\-={}:";'<>?,./]).{8,}$/,message: '密码由8位数字、大小写字母和特殊符号组成!'},
-                     {validator: this.validateToNextPassword,trigger: 'change'}],
+          password: [{
+            required: true,
+            pattern:/^\S{6,}$/,
+            // pattern:/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[~!@#$%^&*()_+`\-={}:";'<>?,./]).{8,}$/,
+            message: '密码长度至少为6!'
+          },
+                     {
+                       validator: this.validateToNextPassword,trigger: 'change'}],
           confirmpassword: [{required: true, message: '请重新输入登录密码!',},
                             { validator: this.compareToFirstPassword,}],
           realname:[{ required: true, message: '请输入用户名称!' }],

@@ -5,7 +5,12 @@ import java.io.IOException;
 
 public interface IKmEsMgntService  {
 
-    Result<?> initTemplate() throws IOException;
+    Result<?> initTemplateAndSyncDocs() throws IOException;
+
+    //为初始化索引
+    void initEXIndex();
+
+    Result<?> syncReleasedDocToES() throws IOException;
 
     Result<?> initKmDocTemplate() throws IOException;
 

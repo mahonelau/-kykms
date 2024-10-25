@@ -2,6 +2,11 @@ import { getAction, deleteAction, putAction, postAction, httpAction } from '@/ap
 import Vue from 'vue'
 import {UI_CACHE_DB_DICT_DATA } from "@/store/mutation-types"
 
+//获取站点信息
+// const getSiteInfo = ()=>getAction("/KM/kmSysConfig/querySiteInfo");
+//加载km_config
+export const getAllKmConfig = ()=>getAction('/KM/kmSysConfig/listAllConfig');
+
 //角色管理
 const addRole = (params)=>postAction("/sys/role/add",params);
 const editRole = (params)=>putAction("/sys/role/edit",params);

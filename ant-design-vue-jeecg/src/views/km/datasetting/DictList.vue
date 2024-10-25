@@ -25,14 +25,17 @@
           </a>
           <a-divider type="vertical"/>
           <a @click="editDictItem(record)"><a-icon type="setting"/> 属性配置</a>
-
+          <!--<a-divider type="vertical"/>-->
+          <!--<a-popconfirm title="确定删除吗?" @confirm="() =>handleDelete(record.id)">-->
+            <!--<a>删除</a>-->
+          <!--</a-popconfirm>-->
         </span>
       </a-table>
 
     </div>
     <dict-modal ref="modalForm" @ok="modalFormOk"></dict-modal>  <!-- 属性类型 -->
     <dict-item-list ref="dictItemList"></dict-item-list>
-    <!--<dict-delete-list ref="dictDeleteList" @refresh="() =>loadData()"></dict-delete-list>-->
+    <dict-delete-list ref="dictDeleteList" @refresh="() =>loadData()"></dict-delete-list>
   </a-card>
 </template>
 
@@ -41,6 +44,7 @@
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import DictModal from './modules/DictModal'
   import DictItemList from './DictItemList'
+  import DictDeleteList from './DictDeleteList'
   import { getAction } from '@/api/manage'
   import { UI_CACHE_DB_DICT_DATA } from "@/store/mutation-types"
   import Vue from 'vue'
@@ -48,7 +52,7 @@
   export default {
     name: "DictList",
     mixins:[JeecgListMixin],
-    components: {DictModal, DictItemList},
+    components: {DictModal, DictItemList,DictDeleteList},
     data() {
       return {
         description: '这是文档属性页面',

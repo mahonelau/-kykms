@@ -11,7 +11,7 @@ import java.util.List;
  * <p>
  * 部门表 服务实现类
  * <p>
- *
+ * 
  * @Author:Steve
  * @Since：   2019-01-22
  */
@@ -47,28 +47,28 @@ public interface ISysDepartService extends IService<SysDepart>{
      * @return
      */
     Boolean updateDepartDataById(SysDepart sysDepart,String username);
-
-    /*
-      删除depart数据
-      @param id
+    
+    /**
+     * 删除depart数据
+     * @param id
      * @return
      */
 	/* boolean removeDepartDataById(String id); */
-
+    
     /**
      * 根据关键字搜索相关的部门数据
      * @param keyWord
      * @return
      */
     List<SysDepartTreeModel> searhBy(String keyWord,String myDeptSearch,String departIds);
-
+    
     /**
      * 根据部门id删除并删除其可能存在的子级部门
      * @param id
      * @return
      */
     boolean delete(String id);
-
+    
     /**
      * 查询SysDepart集合
      * @param userId
@@ -86,7 +86,7 @@ public interface ISysDepartService extends IService<SysDepart>{
 
 	 /**
      * 根据部门id批量删除并删除其可能存在的子级部门
-     * @param ids
+     * @param id
      * @return
      */
 	void deleteBatchWithChildren(List<String> ids);

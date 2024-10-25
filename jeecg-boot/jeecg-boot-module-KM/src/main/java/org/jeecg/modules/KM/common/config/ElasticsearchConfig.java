@@ -20,6 +20,21 @@ import org.springframework.context.annotation.Configuration;
 
 public class ElasticsearchConfig {
 
+    private String masterHost;
+    private Integer masterPort;
+
+    public boolean isMasterAuth() {
+        return masterAuth;
+    }
+
+    public void setMasterAuth(boolean masterAuth) {
+        this.masterAuth = masterAuth;
+    }
+
+    private boolean masterAuth;
+    private String masterUserName;
+    private String masterUserPwd;
+
     public String getMasterHost() {
         return masterHost;
     }
@@ -35,19 +50,6 @@ public class ElasticsearchConfig {
     public void setMasterPort(Integer masterPort) {
         this.masterPort = masterPort;
     }
-
-    private String masterHost;
-    private Integer masterPort;
-
-    public boolean isMasterAuth() {
-        return masterAuth;
-    }
-
-    public void setMasterAuth(boolean masterAuth) {
-        this.masterAuth = masterAuth;
-    }
-
-    private boolean masterAuth;
 
 
     public String getMasterUserName() {
@@ -66,8 +68,6 @@ public class ElasticsearchConfig {
         this.masterUserPwd = masterUserPwd;
     }
 
-    private String masterUserName;
-    private String masterUserPwd;
 
     @Bean
     public RestHighLevelClient restHighLevelClient() {
@@ -79,7 +79,8 @@ public class ElasticsearchConfig {
             credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(masterUserName, masterUserPwd));
             builder.setHttpClientConfigCallback(f -> f.setDefaultCredentialsProvider(credentialsProvider));
         }
+        RestHighLevelClient restClient = new RestHighLevelClient( builder);
 
-        return new RestHighLevelClient( builder);
+        return restClient;
     }
 }

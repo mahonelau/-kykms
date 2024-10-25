@@ -3,6 +3,7 @@ package org.jeecg.modules.KM.VO;
 import lombok.Data;
 import lombok.ToString;
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @ToString
@@ -19,19 +20,19 @@ public class KmDocEsVO implements Serializable {
     /*
     状态：0-内部公开 1-对外公开
      */
-    private Integer publicFlag;
+    private Integer publicRemark;
 
     private String title;
 
     private String category;
 
-    private String source;
+    private String orgCode;
 
-    private String pubTime;
+    private Date createTime;
 
-    private String pubTimeTxt;
-
-    private String[] versions;
+//    private String pubTimeTxt;
+//
+//    private String[] versions;
 
     private String[] businessTypes;
 

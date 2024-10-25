@@ -264,8 +264,8 @@
 
     &.no-title {
       .ant-modal-header {
-        padding: 0 12px;
-        border-bottom: 0 !important;
+        padding: 0px 12px;
+        border-bottom: 0px !important;
       }
     }
   }

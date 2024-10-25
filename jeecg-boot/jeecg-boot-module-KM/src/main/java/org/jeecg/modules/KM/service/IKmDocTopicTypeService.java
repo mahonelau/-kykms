@@ -7,5 +7,7 @@ import java.util.List;
 public interface IKmDocTopicTypeService extends IService<KmDocTopicType> {
     KmDocTopicType getByDocIdAndTopicId(  String docId,   String topicId);
 
+    boolean removeDocFromAllTopics(  String docId );
+
     List<String> getDocTopicCodes(String docId);
 }

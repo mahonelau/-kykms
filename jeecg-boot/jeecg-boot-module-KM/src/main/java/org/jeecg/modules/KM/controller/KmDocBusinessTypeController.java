@@ -19,7 +19,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.jeecg.common.aspect.annotation.AutoLog;
 
-@Api(tags="知识文档业务类型")
+@Api(tags="km_doc_business_type")
 @RestController
 @RequestMapping("/KM/kmDocBusinessType")
 @Slf4j

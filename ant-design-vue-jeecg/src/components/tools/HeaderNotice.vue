@@ -32,7 +32,7 @@
               <a-list-item :key="index" v-for="(record, index) in announcement1">
                 <div style="margin-left: 5%;width: 80%">
                   <p><a @click="showAnnouncement(record)">{{ record.titile }}</a></p>
-                  <p style="color: rgba(0,0,0,.45);margin-bottom: 0">{{ record.createTime }} 发布</p>
+                  <p style="color: rgba(0,0,0,.45);margin-bottom: 0px">{{ record.createTime }} 发布</p>
                 </div>
                 <div style="text-align: right">
                   <a-tag @click="showAnnouncement(record)" v-if="record.priority === 'L'" color="blue">一般消息</a-tag>
@@ -50,7 +50,7 @@
               <a-list-item :key="index" v-for="(record, index) in announcement2">
                 <div style="margin-left: 5%;width: 80%">
                   <p><a @click="showAnnouncement(record)">{{ record.titile }}</a></p>
-                  <p style="color: rgba(0,0,0,.45);margin-bottom: 0">{{ record.createTime }} 发布</p>
+                  <p style="color: rgba(0,0,0,.45);margin-bottom: 0px">{{ record.createTime }} 发布</p>
                 </div>
                 <div style="text-align: right">
                   <a-tag @click="showAnnouncement(record)" v-if="record.priority === 'L'" color="blue">一般消息</a-tag>
@@ -198,7 +198,7 @@
 
       initWebSocket: function () {
         // WebSocket与普通的请求所用协议有所不同，ws等同于http，wss等同于https
-        var userId = store.getters.userInfo.id;
+        var userId = this.$store.getters.userInfo.id;
         var url = window._CONFIG['domianURL'].replace("https://","wss://").replace("http://","ws://")+"/websocket/"+userId;
         //console.log(url);
         this.websock = new WebSocket(url);

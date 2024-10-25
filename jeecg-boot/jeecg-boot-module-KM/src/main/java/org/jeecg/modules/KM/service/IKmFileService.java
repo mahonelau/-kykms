@@ -10,7 +10,9 @@ public interface IKmFileService extends IService<KmFile> {
 
     KmFile saveFile(MultipartFile file);
 
-    KmFile saveFile(String content, String suffix);
+    KmFile transferExternalFile(File file);
+
+    KmFile transferExternalFile(String content, String suffix);
 
     KmFile saveFileInfoToDB(String physicalPath,String fileName);
 

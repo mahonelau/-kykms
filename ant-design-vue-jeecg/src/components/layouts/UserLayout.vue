@@ -5,7 +5,7 @@
         <div class="header">
           <a href="/">
             <!--<img src="~@/assets/logo.svg" class="logo" alt="logo">-->
-            <span class="title">科亿知识库</span>
+            <span class="title">{{ siteInfo.siteTitle }}</span>
           </a>
         </div>
       </div>
@@ -14,12 +14,12 @@
 
       <div class="footer">
       <div class="links">
-        <a href="http://www.kykms.cn" target="_blank">知识库首页</a>
+        <a :href= siteInfo.siteHomePageUrl  target="_blank">{{ siteInfo.siteTitle }}首页</a>
       </div>
       <div class="copyright">
         Copyright
         <a-icon type="copyright"/>
-        2019 <span>科亿信息技术</span>
+        2019 <span>{{ siteInfo.siteCopyRight }}</span>
       </div>
       </div>
 
@@ -36,7 +36,12 @@
     components: { RouteView },
     mixins: [mixinDevice],
     data () {
-      return {}
+      return {
+        siteInfo:{}
+      }
+    },
+    created() {
+      this.siteInfo = this.$store.getters.siteInfo
     },
     mounted () {
       document.body.classList.add('userLayout')

@@ -33,6 +33,7 @@ import org.jeecg.modules.KM.common.enums.DocVisitTypeEnum;
 import org.jeecg.modules.KM.common.rules.KMConstant;
 import org.jeecg.modules.KM.common.utils.EsUtils;
 import org.jeecg.modules.KM.common.utils.KMDateUtils;
+import org.jeecg.modules.KM.common.utils.KMRedisUtils;
 import org.jeecg.modules.KM.common.utils.StringUtils;
 import org.jeecg.modules.KM.entity.KmDocVisitRecord;
 import org.jeecg.modules.KM.mapper.KmDocVisitRecordMapper;
@@ -57,6 +58,8 @@ public class KmDocVisitRecordServiceImpl extends ServiceImpl<KmDocVisitRecordMap
     private EsUtils esUtils;
     @Autowired
     private RestHighLevelClient restHighLevelClient;
+    @Autowired
+    private KMRedisUtils kMRedisUtils;
 
     @Override
     public void logVisit(String docId,String ip,Integer visitType) {
@@ -95,6 +98,8 @@ public class KmDocVisitRecordServiceImpl extends ServiceImpl<KmDocVisitRecordMap
                 || visitType == DocVisitTypeEnum.Download.getCode()) {
             //入库ES
             executorService.execute(()->saveToEs(convertToEsVo(kmDocVisitRecord)));
+
+            executorService.execute(() -> kMRedisUtils.logPersonalDocHistory(userId, docId));
         }
     }
 

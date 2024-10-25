@@ -60,6 +60,7 @@
           { key: '2', icon: 'arrow-right', text: '关闭右侧' },
           { key: '3', icon: 'close', text: '关闭其它' }
         ],
+        siteInfo:{},
         reloadFlag:true
       }
     },
@@ -81,6 +82,7 @@
       }
     },
     created() {
+      this.siteInfo = this.$store.getters.siteInfo
       if (this.$route.path != indexKey) {
         this.addIndexToFirst()
       }
@@ -165,7 +167,7 @@
 
       // update-begin-author:sunjianlei date:20200120 for: 动态更改页面标题
       changeTitle(title) {
-        let projectTitle = "科亿知识库"
+        let projectTitle =   this.siteInfo.siteTitle //Global_Config.SITE_TITLE
         // 首页特殊处理
         if (this.$route.path === indexKey) {
           document.title = projectTitle

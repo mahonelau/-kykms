@@ -13,26 +13,23 @@ import java.util.List;
 @Data
 public class KmDocParamVO extends KmDoc implements Serializable {
 
+//    private List<String> versionList;
+//    private List<String> sourceList;
+//    private List<String> addVersionList;
+//    private List<String> removeVersionList;
+//    private String pubTimeStart;
+//    private String pubTimeEnd;
+
     //多状态查询
     private List<Integer> statusList;
-
     private List<String> businessTypeList;
-    private List<String> versionList;
-    private List<String> sourceList;
-
-
+    private List<String> depIdList;
     private List<String> addBusinessTypeList;
     private List<String> removeBusinessTypeList;
-
-    private List<String> addVersionList;
-    private List<String> removeVersionList;
-
     private List<String> addTopicIdList;
     private List<String> removeTopicIdList;
 
-    private String pubTimeStart;
-
-    private String pubTimeEnd;
+    private boolean departmentFilterEnabled;
 
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")

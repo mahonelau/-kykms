@@ -21,7 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.jeecg.common.aspect.annotation.AutoLog;
 
-@Api(tags="知识文档检索记录")
+@Api(tags="km_search_record")
 @RestController
 @RequestMapping("/KM/kmSearchRecord")
 @Slf4j

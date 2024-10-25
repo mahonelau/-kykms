@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 import org.jeecg.common.aspect.annotation.Dict;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.Date;
 
 @Data
 @Accessors(chain = true)
@@ -19,26 +20,24 @@ public class KmSearchResultVO  implements Serializable {
     private String id;
     private String fileId;
     private String previewFileId;
-    private String fileNo;
     private Integer downloadFlag;
-    private Integer publicFlag;
-    private Long size;
+    private Integer publicRemark;
+    private Long fileSize;
+    private String content;
     private String title;
     @Dict(dictTable ="sys_depart",dicText = "depart_name",dicCode = "org_code")
     private String orgCode;
+    private String createBy;
     private String fileType;
+    @Dict(dicCode = "km_dict_category")
     private String category;
-    @Dict(dicCode = "km_dict_source")
-    private String source;
-    private String  pubTimeTxt;
-    @Dict(dicCode = "km_dict_versions")
-    private String versions;
+    private Date createTime;
     @Dict(dicCode = "km_dict_business")
-    private String businessType;
+    private String businessTypes;
     private String keywords;
+    @Dict(dicCode="code",dictTable = "sys_category",dicText = "name")
     private String topicCodes;
     private BigInteger downloads;
     private BigInteger views;
-    private String effectTime;
     private String remark;
 }

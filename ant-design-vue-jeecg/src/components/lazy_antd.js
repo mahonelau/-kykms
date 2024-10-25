@@ -5,6 +5,8 @@ import Vue from 'vue'
 
 // base library
 import {
+  BackTop,
+  Space,
   ConfigProvider,
   Layout,
   Input,
@@ -28,7 +30,7 @@ import {
   List,
   Avatar,
   Breadcrumb,
-  Steps,
+  // Steps,
   Spin,
   Menu,
   Drawer,
@@ -39,13 +41,13 @@ import {
   DatePicker,
   TimePicker,
   Upload,
-  Progress,
-  Skeleton,
+  // Progress,
+  // Skeleton,
   Popconfirm,
   PageHeader,
-  Result,
-  Statistic,
-  Descriptions,
+  // Result,
+  // Statistic,
+  // Descriptions,
   message,
   notification,
   Empty,
@@ -54,14 +56,16 @@ import {
   Carousel,
   Pagination,
   FormModel,
-  Cascader,
-  Slider,
-  Transfer,
+  // Cascader,
+  // Slider,
+  // Transfer,
   Rate,
-  Collapse,
+  // Collapse,
 } from 'ant-design-vue'
 import Viser from 'viser-vue'
 
+Vue.use(BackTop)
+Vue.use(Space)
 Vue.use(ConfigProvider)
 Vue.use(Layout)
 Vue.use(Input)
@@ -85,7 +89,7 @@ Vue.use(Dropdown)
 Vue.use(List)
 Vue.use(Avatar)
 Vue.use(Breadcrumb)
-Vue.use(Steps)
+// Vue.use(Steps)
 Vue.use(Spin)
 Vue.use(Menu)
 Vue.use(Drawer)
@@ -96,24 +100,24 @@ Vue.use(Divider)
 Vue.use(DatePicker)
 Vue.use(TimePicker)
 Vue.use(Upload)
-Vue.use(Progress)
-Vue.use(Skeleton)
+// Vue.use(Progress)
+// Vue.use(Skeleton)
 Vue.use(Popconfirm)
 Vue.use(PageHeader)
-Vue.use(Result)
-Vue.use(Statistic)
-Vue.use(Descriptions)
+// Vue.use(Result)
+// Vue.use(Statistic)
+// Vue.use(Descriptions)
 Vue.use(Empty)
 Vue.use(Tree)
 Vue.use(TreeSelect)
 Vue.use(Carousel)
 Vue.use(Pagination)
 Vue.use(FormModel)
-Vue.use(Cascader)
-Vue.use(Slider)
-Vue.use(Transfer)
+// Vue.use(Cascader)
+// Vue.use(Slider)
+// Vue.use(Transfer)
 Vue.use(Rate)
-Vue.use(Collapse)
+// Vue.use(Collapse)
 
 Vue.prototype.$confirm = Modal.confirm
 Vue.prototype.$message = message

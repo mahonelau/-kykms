@@ -9,6 +9,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Service
 public class KmSysConfigServiceImpl extends ServiceImpl<KmSysConfigMapper, KmSysConfig> implements IKmSysConfigService {
 
@@ -26,5 +30,32 @@ public class KmSysConfigServiceImpl extends ServiceImpl<KmSysConfigMapper, KmSys
             retValue =  kmSysConfig.getItemValue();
 
         return retValue;
+    }
+
+    @Override
+//    @Cacheable(cacheNames = "kmSysConfig",key = "#sysConfigCode")
+    public List<KmSysConfig> querySiteInfo(){
+        LambdaQueryWrapper<KmSysConfig> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.likeRight(KmSysConfig::getItemCode ,"Site");
+        List<KmSysConfig> kmSysConfigList = this.list(queryWrapper);
+//        KmSysConfig kmSysConfig = (KmSysConfig) list;
+//        String retValue = "";
+//        if(kmSysConfig != null )
+//            retValue =  kmSysConfig.getItemValue();
+
+        return kmSysConfigList;
+    }
+
+    @Override
+    public Map<String,String> queryAllConfig(){
+        List<KmSysConfig> sysConfigs = this.list();
+        Map<String, String> res = new HashMap<String, String>();
+        for (KmSysConfig config : sysConfigs) {
+            String configCode = config.getItemCode();
+            String configValue = config.getItemValue();
+            res.put(configCode,configValue);
+        }
+        log.debug("-------登录KM参数-----" + res.toString());
+        return res;
     }
 }

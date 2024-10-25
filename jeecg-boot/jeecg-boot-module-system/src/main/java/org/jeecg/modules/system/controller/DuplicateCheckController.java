@@ -73,7 +73,7 @@ public class DuplicateCheckController {
 
 		if (num == null || num == 0) {
 			// 该值可用
-			return Result.OK("该值可用！");
+			return Result.ok("该值可用！");
 		} else {
 			// 该值不可用
 			log.info("该值不可用，系统中已存在！");

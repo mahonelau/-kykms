@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.DefaultEditorKit;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.annotations.ApiOperation;
@@ -14,8 +15,11 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.constant.CacheConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.KM.service.IKmDocService;
+import org.jeecg.modules.system.entity.SysDict;
 import org.jeecg.modules.system.entity.SysDictItem;
 import org.jeecg.modules.system.service.ISysDictItemService;
+import org.jeecg.modules.system.service.ISysDictService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,7 +49,10 @@ public class SysDictItemController {
 
 	@Autowired
 	private ISysDictItemService sysDictItemService;
-	
+	@Autowired
+	private ISysDictService sysDictService;
+	@Autowired
+	private IKmDocService kmDocService;
 	/**
 	 * @功能：查询字典数据
 	 * @param sysDictItem
@@ -67,7 +74,7 @@ public class SysDictItemController {
 		result.setResult(pageList);
 		return result;
 	}
-	
+
 	/**
 	 * @功能：新增
 	 * @return
@@ -87,7 +94,7 @@ public class SysDictItemController {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * @功能：编辑
 	 * @param sysDictItem
@@ -99,19 +106,31 @@ public class SysDictItemController {
 	public Result<SysDictItem> edit(@RequestBody SysDictItem sysDictItem) {
 		Result<SysDictItem> result = new Result<SysDictItem>();
 		SysDictItem sysdict = sysDictItemService.getById(sysDictItem.getId());
+		SysDict dict = sysDictService.getById(sysDictItem.getDictId());
 		if(sysdict==null) {
 			result.error500("未找到对应实体");
 		}else {
+			Boolean checkFlag = false;
+			if (!sysdict.getItemValue().equals(sysDictItem.getItemValue())) {
+				if (dict.getDictCode().equals("km_dict_category")) {
+					checkFlag = kmDocService.checkCategoryOfDoc(sysdict.getItemValue());
+				}else if(dict.getDictCode().equals("km_dict_business")){
+					checkFlag = kmDocService.checkBusinessTypeOfDoc(sysdict.getItemValue());
+				}
+				if (checkFlag) {
+					result.error500("该维度下还有知识，请先清理知识");
+					return result;
+				}
+			}
 			sysDictItem.setUpdateTime(new Date());
 			boolean ok = sysDictItemService.updateById(sysDictItem);
-			//TODO 返回false说明什么？
 			if(ok) {
 				result.success("编辑成功!");
 			}
 		}
 		return result;
 	}
-	
+
 	/**
 	 * @功能：删除字典数据
 	 * @param id
@@ -126,14 +145,25 @@ public class SysDictItemController {
 		if(joinSystem==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = sysDictItemService.removeById(id);
-			if(ok) {
-				result.success("删除成功!");
+			SysDict sysDict = sysDictService.getById(joinSystem.getDictId());
+			Boolean checkFlag = false;
+			if (sysDict.getDictCode().equals("km_dict_category")) {
+				checkFlag = kmDocService.checkCategoryOfDoc(joinSystem.getItemValue());
+			}else if(sysDict.getDictCode().equals("km_dict_business")){
+				checkFlag = kmDocService.checkBusinessTypeOfDoc(joinSystem.getItemValue());
+			}
+			if (checkFlag) {
+				result.error500("该维度下还有知识，请先清理知识");
+			}else {
+				boolean ok = sysDictItemService.removeById(id);
+				if (ok) {
+					result.success("删除成功!");
+				}
 			}
 		}
 		return result;
 	}
-	
+
 	/**
 	 * @功能：批量删除字典数据
 	 * @param ids
@@ -180,5 +210,5 @@ public class SysDictItemController {
 			return Result.error("该值不可用，系统中已存在！");
 		}
 	}
-	
+
 }

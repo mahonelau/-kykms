@@ -27,6 +27,13 @@ public class KmDocTopicTypeServiceImpl extends ServiceImpl<KmDocTopicTypeMapper,
     }
 
     @Override
+    public boolean removeDocFromAllTopics(  String docId ){
+        LambdaQueryWrapper<KmDocTopicType> queryWrapper = new LambdaQueryWrapper();
+        queryWrapper.eq(KmDocTopicType::getDocId,docId);
+        return super.remove(queryWrapper);
+     }
+
+    @Override
     public List<String> getDocTopicCodes(String docId){
         List<String> docTopicCodeList = kmDocTopicTypeMapper.getDocTopicCodes(docId);
         if(!docTopicCodeList.isEmpty()){

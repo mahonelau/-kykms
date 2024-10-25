@@ -12,13 +12,14 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class ThreadPoolExecutorService implements IThreadPoolExecutorService {
+//    private ThreadPoolExecutor poolExecutor;
 
-    private static LinkedBlockingDeque<Runnable> deque = new LinkedBlockingDeque<>(10000);
+    private static LinkedBlockingDeque<Runnable> deque = new LinkedBlockingDeque<Runnable>(10000);
     private static ThreadPoolExecutor singleExecutor =new ThreadPoolExecutor(
-            1,10000, 20, TimeUnit.SECONDS,deque);
-    private static ArrayBlockingQueue<Runnable> poolQueue = new ArrayBlockingQueue<>(10);
+            1,10000, 20, TimeUnit.SECONDS,deque);;
+    private static ArrayBlockingQueue<Runnable> poolQeque = new ArrayBlockingQueue<Runnable>(10);
     private static ThreadPoolExecutor poolExecutor=new ThreadPoolExecutor(
-            5,20, 5, TimeUnit.SECONDS,poolQueue);
+                5,20, 5, TimeUnit.SECONDS,poolQeque);
 
     private Logger logger= LoggerFactory.getLogger(ThreadPoolExecutorService.class);
     public ThreadPoolExecutorService(){
@@ -29,6 +30,11 @@ public class ThreadPoolExecutorService implements IThreadPoolExecutorService {
     @Override
     public void singleExecute(Runnable runnable){
         singleExecutor.execute(() -> {
+//            try {
+//                Thread.sleep(300);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
             runnable.run();
         });
     }
@@ -36,6 +42,11 @@ public class ThreadPoolExecutorService implements IThreadPoolExecutorService {
     @Override
     public void execute(Runnable runnable){
         poolExecutor.execute(() -> {
+//            try {
+//                Thread.sleep(3000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
             runnable.run();
         });
     }
@@ -49,7 +60,7 @@ public class ThreadPoolExecutorService implements IThreadPoolExecutorService {
             singleExecutor.getQueue().clear();
             singleExecutor.shutdown();
             singleExecutor.awaitTermination(10,TimeUnit.SECONDS);
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
             logger.error("销毁线程池",e);
         }
         logger.info("销毁线程池");

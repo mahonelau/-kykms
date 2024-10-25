@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
-@Api(tags="ES模板管理")
+@Api(tags="ES-management")
 @RestController
 @RequestMapping("/KM/EsMgnt")
 @Slf4j

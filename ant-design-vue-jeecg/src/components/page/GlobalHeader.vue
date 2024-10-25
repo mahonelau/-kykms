@@ -19,6 +19,7 @@
 
       <span >{{this.$route.meta.title}}</span>
 
+<!--              <user-menu class="menu-txt"/>-->
       <user-menu class="header-index-right" :theme="theme" :style="topMenuStyle.headerIndexRight"/>
     </div>
     <!-- 顶部导航栏模式 -->
@@ -40,6 +41,7 @@
             :type="collapsed ? 'menu-fold' : 'menu-unfold'"
             @click="toggle"></a-icon>
         </div>
+<!--        <user-menu class="menu-txt"/>-->
         <user-menu class="header-index-right" :theme="theme" :style="topMenuStyle.headerIndexRight"/>
       </div>
     </div>

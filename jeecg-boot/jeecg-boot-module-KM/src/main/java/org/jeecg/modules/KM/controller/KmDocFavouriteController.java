@@ -23,7 +23,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.jeecg.common.aspect.annotation.AutoLog;
 
-@Api(tags="知识文档收藏")
+@Api(tags="km_doc_favourite")
 @RestController
 @RequestMapping("/KM/kmDocFavourite")
 @Slf4j
@@ -49,9 +49,9 @@ public class KmDocFavouriteController extends JeecgController<KmDocFavourite, IK
 								   HttpServletRequest req) {
 		LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 		if(sysUser != null) {
-            //处理过滤source -> sourceList
-            if(kmDocParamVO.getSource() != null && !kmDocParamVO.getSource().isEmpty())
-                kmDocParamVO.setSourceList(Arrays.asList(kmDocParamVO.getSource().split(",")));
+//            //处理过滤source -> sourceList
+//            if(kmDocParamVO.getSource() != null && !kmDocParamVO.getSource().isEmpty())
+//                kmDocParamVO.setSourceList(Arrays.asList(kmDocParamVO.getSource().split(",")));
 
 			KmDocVO kmDocVO = new KmDocVO();
 			QueryWrapper<KmDocVO> queryWrapper = QueryGenerator.initQueryWrapper(kmDocVO, req.getParameterMap());

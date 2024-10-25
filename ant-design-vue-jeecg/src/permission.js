@@ -9,14 +9,13 @@ import { generateIndexRouter } from "@/utils/util"
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
-const whiteList = ['/user/login', '/user/register', '/user/register-result','/user/alteration','/login',] // no redirect whitelist
+const whiteList = ['/user/login','/front/user/login', '/user/register', '/user/register-result','/user/alteration','/login',] // no redirect whitelist
 
 router.beforeEach((to, from, next) => {
   NProgress.start() // start progress bar
-
   if (Vue.ls.get(ACCESS_TOKEN)) {
     /* has token */
-    if (to.path === '/user/login') {
+    if (to.path === '/user/login' || to.path === '/front/user/login' || to.path == '/') {
       next({ path: INDEX_MAIN_PAGE_PATH })
       NProgress.done()
     } else {
@@ -51,8 +50,8 @@ router.beforeEach((to, from, next) => {
               description: '请求用户信息失败，请重试！'
             })*/
             store.dispatch('Logout').then(() => {
-              next({path:'/user/login'});
-              // next({ path: '/user/login', query: { redirect: to.fullPath } })
+              // next({path:'/user/login'});
+              next({ path: '/user/login', query: { redirect: to.fullPath } })
             })
           })
       } else {
@@ -66,8 +65,8 @@ router.beforeEach((to, from, next) => {
     } else {
       // 调整没有token重定向问题，默认为系统内登录
       // 第三方登录为 /login
-      next({path:'/user/login'});
-      // next({ path: '/user/login', query: { redirect: to.fullPath } })
+      // next({path:'/user/login'});
+      next({ path: '/front/user/login', query: { redirect: to.fullPath } })
       NProgress.done() // if current page is login will not trigger afterEach hook, so manually handle it
     }
   }

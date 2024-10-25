@@ -1,19 +1,15 @@
 <template>
   <div class="logo">
-    <router-link :to="{name:'defaultDocSearch'}">
-
-      <!-- update-begin- author:sunjianlei --- date:20190814 --- for: logo颜色根据主题颜色变化 -->
-      <img v-if="navTheme === 'dark'" src="~@/assets/logo-white.png" alt="logo">
-      <img v-else src="~@/assets/logo.svg" alt="logo">
-      <!-- update-begin- author:sunjianlei --- date:20190814 --- for: logo颜色根据主题颜色变化 -->
-
-      <span v-if="showTitle" class="showTitle">{{ title }}</span>
-    </router-link>
+    <a @click="jumIndex">
+      <img :src = siteInfo.siteAvatar  alt="logo">
+      <span v-if="showTitle" class="showTitle">{{ siteInfo.siteTitle  }}</span>
+    </a>
   </div>
 </template>
 
 <script>
   import { mixin } from '@/utils/mixin.js'
+  import Vue from 'vue'
 
   export default {
     name: 'Logo',
@@ -21,13 +17,35 @@
     props: {
       title: {
         type: String,
-        default: '科亿知识库',
+        default: "科亿知识库",
         required: false
       },
       showTitle: {
         type: Boolean,
         default: true,
         required: false
+      }
+    },
+    data () {
+      return {
+        siteInfo: {},
+        kmConfig: {},
+        indexUrl:'/front/DefaultDocSearch'
+      }
+    },
+    created() {
+      this.siteInfo = this.$store.getters.siteInfo
+      this.kmConfig = this.$store.getters.kmConfig
+      if(this.kmConfig !== undefined && this.kmConfig.DefaultPageUseTopicList === '1')
+        this.indexUrl = '/front/RecommendTopicList'
+    },
+    methods:{
+      jumIndex(){
+        let routeData = this.$router.resolve({
+          path: this.indexUrl,
+          query: {}
+        })
+        window.open(routeData.href, '_blank')
       }
     }
   }
@@ -40,8 +58,6 @@
     /*color: #303133;*/
     font-weight: 600;
   }
-
-
 
   .sider {
     box-shadow: none !important;

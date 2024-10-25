@@ -6,6 +6,7 @@ import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,7 +16,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @TableName("km_doc")
 @Accessors(chain = true)
@@ -63,10 +64,10 @@ public class KmDoc implements Serializable {
 	@Excel(name = "title", width = 15)
     @ApiModelProperty(value = "title")
     private String title;
-    /**fileNo*/
-    @Excel(name = "fileNo", width = 15)
-    @ApiModelProperty(value = "fileNo")
-    private String fileNo;
+    /**favourites*/
+    @Excel(name = "favourites", width = 15)
+    @ApiModelProperty(value = "favourites")
+    private BigInteger favourites;
     /**serialNumber*/
     @Excel(name = "serialNumber", width = 15)
     @ApiModelProperty(value = "serialNumber")
@@ -84,20 +85,6 @@ public class KmDoc implements Serializable {
     @ApiModelProperty(value = "category")
     @Dict(dicCode = "km_dict_category")
     private String category;
-	/**source*/
-	@Excel(name = "source", width = 15)
-    @ApiModelProperty(value = "source")
-    @Dict(dicCode = "km_dict_source")
-    private String source;
-    /**pubTimeTxt*/
-    @Excel(name = "pubTimeTxt", width = 15)
-    @ApiModelProperty(value = "pubTimeTxt")
-    private String pubTimeTxt;
-    /**pubTime*/
-    @Excel(name = "pubTime", width = 15)
-    @ApiModelProperty(value = "pubTime")
-    @Dict(dicCode = "km_dict_pubTimeYear")
-    private String pubTime;
 	/**keywords*/
 	@Excel(name = "keywords", width = 15)
     @ApiModelProperty(value = "keywords")
@@ -120,15 +107,14 @@ public class KmDoc implements Serializable {
     @ApiModelProperty(value = "downloadFlag")
     @Dict(dicCode = "dict_downloadFlag")
     private Integer downloadFlag;
-    /**publicFlag*/
-    @Excel(name = "publicFlag", width = 15)
-    @ApiModelProperty(value = "publicFlag")
-    @Dict(dicCode = "dict_publicFlag")
-    private Integer publicFlag;
-	/**downloads*/
-	@Excel(name = "downloads", width = 15)
+    /**downloads*/
+    @Excel(name = "downloads", width = 15)
     @ApiModelProperty(value = "downloads")
     private BigInteger downloads;
+    /**comments*/
+    @Excel(name = "comments", width = 15)
+    @ApiModelProperty(value = "comments")
+    private BigInteger comments;
 	/**views*/
 	@Excel(name = "views", width = 15)
     @ApiModelProperty(value = "views")
@@ -156,17 +142,17 @@ public class KmDoc implements Serializable {
     @Excel(name = "processMsg", width = 15)
     @ApiModelProperty(value = "processMsg")
     private String processMsg;
-    /**effectTime*/
-    @Excel(name = "effectTime", width = 15)
-    @ApiModelProperty(value = "effectTime")
-    private String effectTime;
     /**publicRemark*/
-    @Dict(dicCode = "km_dict_public_remark")
+    @Dict(dicCode = "dict_public_remark")
     @Excel(name = "publicRemark", width = 15)
     @ApiModelProperty(value = "publicRemark")
-    private String publicRemark;
+    private Integer publicRemark;
     /**remark*/
     @Excel(name = "remark", width = 15)
     @ApiModelProperty(value = "remark")
     private String remark;
+    /**currentVersion*/
+    @Excel(name = "currentVersion", width = 15)
+    @ApiModelProperty(value = "currentVersion")
+    private Integer currentVersion;
 }

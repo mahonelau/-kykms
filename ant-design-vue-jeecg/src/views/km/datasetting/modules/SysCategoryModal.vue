@@ -32,7 +32,7 @@
         </a-form-model-item>
 
         <a-form-model-item  label="首页推荐" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="recommend">
-          <a-switch checked-children="是" un-checked-children="否" v-model="model.recommend"/>
+          <a-switch checked-children="是" un-checked-children="否" v-model="model.recommend" :disabled="recommendDisable"/>
         </a-form-model-item>
 
       </a-form-model>
@@ -67,11 +67,6 @@
         },
 
         confirmLoading: false,
-        validatorRules:{
-          pid:{},
-          name: [{ required: true, message: '请输入类型名称!' }],
-          sortOrder: [{ required: true, message: '请输入序号!' }]
-        },
         url: {
           add: "/sys/category/add",
           edit: "/sys/category/edit",
@@ -81,6 +76,9 @@
         pidField:"pid",
         subExpandedKeys:[],
         validatorRules:{
+          pid:{},
+          name: [{ required: true, message: '请输入类型名称!' }],
+          sortOrder: [{ required: true, message: '请输入序号!' }],
           recommend: [
             { validator: this.validateRecommend}
           ]
@@ -93,6 +91,9 @@
     computed : {
       disabled() {
           return this.model.id?true : false;
+      },
+      recommendDisable() {
+          return !this.model.id;
       }
     },
     methods: {
@@ -123,7 +124,7 @@
               httpurl+=this.url.edit;
                method = 'put';
             }
-            debugger
+            // debugger
             httpAction(httpurl,this.model,method).then((res)=>{
               if(res.success){
                 that.$message.success(res.message);
@@ -171,7 +172,7 @@
       },
 
       validateRecommend(rule, value, callback){
-        if(value == true && this.model.pid !='0')
+        if(value == true && this.model.pid !=null && this.model.pid !='0')
           callback("只允许推荐根节点专题");
         else
           callback();

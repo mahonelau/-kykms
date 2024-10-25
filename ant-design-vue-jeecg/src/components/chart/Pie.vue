@@ -1,9 +1,11 @@
 <template>
   <v-chart :forceFit="true" :height="height" :data="data" :scale="scale" :onClick="handleClick">
+    <div>{{title}}</div>
+    <a-divider ></a-divider>
     <v-tooltip :showTitle="false" dataKey="item*percent"/>
     <v-axis/>
     <v-legend dataKey="item"/>
-    <v-pie position="percent" color="item" :v-style="pieStyle" :label="labelConfig"/>
+    <v-pie position="count" color="item" :v-style="pieStyle" :label="labelConfig"/>
     <v-coord type="theta"/>
   </v-chart>
 </template>

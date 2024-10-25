@@ -1,40 +1,17 @@
-server:
-  port: 8080
-  tomcat:
-    max-swallow-size: -1
-  error:
-    include-exception: true
-    include-stacktrace: ALWAYS
-    include-message: ALWAYS
-  servlet:
-    context-path: /ky
-  compression:
-    enabled: true
-    min-response-size: 1024
-    mime-types: application/javascript,application/json,application/xml,text/html,text/xml,text/plain,text/css,image/*
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: metrics,httptrace
-
 ##文件上传和转换工具的配置
 base:
   #上传文件保存的路径
   upload-dir: /kykms/KmDocs
+  db-backup-dir: c:\KmDocs
   # libreOffice安装路径
   soffice-path: /usr/bin/soffice
-#  soffice-path: /opt/libreoffice7.0/program/soffice
-  one-system-url:
-
 ##ElasticSearch服务配置 for highLevelRestClient
 esclient:
-  master-host: 127.0.0.1
+  master-host:
   master-port: 9200
-  master-auth: false
+  master-auth: true
   master-user-name: elastic
-  master-user-pwd: xxxxxxxxxxxxxxxx
+  master-user-pwd:
 
 spring:
   servlet:
@@ -99,14 +76,14 @@ spring:
       datasource:
         # 数据库登录信息配置
         master:
-          url: jdbc:mysql://kykms-mysql:3306/km?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
-          username: root
-          password: root
-          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:oracle:thin:@106.52.244.12:1521:GHYZSK
+          username: ZSK
+          password: GHYzsk_163com
+          driver-class-name: oracle.jdbc.driver.OracleDriver
   #redis 配置
   redis:
     database: 0
-    host: kykms-redis
+    host: 127.0.0.1
     lettuce:
       pool:
         max-active: 8
@@ -116,26 +93,13 @@ spring:
       shutdown-timeout: 100ms
     password: ''
     port: 6379
-
-mybatis-plus:
-  mapper-locations: classpath*:org/jeecg/modules/**/xml/*Mapper.xml
-  global-config:
-    banner: false
-    db-config:
-      id-type: ASSIGN_ID
-      table-underline: true
-  configuration:
-    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    call-setters-on-nulls: true
-
 jeecg :
-  uploadType: alioss
+  uploadType: local
   path :
     upload: /opt/upload
     webapp: /opt/webapp
   shiro:
      excludeUrls: /test/jeecgDemo/demo3,/test/jeecgDemo/redisDemo/**,/category/**,/visual/**,/map/**,/jmreport/bigscreen2/**,/sys/loginThird,/KM/EsMgnt/**
-
   oss:
     accessKey: ??
     secretKey: ??

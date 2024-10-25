@@ -191,7 +191,7 @@
         }
         // 数组去重
         tempArray=[...new Set(temp)];
-        console.log("tempArray",tempArray);
+        // console.log("tempArray",tempArray);
         checkedKeys.halfChecked=tempArray;
         this.checkedTitle=checkedNodes.checkedNodes;
       },
@@ -210,10 +210,11 @@
         } else {
           this.topicCodesTree = [];
         }
-       console.log(this.checkedKeys);
+       // console.log(this.checkedKeys);
       },
       // 点击确定触发事件
       submitForm() {
+        console.log("submitForm");
 
         if (this.checkedArray.length > 0) {
           this.model.topicIds = this.checkedArray.toString();
@@ -254,14 +255,18 @@
           }
         }
         this.model.topicIds_dictText="";
+        console.log("submitForm length:",this.checkedTitle.length);
+
         for(let i=0;i<this.checkedTitle.length;i++){
+          console.log("submitForm topicIds_dictText:",this.checkedTitle[i].data.props.title);
+
           if(this.model.topicIds_dictText===""){
             this.model.topicIds_dictText=this.checkedTitle[i].data.props.title;
           }else{
             this.model.topicIds_dictText= this.model.topicIds_dictText+","+this.checkedTitle[i].data.props.title;
           }
         }
-        this.$emit('ok');
+         this.$emit('ok');
       },
 
     }

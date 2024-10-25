@@ -1,21 +1,21 @@
 <template>
   <div>
-    <index-chart v-if="indexStyle==1"></index-chart>
+    <index-km-chart ></index-km-chart>
   </div>
 </template>
 
 <script>
-  import IndexChart from './IndexChart'
+  import IndexKmChart from './IndexKmChart'
 
 
   export default {
     name: "Analysis",
     components: {
-      IndexChart,
+      IndexKmChart,
     },
     data() {
       return {
-        indexStyle:1
+
       }
     },
     created() {

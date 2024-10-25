@@ -1,20 +1,6 @@
-/*
- Navicat Premium Data Transfer
-
- Source Server         : ky_tencent
- Source Server Type    : MySQL
- Source Server Version : 80027
- Source Host           : 119.29.145.199:6033
- Source Schema         : km
-
- Target Server Type    : MySQL
- Target Server Version : 80027
- File Encoding         : 65001
-
- Date: 23/06/2023 14:16:12
-*/
 CREATE database if NOT EXISTS `km` default character set utf8mb4 collate utf8mb4_unicode_ci;
 use `km`;
+
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -34,7 +20,6 @@ CREATE TABLE `km_doc`  (
   `file_type` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `status` smallint(0) NULL DEFAULT NULL,
   `category` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `source` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `keywords` varchar(256) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `fti_flag` smallint(0) NULL DEFAULT NULL,
   `convert_flag` smallint(0) NULL DEFAULT NULL,
@@ -47,19 +32,16 @@ CREATE TABLE `km_doc`  (
   `create_time` datetime(0) NULL DEFAULT NULL,
   `process_msg` varchar(512) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `index_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `file_no` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `org_code` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `dep_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `pub_time_txt` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `public_flag` smallint(0) NULL DEFAULT NULL,
   `download_flag` smallint(0) NULL DEFAULT NULL,
-  `effect_time` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `remark` varchar(512) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `pub_time` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `public_remark` smallint(0) NULL DEFAULT NULL,
+  `favourites` bigint DEFAULT '0',
+  `comments` bigint DEFAULT '0',
+  `current_version` int DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
-
 
 -- ----------------------------
 -- Table structure for km_doc_business_type
@@ -68,7 +50,8 @@ DROP TABLE IF EXISTS `km_doc_business_type`;
 CREATE TABLE `km_doc_business_type`  (
   `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `doc_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `business_type` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL
+  `business_type` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -84,23 +67,26 @@ CREATE TABLE `km_doc_favourite`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Records of km_doc_favourite
+-- ----------------------------
+INSERT INTO `km_doc_favourite` VALUES ('1524665575199780865', 'e9ca23d68d884d4ebb19d07889727dae', '2c9080827fc7b955017fd476ebca0054', '2022-05-12 16:19:35');
+INSERT INTO `km_doc_favourite` VALUES ('1531984776277020674', 'e9ca23d68d884d4ebb19d07889727dae', '2c9080827fde975f0180b8d7046f0e78', '2022-06-01 21:03:28');
+INSERT INTO `km_doc_favourite` VALUES ('1531984778898460673', 'e9ca23d68d884d4ebb19d07889727dae', '2c9080827fde975f0180b8d7046f0e77', '2022-06-01 21:03:29');
+INSERT INTO `km_doc_favourite` VALUES ('1531984784296529922', 'e9ca23d68d884d4ebb19d07889727dae', '2c9080827fde975f0180b8d706c00ead', '2022-06-01 21:03:30');
+INSERT INTO `km_doc_favourite` VALUES ('1531984790973861889', 'e9ca23d68d884d4ebb19d07889727dae', '2c9080827fde975f0180b8d706a20eaa', '2022-06-01 21:03:32');
+INSERT INTO `km_doc_favourite` VALUES ('1531984797605056514', 'e9ca23d68d884d4ebb19d07889727dae', '2c9080827fde975f0180b8d7064a0ea8', '2022-06-01 21:03:33');
+INSERT INTO `km_doc_favourite` VALUES ('1531984800780144641', 'e9ca23d68d884d4ebb19d07889727dae', '2c9080827fde975f0180b8d7046f0e76', '2022-06-01 21:03:34');
+INSERT INTO `km_doc_favourite` VALUES ('1531984806786387970', 'e9ca23d68d884d4ebb19d07889727dae', '2c9080827fde975f0180b8d706b30eac', '2022-06-01 21:03:35');
+
+-- ----------------------------
 -- Table structure for km_doc_topic_type
 -- ----------------------------
 DROP TABLE IF EXISTS `km_doc_topic_type`;
 CREATE TABLE `km_doc_topic_type`  (
   `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `doc_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `topic_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Table structure for km_doc_version
--- ----------------------------
-DROP TABLE IF EXISTS `km_doc_version`;
-CREATE TABLE `km_doc_version`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `doc_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `version` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL
+  `topic_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -119,16 +105,6 @@ CREATE TABLE `km_doc_visit_record`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Records of km_doc_visit_record
--- ----------------------------
-INSERT INTO `km_doc_visit_record` VALUES ('402881ec88cd51160188cd51176c0002', '402881ec88cd51160188cd5116db0001', 0, '', '', '0:0:0:0:0:0:0:1', 'admin', '2023-06-18 15:03:44');
-INSERT INTO `km_doc_visit_record` VALUES ('402881ec88cd52500188cd5250ce0000', '402881ec88cd51160188cd5116db0001', 7, '', '', '0:0:0:0:0:0:0:1', 'admin', '2023-06-18 15:05:04');
-INSERT INTO `km_doc_visit_record` VALUES ('402881ec88cd52500188cd5266bb0003', '402881ec88cd52500188cd5266680002', 0, '', '', '0:0:0:0:0:0:0:1', 'admin', '2023-06-18 15:05:10');
-INSERT INTO `km_doc_visit_record` VALUES ('402881ec88cd52500188cd5285320005', '402881ec88cd52500188cd5266680002', 5, '', '', '0:0:0:0:0:0:0:1', 'admin', '2023-06-18 15:05:17');
-INSERT INTO `km_doc_visit_record` VALUES ('402881e888e6e29f0188e6e29fe30000', '402881ec88cd52500188cd5266680002', 5, '', '', '127.0.0.1', 'admin', '2023-06-23 14:13:12');
-INSERT INTO `km_doc_visit_record` VALUES ('402881e888e6e29f0188e6e2ec9d0001', '402881ec88cd52500188cd5266680002', 5, '', '', '0:0:0:0:0:0:0:1', 'admin', '2023-06-23 14:13:31');
-
--- ----------------------------
 -- Table structure for km_file
 -- ----------------------------
 DROP TABLE IF EXISTS `km_file`;
@@ -137,14 +113,9 @@ CREATE TABLE `km_file`  (
   `sha256` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
   `physical_path` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
   `url` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
-  `original_name` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL
+  `original_name` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of km_file
--- ----------------------------
-INSERT INTO `km_file` VALUES ('402881ec88cd52500188cd5266240001', '16c255987128afcc25aa713695e5b964b38ff97b839d1aedf79a0a6fcf25697e', '\\2023-06-18\\402881ec88cd52500188cd5266240001.docx', NULL, '槽边往事-7.2三叔十年.docx');
-INSERT INTO `km_file` VALUES ('402881ec88cd52500188cd5275a70004', NULL, '\\2023-06-18\\pdf\\402881ec88cd52500188cd5266240001.pdf', NULL, '402881ec88cd52500188cd5266240001.pdf');
 
 -- ----------------------------
 -- Table structure for km_search_record
@@ -165,9 +136,14 @@ CREATE TABLE `km_search_record`  (
 -- ----------------------------
 -- Records of km_search_record
 -- ----------------------------
-INSERT INTO `km_search_record` VALUES ('1670316191024734210', '知识', '知识', '知识', NULL, '知识,知识,知识', '0:0:0:0:0:0:0:1', 'admin', '2023-06-18 14:23:08');
-INSERT INTO `km_search_record` VALUES ('1670326831994974209', '往事', '往事', '往事', NULL, '往事,往事,往事', '0:0:0:0:0:0:0:1', 'admin', '2023-06-18 15:05:25');
-INSERT INTO `km_search_record` VALUES ('1672125611878723585', '往事', '往事', '往事', NULL, '往事,往事,往事', '0:0:0:0:0:0:0:1', 'admin', '2023-06-23 14:13:07');
+INSERT INTO `km_search_record` VALUES ('1531911147703021569', '长春', '长春', '长春', NULL, '长春,长春,长春', '222.168.93.8', 'admin', '2022-06-01 16:10:54');
+INSERT INTO `km_search_record` VALUES ('1531976962238361602', NULL, NULL, NULL, 'B06', '', '118.116.109.72', 'admin', '2022-06-01 20:32:25');
+INSERT INTO `km_search_record` VALUES ('1531976975962124289', NULL, NULL, NULL, 'B10', '', '118.116.109.72', 'admin', '2022-06-01 20:32:28');
+INSERT INTO `km_search_record` VALUES ('1531977266820329473', '好', '好', '好', NULL, '好,好,好', '118.116.109.72', 'admin', '2022-06-01 20:33:38');
+INSERT INTO `km_search_record` VALUES ('1531977934893264897', '客车', '客车', '客车', NULL, '客车,客车,客车', '118.116.109.72', 'admin', '2022-06-01 20:36:17');
+INSERT INTO `km_search_record` VALUES ('1531978057819926530', '月计划', '月计划', '月计划', NULL, '月,计划,月,计划,月计划', '118.116.109.72', 'admin', '2022-06-01 20:36:46');
+INSERT INTO `km_search_record` VALUES ('1531978134076567554', '管理体系', '管理体系', '管理体系', NULL, '管理体系,管理体系,管理体系', '118.116.109.72', 'admin', '2022-06-01 20:37:05');
+INSERT INTO `km_search_record` VALUES ('1531978326683201537', '递进', '递进', '递进', NULL, '递进,递进,递进', '118.116.109.72', 'admin', '2022-06-01 20:37:51');
 
 -- ----------------------------
 -- Table structure for km_sys_config
@@ -178,24 +154,33 @@ CREATE TABLE `km_sys_config`  (
   `item_code` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `item_value` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `item_name` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `value_type` varchar(32) DEFAULT 'text',
+  `value_options` varchar(1024) DEFAULT '',
   `create_time` datetime(0) NULL DEFAULT NULL
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of km_sys_config
 -- ----------------------------
-INSERT INTO `km_sys_config` VALUES ('12', 'MaxContentSearchLength', '102400', '全文检索最大参数最大长度（内容查重，如果时间过长或报错，请调小参数值）', NULL);
-INSERT INTO `km_sys_config` VALUES ('10', 'DuplicateCheckHitRate', '50%', '文档标题与内容查重关键字匹配比例(高于此比例为疑似重复)', NULL);
-INSERT INTO `km_sys_config` VALUES ('1', 'supportFileTypes', 'doc,xls,pdf,ppt,txt,xlsx,docx,pptx,zip,rar,jpg,jpeg,bmp,png,gif', '全部支持的文件格式后缀，如果不限制上传格式则设置为空', NULL);
-INSERT INTO `km_sys_config` VALUES ('4', 'downloadLimitConfig', '102', '24小时下载次数限制', NULL);
-INSERT INTO `km_sys_config` VALUES ('5', 'TitleSearchBoostConfig', '1', '检索权重:标题,以1位基数', NULL);
-INSERT INTO `km_sys_config` VALUES ('6', 'KeywordSearchBoostConfig', '1', '检索权重:关键字,以1位基数', NULL);
-INSERT INTO `km_sys_config` VALUES ('7', 'ContentSearchBoostConfig', '1', '检索权重:内容,以1位基数', NULL);
-INSERT INTO `km_sys_config` VALUES ('8', 'searchLimitConfig', '10', '10秒搜索次数限制', NULL);
-INSERT INTO `km_sys_config` VALUES ('9', 'viewLimitConfig', '10', '10秒预览次数限制', NULL);
-INSERT INTO `km_sys_config` VALUES ('2', 'IndexFileTypes', 'doc,xls,pdf,ppt,txt,xlsx,docx,pptx,zip,rar', '解释并全文入库的文件格式', NULL);
-INSERT INTO `km_sys_config` VALUES ('3', 'ConvertFileTypes', 'doc,xls,pdf,ppt,txt,xlsx,docx,pptx,jpg,jpeg,bmp,png,gif', '自动进行预览文件转换的文件格式', NULL);
-INSERT INTO `km_sys_config` VALUES ('11', 'RecommendHotTopic', '0', '是否在首页推荐热门专题', NULL);
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('12', 'MaxContentSearchLength', '102400', '全文检索最大参数最大长度（内容查重，如果时间过长或报错，请调小参数值）', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('10', 'DuplicateCheckHitRate', '50%', '文档标题与内容查重关键字匹配比例(高于此比例为疑似重复)', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('1', 'supportFileTypes', 'doc,xls,pdf,ppt,txt,xlsx,docx,pptx,zip,rar,jpg,jpeg,bmp,png,gif', '全部支持的文件格式后缀，如果不限制上传格式则设置为空', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('4', 'downloadLimitConfig', '102', '24小时下载次数限制', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('5', 'TitleSearchBoostConfig', '1', '检索权重:标题,以1位基数', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('6', 'KeywordSearchBoostConfig', '1', '检索权重:关键字,以1位基数', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('7', 'ContentSearchBoostConfig', '1', '检索权重:内容,以1位基数', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('8', 'searchLimitConfig', '10', '10秒搜索次数限制', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('9', 'viewLimitConfig', '10', '10秒预览次数限制', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('2', 'IndexFileTypes', 'doc,xls,pdf,ppt,txt,xlsx,docx,pptx,zip,rar', '解释并全文入库的文件格式', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('3', 'ConvertFileTypes', 'doc,xls,pdf,ppt,txt,xlsx,docx,pptx,jpg,jpeg,bmp,png,gif', '自动进行预览文件转换的文件格式', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('11', 'RecommendHotTopic', '0', '是否在首页推荐热门专题', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('13', 'CommonAuthEnable', '1', '是否启用知识权限控制通用规则', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('14', 'SiteTitle', '科亿知识库', '站点名称', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('15', 'SiteHomePageUrl', 'http://www.kykms.cn', '站点首页url', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('16', 'SiteCopyRight', '科亿信息技术', '站点版权所有者', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('17', 'SiteAvatar', 'temp/logo_透明_1666960531563.png', '站点logo', NULL, 'img', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('19', 'DefaultPageUseTopicList', '0', '启用知识专题目录树浏览页作为首页', NULL, 'checkBox', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('20', 'HeaderBackgroundColor', '#03A7EF', '页面抬头背景色', NULL, 'text', '');
 
 -- ----------------------------
 -- Table structure for onl_cgreport_head
@@ -571,32 +556,21 @@ INSERT INTO `sys_category` VALUES ('1450288184205275137', '1450288104739991553',
 INSERT INTO `sys_category` VALUES ('1450288234289459202', '1450288104739991553', '服务', 'B04A03A04', 'ceshi', '2021-10-19 10:30:34', NULL, NULL, 'A01', NULL, 1, NULL);
 INSERT INTO `sys_category` VALUES ('1450288263007858689', '1450288104739991553', '系统', 'B04A03A05', 'ceshi', '2021-10-19 10:30:41', NULL, NULL, 'A01', NULL, 1, NULL);
 INSERT INTO `sys_category` VALUES ('1450287865912127490', '1450287793728155650', '立项审批', 'B04A02A02', 'ceshi', '2021-10-19 10:29:06', NULL, NULL, 'A01', NULL, 1, NULL);
-INSERT INTO `sys_category` VALUES ('1415239215563579394', '0', '教育信息化', 'B04', 'admin', '2021-07-14 04:18:18', 'ceshi', '2021-11-24 18:24:43', 'A01', '1', 1, 1);
+INSERT INTO `sys_category` VALUES ('1415239215563579394', '0', 'Java编程', 'B04', 'admin', '2021-07-14 04:18:18', 'admin', '2022-03-29 15:06:45', 'A01', '1', 1, 1);
 INSERT INTO `sys_category` VALUES ('1450287893921689602', '1450287793728155650', '项目采购', 'B04A02A03', 'ceshi', '2021-10-19 10:29:13', NULL, NULL, 'A01', NULL, 1, NULL);
-INSERT INTO `sys_category` VALUES ('1448923409156202498', '1448923264612098049', '年度计划', 'B06A04', 'ceshi', '2021-10-15 16:07:15', 'ceshi', '2021-11-15 11:32:50', 'A01', NULL, 1, 0);
-INSERT INTO `sys_category` VALUES ('1448923583488253953', '0', '教育管理', 'B07', 'ceshi', '2021-10-15 16:07:56', 'ceshi', '2021-11-23 14:00:03', 'A01', '0', 4, 0);
-INSERT INTO `sys_category` VALUES ('1448923935583297538', '0', '教育理论', 'B10', 'ceshi', '2021-10-15 16:09:20', 'ceshi', '2021-11-23 14:00:10', 'A01', '0', 5, 1);
-INSERT INTO `sys_category` VALUES ('1448923843216334849', '0', '素质教育', 'B08', 'ceshi', '2021-10-15 16:08:58', 'ceshi', '2021-11-23 14:00:36', 'A01', NULL, 7, 0);
-INSERT INTO `sys_category` VALUES ('1448923896492384258', '0', '家校互动', 'B09', 'ceshi', '2021-10-15 16:09:11', 'ceshi', '2021-11-23 14:00:46', 'A01', NULL, 8, 0);
-INSERT INTO `sys_category` VALUES ('1448924019523903490', '0', '教育实践', 'B11', 'ceshi', '2021-10-15 16:09:40', 'ceshi', '2021-11-23 14:00:20', 'A01', NULL, 6, NULL);
+INSERT INTO `sys_category` VALUES ('1448923409156202498', '1448923264612098049', 'SpringCloud', 'B06A04', 'ceshi', '2021-10-15 16:07:15', 'admin', '2022-03-29 15:07:12', 'A01', NULL, 1, 0);
+INSERT INTO `sys_category` VALUES ('1448923583488253953', '0', '数据库设计', 'B07', 'ceshi', '2021-10-15 16:07:56', 'admin', '2022-03-29 15:07:27', 'A01', '0', 4, 0);
+INSERT INTO `sys_category` VALUES ('1448923935583297538', '0', '前端开发', 'B10', 'ceshi', '2021-10-15 16:09:20', 'admin', '2022-03-29 15:07:51', 'A01', '0', 5, 1);
 INSERT INTO `sys_category` VALUES ('1448924056215674881', '0', '学术研讨', 'B12', 'ceshi', '2021-10-15 16:09:49', 'ceshi', '2021-11-23 14:00:56', 'A01', NULL, 9, 0);
-INSERT INTO `sys_category` VALUES ('1448924103653253122', '0', '样板课程', 'B13', 'ceshi', '2021-10-15 16:10:00', 'ceshi', '2021-11-23 14:02:40', 'A01', NULL, 15, NULL);
-INSERT INTO `sys_category` VALUES ('1448924139699101697', '0', '体育教育', 'B14', 'ceshi', '2021-10-15 16:10:09', 'ceshi', '2021-11-23 14:02:01', 'A01', NULL, 11, 0);
+INSERT INTO `sys_category` VALUES ('1448924139699101697', '0', '移动开发', 'B14', 'ceshi', '2021-10-15 16:10:09', 'admin', '2022-03-29 15:08:29', 'A01', NULL, 11, 0);
 INSERT INTO `sys_category` VALUES ('1448924177934376962', '0', '工作总结', 'B15', 'ceshi', '2021-10-15 16:10:18', 'ceshi', '2021-11-23 14:02:09', 'A01', NULL, 12, NULL);
-INSERT INTO `sys_category` VALUES ('1448924211119710210', '0', '备课材料', 'B16', 'ceshi', '2021-10-15 16:10:26', 'ceshi', '2021-11-23 14:02:15', 'A01', NULL, 13, NULL);
-INSERT INTO `sys_category` VALUES ('1448924255076016129', '0', '工作汇报', 'B17', 'ceshi', '2021-10-15 16:10:36', 'ceshi', '2021-11-23 14:02:24', 'A01', NULL, 14, NULL);
-INSERT INTO `sys_category` VALUES ('1448924309627133953', '0', '社会反馈', 'B18', 'ceshi', '2021-10-15 16:10:49', 'ceshi', '2021-12-28 11:09:43', 'A01', '0', 10, 0);
-INSERT INTO `sys_category` VALUES ('1448924350068613122', '0', '德智体发展', 'B19', 'ceshi', '2021-10-15 16:10:59', 'ceshi', '2021-11-23 14:03:04', 'A01', NULL, 16, NULL);
-INSERT INTO `sys_category` VALUES ('1448924381949517826', '0', '国防教育', 'B20', 'ceshi', '2021-10-15 16:11:07', 'ceshi', '2021-11-23 14:03:17', 'A01', NULL, 17, NULL);
-INSERT INTO `sys_category` VALUES ('1448924413280968705', '0', '人事政策', 'B21', 'ceshi', '2021-10-15 16:11:14', 'ceshi', '2021-11-23 14:03:32', 'A01', NULL, 18, NULL);
 INSERT INTO `sys_category` VALUES ('1448924439432454145', '0', '其他', 'B22', 'ceshi', '2021-10-15 16:11:20', 'ceshi', '2021-10-21 16:46:11', 'A01', NULL, 19, NULL);
 INSERT INTO `sys_category` VALUES ('1450287922069663745', '1450287793728155650', '云资源管理', 'B04A02A04', 'ceshi', '2021-10-19 10:29:20', NULL, NULL, 'A01', NULL, 1, NULL);
 INSERT INTO `sys_category` VALUES ('1450287830122131457', '1450287793728155650', '预算编制', 'B04A02A01', 'ceshi', '2021-10-19 10:28:58', NULL, NULL, 'A01', NULL, 1, NULL);
 INSERT INTO `sys_category` VALUES ('1450288104739991553', '1415239215563579394', '信息化框架', 'B04A03', 'ceshi', '2021-10-19 10:30:03', 'ceshi', '2021-10-19 10:30:10', 'A01', '1', 1, NULL);
 INSERT INTO `sys_category` VALUES ('1450288134951563265', '1450288104739991553', '软硬件环境', 'B04A03A01', 'ceshi', '2021-10-19 10:30:11', NULL, NULL, 'A01', NULL, 1, NULL);
 INSERT INTO `sys_category` VALUES ('1450288212390998018', '1450288104739991553', '平台', 'B04A03A03', 'ceshi', '2021-10-19 10:30:29', NULL, NULL, 'A01', NULL, 1, NULL);
-INSERT INTO `sys_category` VALUES ('1448919819863777282', '0', '教育研究', 'B05', 'ceshi', '2021-10-15 15:52:59', 'ceshi', '2021-11-24 18:24:39', 'A01', '0', 2, 1);
-INSERT INTO `sys_category` VALUES ('1448923264612098049', '0', '经验交流', 'B06', 'ceshi', '2021-10-15 16:06:40', 'ceshi', '2021-12-28 11:17:28', 'A01', '1', 3, NULL);
+INSERT INTO `sys_category` VALUES ('1448923264612098049', '0', '架构设计', 'B06', 'ceshi', '2021-10-15 16:06:40', 'admin', '2022-03-29 15:07:03', 'A01', '1', 3, NULL);
 
 -- ----------------------------
 -- Table structure for sys_check_rule
@@ -692,6 +666,7 @@ CREATE TABLE `sys_depart`  (
   `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建日期',
   `update_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '更新人',
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新日期',
+  PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uniq_depart_org_code`(`org_code`) USING BTREE,
   INDEX `idx_sd_depart_order`(`depart_order`) USING BTREE,
   INDEX `idx_sd_parent_id`(`parent_id`) USING BTREE
@@ -700,24 +675,20 @@ CREATE TABLE `sys_depart`  (
 -- ----------------------------
 -- Records of sys_depart
 -- ----------------------------
-INSERT INTO `sys_depart` VALUES ('f79b7d5a99b1442c876858a6961cb1fb', NULL, '默认部门', NULL, NULL, 0, NULL, '1', '1', 'A01', NULL, NULL, NULL, 'root', NULL, '0', NULL, 'ceshi', '2021-10-14 16:41:10', NULL, NULL);
-INSERT INTO `sys_depart` VALUES ('10c6c58575c24db297d838ec5c5f813d', NULL, '院长室', NULL, NULL, 0, NULL, '1', '1', 'A04', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-21 16:29:03', 'ceshi', '2021-10-21 16:29:15');
-INSERT INTO `sys_depart` VALUES ('a06041ec62674810983326ae552ced92', NULL, '副院长室', NULL, NULL, 0, NULL, '1', '1', 'A05', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-21 16:30:10', 'ceshi', '2021-10-28 10:55:17');
-INSERT INTO `sys_depart` VALUES ('e615307e7b684f15885ef6da29f6771d', 'a06041ec62674810983326ae552ced92', '一副院长', NULL, NULL, 1, NULL, '2', '2', 'A05A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:55:59', NULL, NULL);
-INSERT INTO `sys_depart` VALUES ('e0c42ad532b24b5fb76e44e9ecc03389', 'e615307e7b684f15885ef6da29f6771d', '人事财务室', NULL, NULL, 1, NULL, '2', '3', 'A05A01A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:58:15', NULL, NULL);
-INSERT INTO `sys_depart` VALUES ('2d9f7327dc2e4cf2b62d058a2c422534', 'e615307e7b684f15885ef6da29f6771d', '规划室', NULL, NULL, 2, NULL, '2', '3', 'A05A01A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:58:28', NULL, NULL);
-INSERT INTO `sys_depart` VALUES ('7aeb44fb58da45b484ab63b338acf738', 'e615307e7b684f15885ef6da29f6771d', '综合室', NULL, NULL, 3, NULL, '2', '3', 'A05A01A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:58:42', NULL, NULL);
-INSERT INTO `sys_depart` VALUES ('5eebbb70b6e24289933613b83c19c92b', 'a06041ec62674810983326ae552ced92', '二副院长', NULL, NULL, 2, NULL, '2', '2', 'A05A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:56:20', NULL, NULL);
-INSERT INTO `sys_depart` VALUES ('2b098c54e19943fb8246e1c1162a63a2', '5eebbb70b6e24289933613b83c19c92b', '园区管理办公室', NULL, NULL, 1, NULL, '2', '3', 'A05A02A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:59:21', NULL, NULL);
-INSERT INTO `sys_depart` VALUES ('8ef9c3c7e11e4fe0b2d457803b85cd24', 'a06041ec62674810983326ae552ced92', '三副院长', NULL, NULL, 3, NULL, '2', '2', 'A05A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:56:29', NULL, NULL);
-INSERT INTO `sys_depart` VALUES ('d28c13eaaa1d4655ac4a1cd248d10158', '8ef9c3c7e11e4fe0b2d457803b85cd24', '调查室', NULL, NULL, 1, NULL, '2', '3', 'A05A03A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 11:00:47', NULL, NULL);
-INSERT INTO `sys_depart` VALUES ('02e9449426374c099d59d31ba9142520', '8ef9c3c7e11e4fe0b2d457803b85cd24', '监测室', NULL, NULL, 2, NULL, '2', '3', 'A05A03A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 11:01:11', NULL, NULL);
+INSERT INTO `sys_depart` VALUES ('f79b7d5a99b1442c876858a6961cb1fb', NULL, '总裁办公室', NULL, NULL, 0, NULL, '1', '1', 'A01', NULL, NULL, NULL, 'root', NULL, '0', NULL, 'ceshi', '2021-10-14 16:41:10', 'admin', '2022-06-01 21:23:52');
+INSERT INTO `sys_depart` VALUES ('10c6c58575c24db297d838ec5c5f813d', NULL, '秘书部', NULL, NULL, 0, NULL, '1', '1', 'A04', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-21 16:29:03', 'admin', '2022-06-01 21:22:04');
+INSERT INTO `sys_depart` VALUES ('a06041ec62674810983326ae552ced92', NULL, '研发部', NULL, NULL, 0, NULL, '1', '1', 'A05', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-21 16:30:10', 'admin', '2022-06-01 21:22:11');
+INSERT INTO `sys_depart` VALUES ('e615307e7b684f15885ef6da29f6771d', 'a06041ec62674810983326ae552ced92', '开发部门', NULL, NULL, 1, NULL, '2', '2', 'A05A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:55:59', 'admin', '2022-06-01 21:22:24');
+INSERT INTO `sys_depart` VALUES ('e0c42ad532b24b5fb76e44e9ecc03389', 'e615307e7b684f15885ef6da29f6771d', '前端开发', NULL, NULL, 1, NULL, '2', '3', 'A05A01A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:58:15', 'admin', '2022-06-01 21:23:24');
+INSERT INTO `sys_depart` VALUES ('2d9f7327dc2e4cf2b62d058a2c422534', 'e615307e7b684f15885ef6da29f6771d', '后端开发', NULL, NULL, 2, NULL, '2', '3', 'A05A01A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:58:28', 'admin', '2022-06-01 21:23:32');
+INSERT INTO `sys_depart` VALUES ('7aeb44fb58da45b484ab63b338acf738', 'e615307e7b684f15885ef6da29f6771d', '测试部门', NULL, NULL, 3, NULL, '2', '3', 'A05A01A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:58:42', 'admin', '2022-06-01 21:23:42');
+INSERT INTO `sys_depart` VALUES ('5eebbb70b6e24289933613b83c19c92b', 'a06041ec62674810983326ae552ced92', '运维部', NULL, NULL, 2, NULL, '2', '2', 'A05A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:56:20', 'admin', '2022-06-01 21:22:31');
+INSERT INTO `sys_depart` VALUES ('2b098c54e19943fb8246e1c1162a63a2', '5eebbb70b6e24289933613b83c19c92b', '系统运维', NULL, NULL, 1, NULL, '2', '3', 'A05A02A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:59:21', 'admin', '2022-06-01 21:23:15');
+INSERT INTO `sys_depart` VALUES ('8ef9c3c7e11e4fe0b2d457803b85cd24', 'a06041ec62674810983326ae552ced92', '市场部', NULL, NULL, 3, NULL, '2', '2', 'A05A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:56:29', 'admin', '2022-06-01 21:22:40');
+INSERT INTO `sys_depart` VALUES ('d28c13eaaa1d4655ac4a1cd248d10158', '8ef9c3c7e11e4fe0b2d457803b85cd24', '商务部', NULL, NULL, 1, NULL, '2', '3', 'A05A03A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 11:00:47', 'admin', '2022-06-01 21:22:59');
+INSERT INTO `sys_depart` VALUES ('02e9449426374c099d59d31ba9142520', '8ef9c3c7e11e4fe0b2d457803b85cd24', '销售部', NULL, NULL, 2, NULL, '2', '3', 'A05A03A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 11:01:11', 'admin', '2022-06-01 21:22:50');
 INSERT INTO `sys_depart` VALUES ('3995768f0b814cb6ba09a12f833c70f5', '8ef9c3c7e11e4fe0b2d457803b85cd24', '预报运维室', NULL, NULL, 3, NULL, '2', '3', 'A05A03A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 11:01:29', NULL, NULL);
-INSERT INTO `sys_depart` VALUES ('93732fbb0ff14965a337fc27972c6f4d', 'a06041ec62674810983326ae552ced92', '四副院长', NULL, NULL, 4, NULL, '2', '2', 'A05A04', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:56:40', NULL, NULL);
-INSERT INTO `sys_depart` VALUES ('35ccd833985b475a975e4b46eb4cf127', '93732fbb0ff14965a337fc27972c6f4d', '办公室', NULL, NULL, 1, NULL, '2', '3', 'A05A04A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 11:01:46', NULL, NULL);
-INSERT INTO `sys_depart` VALUES ('fb8b5f2a6d5d40508b9523434e44d536', '93732fbb0ff14965a337fc27972c6f4d', '政策研究室', NULL, NULL, 2, NULL, '2', '3', 'A05A04A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 11:01:57', NULL, NULL);
-INSERT INTO `sys_depart` VALUES ('c66be80d393b45af85ad2f1b307785e9', '93732fbb0ff14965a337fc27972c6f4d', '评价室', NULL, NULL, 3, NULL, '2', '3', 'A05A04A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 11:02:12', NULL, NULL);
-INSERT INTO `sys_depart` VALUES ('1fbd9362d9cd4f3b9781794ca1f509b8', '', 'test', NULL, NULL, 0, NULL, '1', '1', 'A06', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'admin', '2022-01-06 15:00:32', NULL, NULL);
+INSERT INTO `sys_depart` VALUES ('1fbd9362d9cd4f3b9781794ca1f509b8', '', '财务部', NULL, NULL, 0, NULL, '1', '1', 'A06', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'admin', '2022-01-06 15:00:32', 'admin', '2022-06-01 21:23:59');
 
 -- ----------------------------
 -- Table structure for sys_depart_permission
@@ -757,7 +728,7 @@ CREATE TABLE `sys_depart_role_permission`  (
   `permission_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '权限id',
   `data_rule_ids` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '数据权限ids',
   `operate_date` datetime(0) NULL DEFAULT NULL COMMENT '操作时间',
-  `operate_ip` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '操作ip',
+  `operate_ip` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '操作ip',
   INDEX `idx_sdrp_per_id`(`permission_id`) USING BTREE,
   INDEX `idx_sdrp_role_id`(`role_id`) USING BTREE,
   INDEX `idx_sdrp_role_per_id`(`permission_id`, `role_id`) USING BTREE
@@ -807,17 +778,14 @@ INSERT INTO `sys_dict` VALUES ('1232913193820581889', 'Online表单业务分类'
 INSERT INTO `sys_dict` VALUES ('1250687930947620866', '定时任务状态', 'quartz_status', NULL, 0, 'admin', '2020-04-16 15:30:14', NULL, NULL, NULL);
 INSERT INTO `sys_dict` VALUES ('1280401766745718786', '租户状态', 'tenant_status', '租户状态', 0, 'admin', '2020-07-07 15:22:25', NULL, NULL, 0);
 INSERT INTO `sys_dict` VALUES ('1356445645198135298', '开关', 'is_open', NULL, 0, 'admin', '2021-02-02 11:33:38', 'admin', '2021-02-02 15:28:12', 0);
-INSERT INTO `sys_dict` VALUES ('1415509679443714049', '涉及业务', 'km_dict_business', '涉及业务', 0, 'admin', '2021-07-14 22:13:01', 'admin', '2021-07-29 17:16:56', 0);
-INSERT INTO `sys_dict` VALUES ('1415572544998932482', '文档来源', 'km_dict_source', '文档来源', 0, 'admin', '2021-07-15 02:22:49', 'admin', '2021-07-29 17:16:51', 0);
-INSERT INTO `sys_dict` VALUES ('1415574243599777794', '分类目录', 'km_dict_category', '分类目录', 0, 'admin', '2021-07-15 02:29:34', 'admin', '2021-07-29 17:16:46', 0);
-INSERT INTO `sys_dict` VALUES ('1415575033756319746', '文档版本状态', 'km_dict_versions', '文档版本状态', 0, 'admin', '2021-07-15 02:32:43', 'admin', '2021-07-29 17:16:40', 0);
+INSERT INTO `sys_dict` VALUES ('1415509679443714049', '标签', 'km_dict_business', '标签', 0, 'admin', '2021-07-14 22:13:01', 'admin', '2022-06-01 20:55:02', 0);
+INSERT INTO `sys_dict` VALUES ('1415574243599777794', '分类', 'km_dict_category', '分类目录', 0, 'admin', '2021-07-15 02:29:34', 'admin', '2022-06-01 21:00:46', 0);
 INSERT INTO `sys_dict` VALUES ('1418495479619317761', '入库状态', 'dict_fti_flag', NULL, 0, 'admin', '2021-07-23 03:57:31', 'admin', '2021-07-23 04:04:33', 0);
 INSERT INTO `sys_dict` VALUES ('1420563456950808577', '操作类型', 'dict_doc_visit_type', '操作日志-操作类型', 0, 'admin', '2021-07-29 09:54:56', 'admin', '2021-07-29 10:06:39', 0);
 INSERT INTO `sys_dict` VALUES ('1435461054779015169', '文档状态', 'doc_dict_status', NULL, 0, 'admin', '2021-09-08 12:32:40', 'admin', '2021-09-08 12:46:04', 0);
 INSERT INTO `sys_dict` VALUES ('1435763999777144834', '统计维度', 'dict_statisticsType', NULL, 0, 'admin', '2021-09-09 08:36:27', NULL, NULL, 0);
 INSERT INTO `sys_dict` VALUES ('1446749054125019137', '是否公开', 'dict_is_open', NULL, 1, 'admin', '2021-10-09 16:07:08', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('1448189415518433282', '年份', 'km_dict_year', '发布年份', 0, 'admin', '2021-10-13 15:30:37', 'ceshi', '2021-10-14 23:12:52', 0);
-INSERT INTO `sys_dict` VALUES ('1450412344901677057', '公开方式', 'km_dict_public_remark', '公开方式', 0, 'ceshi', '2021-10-19 18:43:45', NULL, NULL, 0);
+INSERT INTO `sys_dict` VALUES ('1450412344901677057', '公开范围', 'dict_public_remark', '公开方式', 0, 'ceshi', '2021-10-19 18:43:45', 'admin', '2022-06-01 21:00:55', 0);
 INSERT INTO `sys_dict` VALUES ('236e8a4baff0db8c62c00dd95632834f', '同步工作流引擎', 'activiti_sync', '同步工作流引擎', 0, 'admin', '2019-05-15 15:27:33', NULL, NULL, 0);
 INSERT INTO `sys_dict` VALUES ('2e02df51611a4b9632828ab7e5338f00', '权限策略', 'perms_type', '权限策略', 0, 'admin', '2019-04-26 18:26:55', NULL, NULL, 0);
 INSERT INTO `sys_dict` VALUES ('2f0320997ade5dd147c90130f7218c3e', '推送类别', 'msg_type', NULL, 0, 'admin', '2019-03-17 21:21:32', 'admin', '2019-03-26 19:57:45', 0);
@@ -877,9 +845,8 @@ INSERT INTO `sys_dict_item` VALUES ('fcec03570f68a175e1964808dc3f1c91', '4c03fca
 INSERT INTO `sys_dict_item` VALUES ('fe50b23ae5e68434def76f67cef35d2d', '78bda155fe380b1b3f175f1e88c284c6', '已作废', '4', '已作废', 4, 1, 'admin', '2021-09-09 16:33:43', 'admin', '2019-05-09 16:34:40');
 INSERT INTO `sys_dict_item` VALUES ('1420564005536411661', '1420563456950808577', '修改', '6', '修改', 6, 1, 'admin', '2021-07-29 09:57:06', NULL, NULL);
 INSERT INTO `sys_dict_item` VALUES ('1420564005536411664', '1420563456950808577', '删除', '7', '删除', 7, 1, 'admin', '2021-07-29 09:57:06', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1450412465588580354', '1450412344901677057', '主动公开', '1', NULL, 1, 1, NULL, '2021-10-19 18:44:14', 'ceshi', '2021-11-12 01:33:39');
-INSERT INTO `sys_dict_item` VALUES ('1450412578524409857', '1450412344901677057', '依申请公开', '2', NULL, 2, 1, NULL, '2021-10-19 18:44:41', 'ceshi', '2021-10-19 19:10:43');
-INSERT INTO `sys_dict_item` VALUES ('1450412635868934145', '1450412344901677057', '不公开', '3', NULL, 3, 1, NULL, '2021-10-19 18:44:54', 'ceshi', '2021-10-19 19:10:53');
+INSERT INTO `sys_dict_item` VALUES ('1450412465588580354', '1450412344901677057', '本部门公开', '1', '本部门与下级部门可见', 2, 1, NULL, '2021-10-19 18:44:14', 'admin', '2022-06-01 20:54:15');
+INSERT INTO `sys_dict_item` VALUES ('1450412578524409857', '1450412344901677057', '所有部门', '0', '所有部门公开可见', 2, 1, NULL, '2021-10-19 18:44:41', 'admin', '2022-06-01 20:54:32');
 INSERT INTO `sys_dict_item` VALUES ('0072d115e07c875d76c9b022e2179128', '4d7fec1a7799a436d26d02325eff295e', '低', 'L', '低', 3, 1, 'admin', '2019-04-16 17:04:59', NULL, NULL);
 INSERT INTO `sys_dict_item` VALUES ('05a2e732ce7b00aa52141ecc3e330b4e', '3486f32803bb953e7155dab3513dc68b', '已删除', '1', NULL, NULL, 1, 'admin', '2025-10-18 21:46:56', 'admin', '2019-03-28 22:23:20');
 INSERT INTO `sys_dict_item` VALUES ('096c2e758d823def3855f6376bc736fb', 'bd1b8bc28e65d6feefefb6f3c79f42fd', 'SQL', 'sql', NULL, 1, 1, 'admin', '2019-04-12 17:26:26', NULL, NULL);
@@ -925,50 +892,34 @@ INSERT INTO `sys_dict_item` VALUES ('1305827309355302914', 'bd1b8bc28e65d6feefef
 INSERT INTO `sys_dict_item` VALUES ('1334440962954936321', '1209733563293962241', 'MYSQL5.7', '4', NULL, 1, 1, 'admin', '2020-12-03 18:16:02', 'admin', '2020-12-03 18:16:02');
 INSERT INTO `sys_dict_item` VALUES ('1356445705549975553', '1356445645198135298', '是', 'Y', NULL, 1, 1, 'admin', '2021-02-02 11:33:52', NULL, NULL);
 INSERT INTO `sys_dict_item` VALUES ('1356445754212290561', '1356445645198135298', '否', 'N', NULL, 1, 1, 'admin', '2021-02-02 11:34:04', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1415510117652013057', '1415509679443714049', '工作汇报', '1', '', 1, 1, 'admin', '2021-07-14 22:14:46', 'ceshi', '2021-11-23 11:50:48');
-INSERT INTO `sys_dict_item` VALUES ('1415512755764371457', '1415509679443714049', '教学研究', '2', '', 1, 1, 'admin', '2021-07-14 22:25:15', 'ceshi', '2021-11-23 11:51:07');
-INSERT INTO `sys_dict_item` VALUES ('1415512840657084418', '1415509679443714049', '教学材料', '3', '', 1, 1, 'admin', '2021-07-14 22:25:35', 'ceshi', '2021-11-23 11:51:44');
-INSERT INTO `sys_dict_item` VALUES ('1415512908009218049', '1415509679443714049', '行业交流', '4', '', 1, 1, 'admin', '2021-07-14 22:25:51', 'ceshi', '2021-11-23 11:52:07');
-INSERT INTO `sys_dict_item` VALUES ('1415512988313362433', '1415509679443714049', '政策研究', '5', NULL, 1, 1, 'admin', '2021-07-14 22:26:10', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1415513052456853505', '1415509679443714049', '学生档案', '6', '', 1, 1, 'admin', '2021-07-14 22:26:25', 'ceshi', '2021-11-23 11:54:12');
-INSERT INTO `sys_dict_item` VALUES ('1415513104826933249', '1415509679443714049', '备课材料', '7', '', 1, 1, 'admin', '2021-07-14 22:26:38', 'ceshi', '2021-11-23 11:54:29');
-INSERT INTO `sys_dict_item` VALUES ('1415518346117292034', '1415509679443714049', '会议纪要', '8', '', 1, 1, 'admin', '2021-07-14 22:47:27', 'ceshi', '2021-11-23 11:54:44');
-INSERT INTO `sys_dict_item` VALUES ('1415518423493812226', '1415509679443714049', '政府文件', '9', '', 1, 1, 'admin', '2021-07-14 22:47:46', 'ceshi', '2021-11-23 13:52:59');
-INSERT INTO `sys_dict_item` VALUES ('1415518535649501185', '1415509679443714049', '考试题库', '10', '', 1, 1, 'admin', '2021-07-14 22:48:13', 'ceshi', '2021-11-23 13:53:32');
-INSERT INTO `sys_dict_item` VALUES ('1415518651982716929', '1415509679443714049', '进修', '11', '', 1, 0, 'admin', '2021-07-14 22:48:40', 'ceshi', '2021-11-23 13:57:07');
-INSERT INTO `sys_dict_item` VALUES ('1415518739014524929', '1415509679443714049', '继续教育', '12', '', 1, 0, 'admin', '2021-07-14 22:49:01', 'ceshi', '2021-11-23 13:57:17');
-INSERT INTO `sys_dict_item` VALUES ('1415518841401679874', '1415509679443714049', '听课评课', '13', '', 1, 0, 'admin', '2021-07-14 22:49:26', 'ceshi', '2021-11-23 13:57:27');
-INSERT INTO `sys_dict_item` VALUES ('1415518946661933057', '1415509679443714049', '教育实践', '14', '', 1, 0, 'admin', '2021-07-14 22:49:51', 'ceshi', '2021-11-23 13:58:04');
-INSERT INTO `sys_dict_item` VALUES ('1415519089138245634', '1415509679443714049', '联合办学', '15', '', 1, 0, 'admin', '2021-07-14 22:50:25', 'ceshi', '2021-11-23 13:58:12');
-INSERT INTO `sys_dict_item` VALUES ('1415519256226734082', '1415509679443714049', '学校管理', '16', '', 1, 0, 'admin', '2021-07-14 22:51:04', 'ceshi', '2021-11-23 13:58:29');
-INSERT INTO `sys_dict_item` VALUES ('1415519311788679170', '1415509679443714049', '职称考评', '17', '', 1, 0, 'admin', '2021-07-14 22:51:18', 'ceshi', '2021-11-23 13:58:45');
-INSERT INTO `sys_dict_item` VALUES ('1415519414536544257', '1415509679443714049', '人事政策', '18', '', 1, 0, 'admin', '2021-07-14 22:51:42', 'ceshi', '2021-11-23 13:58:57');
-INSERT INTO `sys_dict_item` VALUES ('1415519478847807490', '1415509679443714049', '其他', '19', '', 11, 1, 'admin', '2021-07-14 22:51:57', 'ceshi', '2021-11-23 13:55:27');
-INSERT INTO `sys_dict_item` VALUES ('1415572705485586434', '1415572544998932482', '中央国务院全国人大', '1', NULL, 1, 1, 'admin', '2021-07-15 02:23:28', 'ceshi', '2021-10-15 16:44:35');
-INSERT INTO `sys_dict_item` VALUES ('1415572764965011458', '1415572544998932482', '自然资源部', '2', NULL, 1, 1, 'admin', '2021-07-15 02:23:42', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1415572821936242690', '1415572544998932482', '其他部委', '3', NULL, 1, 1, 'admin', '2021-07-15 02:23:55', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1415572891293253634', '1415572544998932482', '省委省府省人大', '4', NULL, 1, 1, 'admin', '2021-07-15 02:24:12', 'ceshi', '2021-10-15 16:44:49');
-INSERT INTO `sys_dict_item` VALUES ('1415572979956645890', '1415572544998932482', '省自然资源厅', '5', NULL, 1, 1, 'admin', '2021-07-15 02:24:33', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1415573174215835649', '1415572544998932482', '其他省直单位', '6', NULL, 1, 1, 'admin', '2021-07-15 02:25:19', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1415573266092064770', '1415572544998932482', '省土地调查规划院', '7', NULL, 1, 1, 'admin', '2021-07-15 02:25:41', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1415573399961665538', '1415572544998932482', '省内其他单位', '8', NULL, 1, 1, 'admin', '2021-07-15 02:26:13', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1415573454684749826', '1415572544998932482', '外省单位', '9', NULL, 1, 1, 'admin', '2021-07-15 02:26:26', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1415573499555414018', '1415572544998932482', '境外', '10', NULL, 1, 1, 'admin', '2021-07-15 02:26:37', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1415573567788351489', '1415572544998932482', '媒体', '11', NULL, 1, 1, 'admin', '2021-07-15 02:26:53', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1415573676152389634', '1415572544998932482', '个人', '12', NULL, 1, 1, 'admin', '2021-07-15 02:27:19', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1415574342098812929', '1415574243599777794', '语文', '1', '', 1, 1, 'admin', '2021-07-15 02:29:58', 'ceshi', '2021-11-23 11:39:09');
-INSERT INTO `sys_dict_item` VALUES ('1415574391214112769', '1415574243599777794', '数学', '2', '', 1, 1, 'admin', '2021-07-15 02:30:10', 'ceshi', '2021-11-23 11:39:18');
-INSERT INTO `sys_dict_item` VALUES ('1415574432960020481', '1415574243599777794', '英语', '3', '', 1, 1, 'admin', '2021-07-15 02:30:20', 'ceshi', '2021-11-23 11:39:24');
-INSERT INTO `sys_dict_item` VALUES ('1415574502241533954', '1415574243599777794', '品德', '4', '', 1, 1, 'admin', '2021-07-15 02:30:36', 'ceshi', '2021-11-23 11:39:43');
-INSERT INTO `sys_dict_item` VALUES ('1415574564849909762', '1415574243599777794', '体育', '5', '', 1, 1, 'admin', '2021-07-15 02:30:51', 'ceshi', '2021-11-23 11:39:50');
-INSERT INTO `sys_dict_item` VALUES ('1415574697549299713', '1415574243599777794', '美术', '7', '', 1, 1, 'admin', '2021-07-15 02:31:23', 'ceshi', '2021-11-23 11:40:23');
-INSERT INTO `sys_dict_item` VALUES ('1415575114165321729', '1415575033756319746', '最终稿', '1', NULL, 1, 1, 'admin', '2021-07-15 02:33:02', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1415575176530427906', '1415575033756319746', '过程稿', '2', NULL, 1, 1, 'admin', '2021-07-15 02:33:17', 'ceshi', '2021-10-26 17:26:24');
+INSERT INTO `sys_dict_item` VALUES ('1415510117652013057', '1415509679443714049', '干货', '1', '', 1, 1, 'admin', '2021-07-14 22:14:46', 'admin', '2022-06-01 20:55:30');
+INSERT INTO `sys_dict_item` VALUES ('1415512755764371457', '1415509679443714049', '重点', '2', '', 1, 1, 'admin', '2021-07-14 22:25:15', 'admin', '2022-06-01 20:55:37');
+INSERT INTO `sys_dict_item` VALUES ('1415512840657084418', '1415509679443714049', '最新', '3', '', 1, 1, 'admin', '2021-07-14 22:25:35', 'admin', '2022-06-01 20:55:44');
+INSERT INTO `sys_dict_item` VALUES ('1415512908009218049', '1415509679443714049', '实用', '4', '', 1, 1, 'admin', '2021-07-14 22:25:51', 'admin', '2022-06-01 20:55:54');
+INSERT INTO `sys_dict_item` VALUES ('1415512988313362433', '1415509679443714049', '名师', '5', '', 1, 1, 'admin', '2021-07-14 22:26:10', 'admin', '2022-06-01 20:56:03');
+INSERT INTO `sys_dict_item` VALUES ('1415513052456853505', '1415509679443714049', '经典', '6', '', 1, 1, 'admin', '2021-07-14 22:26:25', 'admin', '2022-06-01 20:56:31');
+INSERT INTO `sys_dict_item` VALUES ('1415513104826933249', '1415509679443714049', '理论', '7', '', 1, 1, 'admin', '2021-07-14 22:26:38', 'admin', '2022-06-01 20:56:40');
+INSERT INTO `sys_dict_item` VALUES ('1415518346117292034', '1415509679443714049', '实操', '8', '', 1, 1, 'admin', '2021-07-14 22:47:27', 'admin', '2022-06-01 20:56:50');
+INSERT INTO `sys_dict_item` VALUES ('1415518423493812226', '1415509679443714049', '潮流', '9', '', 1, 1, 'admin', '2021-07-14 22:47:46', 'admin', '2022-06-01 20:57:04');
+INSERT INTO `sys_dict_item` VALUES ('1415518535649501185', '1415509679443714049', '必考', '10', '', 1, 1, 'admin', '2021-07-14 22:48:13', 'admin', '2022-06-01 20:57:12');
+INSERT INTO `sys_dict_item` VALUES ('1415518651982716929', '1415509679443714049', '进修', '11', '', 1, 1, 'admin', '2021-07-14 22:48:40', 'admin', '2022-06-01 20:58:11');
+INSERT INTO `sys_dict_item` VALUES ('1415518739014524929', '1415509679443714049', '继续教育', '12', '', 1, 1, 'admin', '2021-07-14 22:49:01', 'admin', '2022-06-01 20:58:42');
+INSERT INTO `sys_dict_item` VALUES ('1415518946661933057', '1415509679443714049', '实践', '14', '', 1, 1, 'admin', '2021-07-14 22:49:51', 'admin', '2022-06-01 20:58:33');
+INSERT INTO `sys_dict_item` VALUES ('1415519089138245634', '1415509679443714049', '付费', '15', '', 3, 1, 'admin', '2021-07-14 22:50:25', 'admin', '2022-06-01 20:59:12');
+INSERT INTO `sys_dict_item` VALUES ('1415519478847807490', '1415509679443714049', '入门', '19', '', 11, 1, 'admin', '2021-07-14 22:51:57', 'admin', '2022-06-01 20:58:18');
+INSERT INTO `sys_dict_item` VALUES ('1415574342098812929', '1415574243599777794', '编程', '1', '', 1, 1, 'admin', '2021-07-15 02:29:58', 'admin', '2022-03-29 15:13:08');
+INSERT INTO `sys_dict_item` VALUES ('1415574391214112769', '1415574243599777794', '数据库', '2', '', 1, 1, 'admin', '2021-07-15 02:30:10', 'admin', '2022-03-29 15:13:14');
+INSERT INTO `sys_dict_item` VALUES ('1415574432960020481', '1415574243599777794', '架构', '3', '', 1, 1, 'admin', '2021-07-15 02:30:20', 'admin', '2022-03-29 15:13:20');
+INSERT INTO `sys_dict_item` VALUES ('1415574502241533954', '1415574243599777794', '前端', '4', '', 1, 1, 'admin', '2021-07-15 02:30:36', 'admin', '2022-03-29 15:13:28');
+INSERT INTO `sys_dict_item` VALUES ('1415574564849909762', '1415574243599777794', 'UI设计', '5', '', 1, 1, 'admin', '2021-07-15 02:30:51', 'admin', '2022-03-29 15:13:36');
+INSERT INTO `sys_dict_item` VALUES ('1415574697549299713', '1415574243599777794', '中间件', '7', '', 1, 1, 'admin', '2021-07-15 02:31:23', 'admin', '2022-03-29 15:14:17');
 INSERT INTO `sys_dict_item` VALUES ('1418496971277398018', '1418495479619317761', '入库失败', '-1', NULL, 1, 1, 'admin', '2021-07-23 04:03:27', NULL, NULL);
 INSERT INTO `sys_dict_item` VALUES ('1418497014818467842', '1418495479619317761', '等待入库', '0', NULL, 1, 1, 'admin', '2021-07-23 04:03:37', NULL, NULL);
 INSERT INTO `sys_dict_item` VALUES ('1418497058619584514', '1418495479619317761', '已入库', '1', NULL, 1, 1, 'admin', '2021-07-23 04:03:48', NULL, NULL);
 INSERT INTO `sys_dict_item` VALUES ('1418497118333890561', '1418495479619317761', '不需要入库', '2', NULL, 1, 1, 'admin', '2021-07-23 04:04:02', NULL, NULL);
 INSERT INTO `sys_dict_item` VALUES ('1420563600144347137', '1420563456950808577', '上传', '0', '上传', 0, 1, 'admin', '2021-07-29 09:55:30', 'admin', '2021-07-29 09:55:57');
+INSERT INTO `sys_dict_item` VALUES ('1420563682348511233', '1420563456950808577', '审核通过', '1', '审核通过', 1, 1, 'admin', '2021-07-29 09:55:49', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1420563785893294082', '1420563456950808577', '审核拒绝', '2', '审核拒绝', 2, 1, 'admin', '2021-07-29 09:56:14', NULL, NULL);
 INSERT INTO `sys_dict_item` VALUES ('1420563852746305538', '1420563456950808577', '修改预览文档', '3', '修改预览文档', 3, 1, 'admin', '2021-07-29 09:56:30', NULL, NULL);
 INSERT INTO `sys_dict_item` VALUES ('1420563930554839041', '1420563456950808577', '下载', '4', '下载', 4, 1, 'admin', '2021-07-29 09:56:49', NULL, NULL);
 INSERT INTO `sys_dict_item` VALUES ('1420564005536411650', '1420563456950808577', '预览', '5', '预览', 5, 1, 'admin', '2021-07-29 09:57:06', NULL, NULL);
@@ -977,26 +928,11 @@ INSERT INTO `sys_dict_item` VALUES ('1435461470677811202', '1435461054779015169'
 INSERT INTO `sys_dict_item` VALUES ('1435461526139092994', '1435461054779015169', '审核通过', '2', NULL, 1, 1, 'admin', '2021-09-08 12:34:32', NULL, NULL);
 INSERT INTO `sys_dict_item` VALUES ('1435461599442944002', '1435461054779015169', '审核驳回', '3', NULL, 1, 1, 'admin', '2021-09-08 12:34:50', NULL, NULL);
 INSERT INTO `sys_dict_item` VALUES ('1435764110502576129', '1435763999777144834', '分类', '1', NULL, 1, 1, 'admin', '2021-09-09 08:36:54', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1435764144711319554', '1435763999777144834', '来源', '2', NULL, 1, 1, 'admin', '2021-09-09 08:37:02', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1435764240131735554', '1435763999777144834', '涉及业务', '4', NULL, 1, 1, 'admin', '2021-09-09 08:37:25', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1435764293730746370', '1435763999777144834', '版本状态', '5', NULL, 1, 1, 'admin', '2021-09-09 08:37:37', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1435764144711319554', '1435763999777144834', '状态', '2', NULL, 1, 1, 'admin', '2021-09-09 08:37:02', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1435764240131735554', '1435763999777144834', '标签', '4', NULL, 1, 1, 'admin', '2021-09-09 08:37:25', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1435764293730746370', '1435763999777144834', '知识专题', '5', NULL, 1, 1, 'admin', '2021-09-09 08:37:37', NULL, NULL);
 INSERT INTO `sys_dict_item` VALUES ('1446749165269880833', '1446749054125019137', '公开', '0', NULL, 1, 1, 'admin', '2021-10-09 16:07:35', NULL, NULL);
 INSERT INTO `sys_dict_item` VALUES ('1446749218503987201', '1446749054125019137', '不公开', '1', NULL, 1, 1, 'admin', '2021-10-09 16:07:48', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1448189485705916417', '1448189415518433282', '2021年', '2021', NULL, 2021, 1, NULL, '2021-10-13 15:30:54', NULL, '2021-10-13 15:31:47');
-INSERT INTO `sys_dict_item` VALUES ('1448189539787272194', '1448189415518433282', '2022年', '2022', NULL, 2022, 1, NULL, '2021-10-13 15:31:07', NULL, '2021-10-13 15:31:59');
-INSERT INTO `sys_dict_item` VALUES ('1448189588860628993', '1448189415518433282', '2020年', '2020', NULL, 2020, 1, NULL, '2021-10-13 15:31:19', NULL, '2021-10-13 15:31:54');
-INSERT INTO `sys_dict_item` VALUES ('1448199169691152386', '1448189415518433282', '2019年', '2019', NULL, 2019, 1, NULL, '2021-10-13 16:09:23', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1448199236258951170', '1448189415518433282', '2018年', '2018', NULL, 2018, 1, NULL, '2021-10-13 16:09:39', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1448199306417074178', '1448189415518433282', '2023年', '2023', NULL, 2023, 1, NULL, '2021-10-13 16:09:56', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1448199379939028994', '1448189415518433282', '2024年', '2024', NULL, 2024, 1, NULL, '2021-10-13 16:10:13', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1448199445483417601', '1448189415518433282', '2025年', '2025', NULL, 2025, 1, NULL, '2021-10-13 16:10:29', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1448199700622929921', '1448189415518433282', '2017年', '2017', NULL, 2017, 1, NULL, '2021-10-13 16:11:30', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1448199760270127105', '1448189415518433282', '2016年', '2016', NULL, 2016, 1, NULL, '2021-10-13 16:11:44', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1448199814963851265', '1448189415518433282', '2015年', '2015', NULL, 2015, 1, NULL, '2021-10-13 16:11:57', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1448199899512631298', '1448189415518433282', '2026年', '2026', NULL, 2026, 1, NULL, '2021-10-13 16:12:17', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1448199976788488193', '1448189415518433282', '2027年', '2027', NULL, 2027, 1, NULL, '2021-10-13 16:12:35', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1448200037769474050', '1448189415518433282', '2028年', '2028', NULL, 2028, 1, NULL, '2021-10-13 16:12:50', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1448200113774456834', '1448189415518433282', '2029年', '2029', NULL, 2029, 1, NULL, '2021-10-13 16:13:08', NULL, NULL);
 INSERT INTO `sys_dict_item` VALUES ('147c48ff4b51545032a9119d13f3222a', 'd6e1152968b02d69ff358c75b48a6ee1', '测试流程', 'test', NULL, 1, 1, 'admin', '2019-03-22 19:27:05', NULL, NULL);
 INSERT INTO `sys_dict_item` VALUES ('1543fe7e5e26fb97cdafe4981bedc0c8', '4c03fca6bf1f0299c381213961566349', '单排布局', 'single', NULL, 2, 1, 'admin', '2022-07-12 17:43:39', 'admin', '2019-04-12 17:43:57');
 INSERT INTO `sys_dict_item` VALUES ('1ce390c52453891f93514c1bd2795d44', 'ad7c65ba97c20a6805d5dcdf13cdaf36', '000', '00', NULL, 1, 1, 'admin', '2019-03-22 16:34:34', NULL, NULL);
@@ -1067,7 +1003,8 @@ INSERT INTO `sys_dict_item` VALUES ('df168368dcef46cade2aadd80100d8aa', '3d9a351
 INSERT INTO `sys_dict_item` VALUES ('e6329e3a66a003819e2eb830b0ca2ea0', '4e4602b3e3686f0911384e188dc7efb4', '小于', '<', '小于', 2, 1, 'admin', '2019-04-01 16:44:15', 'admin', '2019-04-01 17:48:34');
 INSERT INTO `sys_dict_item` VALUES ('e94eb7af89f1dbfa0d823580a7a6e66a', '236e8a4baff0db8c62c00dd95632834f', '不同步', '0', '不同步', 2, 1, 'admin', '2019-05-15 15:28:28', NULL, NULL);
 INSERT INTO `sys_dict_item` VALUES ('f0162f4cc572c9273f3e26b2b4d8c082', 'ad7c65ba97c20a6805d5dcdf13cdaf36', 'booostrap', '1', NULL, 1, 1, 'admin', '2021-08-22 16:32:04', 'admin', '2019-03-22 16:33:57');
-
+INSERT INTO `sys_dict_item` VALUES ('1531984025085562882', '1415574243599777794', '社会', '8', '社会', 1, 1, 'admin', '2022-06-01 21:00:29', NULL, NULL);
+INSERT into `sys_dict_item` VALUES('1420564005536411665','1420563456950808577','编辑文件',8,'编辑文件',8,1,'admin','2022-10-29 09:57:06',null,null);
 -- ----------------------------
 -- Table structure for sys_fill_rule
 -- ----------------------------
@@ -1153,16 +1090,6 @@ CREATE TABLE `sys_log`  (
 -- ----------------------------
 -- Records of sys_log
 -- ----------------------------
-INSERT INTO `sys_log` VALUES ('1670316130794528769', 1, '用户名: admin,登录成功！', NULL, 'admin', '管理员', '0:0:0:0:0:0:0:1', NULL, NULL, NULL, NULL, NULL, NULL, '2023-06-18 14:22:53', NULL, NULL);
-INSERT INTO `sys_log` VALUES ('1670324216057880577', 2, 'km_doc-文件上传', 1, 'admin', '管理员', '0:0:0:0:0:0:0:1', 'org.jeecg.modules.KM.controller.KmDocController.uploadDoc()', NULL, '[null,null]', NULL, 133, NULL, '2023-06-18 14:55:01', NULL, NULL);
-INSERT INTO `sys_log` VALUES ('1670324591968182274', 2, 'km_doc-文件上传', 1, 'admin', '管理员', '0:0:0:0:0:0:0:1', 'org.jeecg.modules.KM.controller.KmDocController.uploadDoc()', NULL, '[null,null]', NULL, 30796, NULL, '2023-06-18 14:56:31', NULL, NULL);
-INSERT INTO `sys_log` VALUES ('1670326409272037378', 2, 'km_doc-文件上传', 1, 'admin', '管理员', '0:0:0:0:0:0:0:1', 'org.jeecg.modules.KM.controller.KmDocController.uploadDoc()', NULL, '[null,null]', NULL, 278, NULL, '2023-06-18 15:03:44', NULL, NULL);
-INSERT INTO `sys_log` VALUES ('1670326745558757378', 2, 'km_doc-通过id删除', 4, 'admin', '管理员', '0:0:0:0:0:0:0:1', 'org.jeecg.modules.KM.controller.KmDocController.delete()', NULL, '  id: 402881ec88cd51160188cd5116db0001  req: org.apache.shiro.web.servlet.ShiroHttpServletRequest@41a8f62e', NULL, 660, NULL, '2023-06-18 15:05:04', NULL, NULL);
-INSERT INTO `sys_log` VALUES ('1670326769520816130', 2, 'km_doc-文件上传', 1, 'admin', '管理员', '0:0:0:0:0:0:0:1', 'org.jeecg.modules.KM.controller.KmDocController.uploadDoc()', NULL, '[null,null]', NULL, 189, NULL, '2023-06-18 15:05:10', NULL, NULL);
-INSERT INTO `sys_log` VALUES ('1672124946553057282', 1, '用户名: admin,登录成功！', NULL, 'admin', '管理员', '127.0.0.1', NULL, NULL, NULL, NULL, NULL, NULL, '2023-06-23 14:10:28', NULL, NULL);
-INSERT INTO `sys_log` VALUES ('1672125012772728834', 2, 'km_sys_config-分页列表查询', 1, 'admin', '管理员', '127.0.0.1', 'org.jeecg.modules.KM.controller.KmSysConfigController.queryPageList()', NULL, '  kmSysConfig: KmSysConfig(id=null, itemCode=null, itemValue=null, itemName=null)  pageNo: 1  pageSize: 10  req: org.apache.shiro.web.servlet.ShiroHttpServletRequest@465d65af', NULL, 58, NULL, '2023-06-23 14:10:44', NULL, NULL);
-INSERT INTO `sys_log` VALUES ('1672125052597645314', 2, 'km_sys_config-分页列表查询', 1, 'admin', '管理员', '0:0:0:0:0:0:0:1', 'org.jeecg.modules.KM.controller.KmSysConfigController.queryPageList()', NULL, '  kmSysConfig: KmSysConfig(id=null, itemCode=null, itemValue=null, itemName=null)  pageNo: 2  pageSize: 10  req: org.apache.shiro.web.servlet.ShiroHttpServletRequest@526e73d7', NULL, 40, NULL, '2023-06-23 14:10:54', NULL, NULL);
-INSERT INTO `sys_log` VALUES ('1672125062345207810', 2, 'km_sys_config-分页列表查询', 1, 'admin', '管理员', '127.0.0.1', 'org.jeecg.modules.KM.controller.KmSysConfigController.queryPageList()', NULL, '  kmSysConfig: KmSysConfig(id=null, itemCode=null, itemValue=null, itemName=null)  pageNo: 1  pageSize: 10  req: org.apache.shiro.web.servlet.ShiroHttpServletRequest@bee47a0', NULL, 38, NULL, '2023-06-23 14:10:56', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for sys_permission
@@ -1201,14 +1128,25 @@ CREATE TABLE `sys_permission`  (
 -- Records of sys_permission
 -- ----------------------------
 INSERT INTO `sys_permission` VALUES ('9502685863ab87f0ad1134142788a385', NULL, '首页', '/dashboard/analysis', 'dashboard/Analysis', NULL, NULL, 0, NULL, NULL, 0.00, 0, 'home', 1, 1, NULL, 0, NULL, NULL, '2018-12-25 20:34:38', 'admin', '2019-03-29 11:04:13', 0, 0, NULL, NULL);
+INSERT INTO `sys_permission` VALUES ('97c8629abc7848eccdb6d77c24bb3ebb', '700b7f95165c46cc7a78bf227aa8fed3', '磁盘监控', '/monitor/Disk', 'modules/monitor/DiskMonitoring', NULL, NULL, 1, NULL, NULL, 6.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-25 14:30:06', 'admin', '2019-05-05 14:37:14', 0, 0, NULL, NULL);
 INSERT INTO `sys_permission` VALUES ('9cb91b8851db0cf7b19d7ecc2a8193dd', '1939e035e803a99ceecb6f5563570fb2', '我的任务表单', '/modules/bpm/task/form/FormModule', 'modules/bpm/task/form/FormModule', NULL, NULL, 1, NULL, NULL, 1.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-03-08 16:49:05', 'admin', '2019-03-08 18:37:56', 0, 0, NULL, NULL);
+INSERT INTO `sys_permission` VALUES ('b1cb0a3fedf7ed0e4653cb5a229837ee', '08e6b9dc3c04489c8e1ff2ce6f105aa4', '定时任务', '/isystem/QuartzJobList', 'system/QuartzJobList', NULL, NULL, 1, NULL, NULL, 1.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, '2019-01-03 09:38:52', 'admin', '2020-09-09 14:48:16', 0, 0, NULL, 0);
 INSERT INTO `sys_permission` VALUES ('b6bcee2ccc854052d3cc3e9c96d90197', '71102b3b87fb07e5527bbd2c530dd90a', '加班申请', '/modules/extbpm/joa/JoaOvertimeList', 'modules/extbpm/joa/JoaOvertimeList', NULL, NULL, 1, NULL, NULL, 1.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-03 15:33:10', 'admin', '2019-04-03 15:34:48', 0, 0, NULL, NULL);
+INSERT INTO `sys_permission` VALUES ('d07a2c87a451434c99ab06296727ec4f', '700b7f95165c46cc7a78bf227aa8fed3', 'JVM信息', '/monitor/JvmInfo', 'modules/monitor/JvmInfo', NULL, NULL, 1, NULL, NULL, 4.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-01 23:07:48', 'admin', '2019-04-02 11:37:16', 0, 0, NULL, NULL);
 INSERT INTO `sys_permission` VALUES ('d7d6e2e4e2934f2c9385a623fd98c6f3', NULL, '系统管理', '/isystem', 'layouts/RouteView', NULL, NULL, 0, NULL, NULL, 7.00, 0, 'setting', 1, 0, 0, 0, NULL, NULL, '2018-12-25 20:34:38', 'admin', '2021-07-14 01:50:27', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('e41b69c57a941a3bbcce45032fe57605', '', '在线开发', '/online', 'layouts/RouteView', NULL, NULL, 0, NULL, NULL, 6.00, 0, 'cloud', 1, 0, 0, 1, NULL, 'admin', '2019-03-08 10:43:10', 'admin', '2022-06-01 20:07:25', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('024f1fd1283dc632458976463d8984e1', '700b7f95165c46cc7a78bf227aa8fed3', 'Tomcat信息', '/monitor/TomcatInfo', 'modules/monitor/TomcatInfo', NULL, NULL, 1, NULL, NULL, 4.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-02 09:44:29', 'admin', '2019-05-07 15:19:10', 0, 0, NULL, NULL);
+INSERT INTO `sys_permission` VALUES ('08e6b9dc3c04489c8e1ff2ce6f105aa4', NULL, '系统监控', '/dashboard3', 'layouts/RouteView', NULL, NULL, 0, NULL, NULL, 6.00, 0, 'dashboard', 1, 0, 0, 1, NULL, NULL, '2018-12-25 20:34:38', 'ceshi', '2021-10-14 15:05:03', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('109c78a583d4693ce2f16551b7786786', 'e41b69c57a941a3bbcce45032fe57605', 'Online报表配置', '/online/cgreport', 'modules/online/cgreport/OnlCgreportHeadList', NULL, NULL, 1, NULL, NULL, 2.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2019-03-08 10:51:07', 'ceshi', '2021-12-15 22:21:31', 0, 0, NULL, 0);
 INSERT INTO `sys_permission` VALUES ('1415139394194399233', NULL, '文件管理', '/km/filemanagement', 'layouts/RouteView', NULL, NULL, 0, NULL, '1', 1.00, 0, 'folder', 1, 0, 0, 0, NULL, 'admin', '2021-07-13 21:41:38', 'admin', '2021-07-14 01:40:06', 0, 0, '1', 0);
-INSERT INTO `sys_permission` VALUES ('1415145872468893697', '1415139394194399233', '知识文件管理', '/km/filemanagement/draftslist', 'km/filemanagement/DraftsList', NULL, NULL, 1, NULL, '1', 1.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2021-07-13 22:07:23', 'admin', '2022-03-28 00:11:34', 0, 0, '1', 0);
+INSERT INTO `sys_permission` VALUES ('1415145872468893697', '1415139394194399233', '草稿文件上传', '/km/filemanagement/draftslist', 'km/filemanagement/DraftsList', NULL, NULL, 1, NULL, '1', 1.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2021-07-13 22:07:23', 'admin', '2022-03-16 20:18:22', 0, 0, '1', 0);
 INSERT INTO `sys_permission` VALUES ('1415156984451063809', NULL, '配置管理', '/km/datasetting', 'layouts/RouteView', NULL, NULL, 0, NULL, '1', 2.00, 0, 'cluster', 1, 0, 0, 0, NULL, 'admin', '2021-07-13 22:51:32', 'admin', '2021-07-29 17:28:49', 0, 0, '1', 0);
+INSERT INTO `sys_permission` VALUES ('1415201088958537730', '1415139394194399233', '待审核文件', '/km/filemanagement/pendingreviewlist', 'km/filemanagement/PendingReviewList', NULL, NULL, 1, NULL, '1', 2.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2021-07-14 01:46:47', 'ceshi', '2021-10-14 15:17:42', 0, 1, '1', 0);
+INSERT INTO `sys_permission` VALUES ('1415206488843919361', '1415139394194399233', '已审核文件', '/km/filemanagement/auditedlist', 'km/filemanagement/AuditedList', NULL, NULL, 1, NULL, '1', 3.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2021-07-14 02:08:15', 'admin', '2021-10-09 20:20:35', 0, 1, '1', 0);
+INSERT INTO `sys_permission` VALUES ('1415216128377921537', '1415156984451063809', '知识专题定义', '/km/datasetting/projectdefinitionlist', 'km/datasetting/ProjectDefinitionList', NULL, NULL, 1, NULL, '1', NULL, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2021-07-14 02:46:33', NULL, NULL, 0, 0, '1', 0);
 INSERT INTO `sys_permission` VALUES ('1415277817119023106', '1415156984451063809', '文档属性定义', '/km/datasetting/dictlist', 'km/datasetting/DictList', NULL, NULL, 1, NULL, '1', NULL, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2021-07-14 06:51:41', 'admin', '2021-07-29 17:28:22', 0, 0, '1', 0);
 INSERT INTO `sys_permission` VALUES ('1419574496959193090', '1415156984451063809', '系统参数', '/km/datasetting/KmSysConfigList', 'km/datasetting/KmSysConfigList', NULL, NULL, 1, NULL, '1', 3.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2021-07-26 03:25:09', NULL, NULL, 0, 0, '1', 0);
+INSERT INTO `sys_permission` VALUES ('1420569168296886273', '1420569665158332418', '文档操作记录', '/online/cgreport/1420565897964433409', 'modules/online/cgreport/auto/OnlCgreportAutoList', NULL, NULL, 1, NULL, '1', 1.00, 0, NULL, 0, 1, 0, 0, NULL, 'admin', '2021-07-29 10:17:37', 'ceshi', '2021-10-14 23:30:58', 0, 0, '1', 0);
 INSERT INTO `sys_permission` VALUES ('1420569665158332418', NULL, '日志', '/layouts/RouteView', 'layouts/RouteView', NULL, NULL, 0, NULL, '1', 1.80, 0, 'diff', 1, 0, 0, 0, NULL, 'admin', '2021-07-29 10:19:36', 'admin', '2021-08-04 17:04:21', 0, 0, '1', 0);
 INSERT INTO `sys_permission` VALUES ('1422846497589129218', '1415139394194399233', '文件统计', '/km/filemanagement/FileStatisticsList', 'km/filemanagement/FileStatisticsList', NULL, NULL, 1, NULL, '1', 4.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2021-08-04 17:06:55', 'ceshi', '2021-10-14 18:01:35', 0, 0, '1', 0);
 INSERT INTO `sys_permission` VALUES ('190c2b43bec6a5f7a4194a85db67d96a', 'd7d6e2e4e2934f2c9385a623fd98c6f3', '角色管理', '/isystem/roleUserList', 'system/RoleUserList', NULL, NULL, 1, NULL, NULL, 1.20, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2019-04-17 15:13:56', 'admin', '2019-12-25 09:36:31', 0, 0, NULL, 0);
@@ -1216,10 +1154,17 @@ INSERT INTO `sys_permission` VALUES ('3f915b2769fc80648e92d04e84ca059d', 'd7d6e2
 INSERT INTO `sys_permission` VALUES ('45c966826eeff4c99b8f8ebfe74511fc', 'd7d6e2e4e2934f2c9385a623fd98c6f3', '部门管理', '/isystem/depart', 'system/DepartList', NULL, NULL, 1, NULL, NULL, 1.40, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2019-01-29 18:47:40', 'admin', '2019-12-25 09:36:47', 0, 0, NULL, 0);
 INSERT INTO `sys_permission` VALUES ('54dd5457a3190740005c1bfec55b1c34', 'd7d6e2e4e2934f2c9385a623fd98c6f3', '菜单管理', '/isystem/permission', 'system/PermissionList', NULL, NULL, 1, NULL, NULL, 1.30, 0, NULL, 1, 1, 0, 0, NULL, NULL, '2018-12-25 20:34:38', 'admin', '2019-12-25 09:36:39', 0, 0, NULL, 0);
 INSERT INTO `sys_permission` VALUES ('58857ff846e61794c69208e9d3a85466', '1420569665158332418', '系统日志', '/isystem/log', 'system/LogList', NULL, NULL, 1, NULL, NULL, 2.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, '2018-12-26 10:11:18', 'admin', '2021-07-29 10:20:23', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('841057b8a1bef8f6b4b20f9a618a7fa6', '1420569665158332418', '数据日志', '/sys/dataLog-list', 'system/DataLogList', NULL, NULL, 1, NULL, NULL, 2.10, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2019-03-11 19:26:49', 'admin', '2023-06-23 14:11:38', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('700b7f95165c46cc7a78bf227aa8fed3', '08e6b9dc3c04489c8e1ff2ce6f105aa4', '性能监控', '/monitor', 'layouts/RouteView', NULL, NULL, 1, NULL, NULL, 3.00, 0, NULL, 1, 0, 0, 0, NULL, 'admin', '2019-04-02 11:34:34', 'admin', '2020-09-09 14:48:51', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('841057b8a1bef8f6b4b20f9a618a7fa6', '08e6b9dc3c04489c8e1ff2ce6f105aa4', '数据日志', '/sys/dataLog-list', 'system/DataLogList', NULL, NULL, 1, NULL, NULL, 2.10, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2019-03-11 19:26:49', 'admin', '2020-09-09 14:48:32', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('8b3bff2eee6f1939147f5c68292a1642', '700b7f95165c46cc7a78bf227aa8fed3', '服务器信息', '/monitor/SystemInfo', 'modules/monitor/SystemInfo', NULL, NULL, 1, NULL, NULL, 4.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-02 11:39:19', 'admin', '2019-04-02 15:40:02', 0, 0, NULL, NULL);
+INSERT INTO `sys_permission` VALUES ('8d1ebd663688965f1fd86a2f0ead3416', '700b7f95165c46cc7a78bf227aa8fed3', 'Redis监控', '/monitor/redis/info', 'modules/monitor/RedisInfo', NULL, NULL, 1, NULL, NULL, 1.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-02 13:11:33', 'admin', '2019-05-07 15:18:54', 0, 0, NULL, NULL);
+INSERT INTO `sys_permission` VALUES ('9fe26464838de2ea5e90f2367e35efa0', 'e41b69c57a941a3bbcce45032fe57605', 'AUTO在线报表', '/online/cgreport/:code', 'modules/online/cgreport/auto/OnlCgreportAutoList', 'onlineAutoList', NULL, 1, NULL, NULL, 9.00, 0, NULL, 1, 1, 0, 1, NULL, 'admin', '2019-03-12 11:06:48', 'ceshi', '2021-12-15 22:21:35', 0, 0, NULL, 0);
 INSERT INTO `sys_permission` VALUES ('1453933027082489858', '1415139394194399233', '收藏夹', '/km/filemanagement/KmDocFavouriteList', 'km/filemanagement/KmDocFavouriteList', NULL, NULL, 1, NULL, '1', 0.00, 0, NULL, 1, 1, 0, 0, NULL, 'ceshi', '2021-10-29 11:53:41', NULL, NULL, 0, NULL, '1', 0);
 INSERT INTO `sys_permission` VALUES ('1456909004028821505', '1415139394194399233', '检索列表', '/km/search/DoSearch', 'km/search/DoSearch', NULL, NULL, 1, NULL, '1', 9.00, 0, NULL, 1, 0, 0, 1, NULL, 'ceshi', '2021-11-06 16:59:09', NULL, NULL, 0, NULL, '1', 0);
 INSERT INTO `sys_permission` VALUES ('1456909292378832898', '1456909004028821505', '批量下载', '/km/search/DoSearch', NULL, NULL, NULL, 2, 'searchList:batchDownload', '1', NULL, 0, NULL, 1, 1, 0, 0, NULL, 'ceshi', '2021-11-06 17:00:18', NULL, NULL, 0, NULL, '1', 0);
+INSERT INTO `sys_permission` VALUES ('fc810a2267dd183e4ef7c71cc60f4670', '700b7f95165c46cc7a78bf227aa8fed3', '请求追踪', '/monitor/HttpTrace', 'modules/monitor/HttpTrace', NULL, NULL, 1, NULL, NULL, 4.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-02 09:46:19', 'admin', '2019-04-02 11:37:27', 0, 0, NULL, NULL);
+INSERT INTO `sys_permission` VALUES ('1531912068221132802', '1415139394194399233', '全局检索权限', NULL, NULL, NULL, NULL, 2, 'DepartmentFilterIgnore', '1', 1.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2022-06-01 16:14:33', NULL, NULL, 0, NULL, '1', 0);
+INSERT INTO `sys_permission` VALUES ('141957449695919345', '1415156984451063809', '数据库备份', '/km/datasetting/KmSysDbBackupList', 'km/datasetting/KmSysDbBackupList', NULL, NULL, 1, NULL, '1', 4.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2023-05-11 03:25:09', NULL, NULL, 0, 0, '1', 0);
 
 -- ----------------------------
 -- Table structure for sys_permission_data_rule
@@ -1242,6 +1187,8 @@ CREATE TABLE `sys_permission_data_rule`  (
 -- ----------------------------
 -- Records of sys_permission_data_rule
 -- ----------------------------
+INSERT INTO `sys_permission_data_rule` VALUES ('1446812832576593922', '1415206488843919361', '看归属部门数据', 'orgCode', 'USE_SQL_RULES', '(org_code like \'#{sys_org_code}%\' or org_code like \'A%\')', '1', '2021-10-09 20:20:34', 'admin', '2022-03-17 10:43:51', 'admin');
+INSERT INTO `sys_permission_data_rule` VALUES ('1448548552202784769', '1415201088958537730', '看归属部门的数据', 'orgCode', 'USE_SQL_RULES', '(org_code like \'#{sys_org_code}%\' or org_code like \'A02%\')', '1', '2021-10-14 15:17:42', 'ceshi', NULL, NULL);
 INSERT INTO `sys_permission_data_rule` VALUES ('40283181614231d401614234fe670003', '40283181614231d401614232cd1c0001', 'createBy', 'createBy', '=', '#{sys_user_code}', '1', '2018-01-29 21:57:04', 'admin', NULL, NULL);
 INSERT INTO `sys_permission_data_rule` VALUES ('4028318161424e730161424fca6f0004', '4028318161424e730161424f61510002', 'createBy', 'createBy', '=', '#{sys_user_code}', '1', '2018-01-29 22:26:20', 'admin', NULL, NULL);
 INSERT INTO `sys_permission_data_rule` VALUES ('402880e6487e661a01487e732c020005', '402889fb486e848101486e93a7c80014', 'SYS_ORG_CODE', 'SYS_ORG_CODE', 'LIKE', '010201%', '1', '2014-09-16 20:32:30', 'admin', NULL, NULL);
@@ -1326,14 +1273,18 @@ CREATE TABLE `sys_role`  (
   `create_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建人',
   `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
   `update_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '更新人',
-  `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间'
+  `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uniq_sys_role_role_code`(`role_code`) USING BTREE,
+  INDEX `idx_sr_role_code`(`role_code`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '角色表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_role
 -- ----------------------------
 INSERT INTO `sys_role` VALUES ('f6817f48af4fb3af11b9e8bf182f618b', '管理员', 'admin', '管理员', NULL, '2018-12-21 18:03:39', 'admin', '2022-01-06 14:36:13');
-INSERT INTO `sys_role` VALUES ('1501891096828817410', 'test', '9dcb6f3da512450db97043164d6894e6', NULL, 'ceshi', '2022-03-10 20:01:56', NULL, NULL);
+INSERT INTO `sys_role` VALUES ('1501891096828817410', '测试角色', 'ceshi', NULL, 'ceshi', '2022-03-10 20:01:56', 'admin', '2022-06-01 21:25:49');
+INSERT INTO `sys_role` VALUES ('1531990117173710849', '普通用户角色', 'Common', NULL, 'admin', '2022-06-01 21:24:42', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for sys_role_permission
@@ -1345,7 +1296,7 @@ CREATE TABLE `sys_role_permission`  (
   `permission_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '权限id',
   `data_rule_ids` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '数据权限ids',
   `operate_date` datetime(0) NULL DEFAULT NULL COMMENT '操作时间',
-  `operate_ip` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '操作ip'
+  `operate_ip` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '操作ip'
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '角色权限表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -1366,8 +1317,12 @@ INSERT INTO `sys_role_permission` VALUES ('1269526122208522241', 'f6817f48af4fb3
 INSERT INTO `sys_role_permission` VALUES ('1415139448871346178', 'f6817f48af4fb3af11b9e8bf182f618b', '1415139394194399233', NULL, '2021-07-13 21:41:51', '0:0:0:0:0:0:0:1');
 INSERT INTO `sys_role_permission` VALUES ('1415145981671792642', 'f6817f48af4fb3af11b9e8bf182f618b', '1415145872468893697', NULL, '2021-07-13 22:07:49', '0:0:0:0:0:0:0:1');
 INSERT INTO `sys_role_permission` VALUES ('1415157254522298370', 'f6817f48af4fb3af11b9e8bf182f618b', '1415156984451063809', NULL, '2021-07-13 22:52:36', '0:0:0:0:0:0:0:1');
+INSERT INTO `sys_role_permission` VALUES ('1415201137276919810', 'f6817f48af4fb3af11b9e8bf182f618b', '1415201088958537730', NULL, '2021-07-14 01:46:59', '0:0:0:0:0:0:0:1');
+INSERT INTO `sys_role_permission` VALUES ('1415206549682298882', 'f6817f48af4fb3af11b9e8bf182f618b', '1415206488843919361', '', '2021-07-14 02:08:29', '0:0:0:0:0:0:0:1');
+INSERT INTO `sys_role_permission` VALUES ('1415216174586568705', 'f6817f48af4fb3af11b9e8bf182f618b', '1415216128377921537', NULL, '2021-07-14 02:46:44', '0:0:0:0:0:0:0:1');
 INSERT INTO `sys_role_permission` VALUES ('1415277853504610305', 'f6817f48af4fb3af11b9e8bf182f618b', '1415277817119023106', NULL, '2021-07-14 06:51:50', '0:0:0:0:0:0:0:1');
 INSERT INTO `sys_role_permission` VALUES ('1419574538910621698', 'f6817f48af4fb3af11b9e8bf182f618b', '1419574496959193090', NULL, '2021-07-26 03:25:19', '192.168.0.103');
+INSERT INTO `sys_role_permission` VALUES ('1420569931790237697', 'f6817f48af4fb3af11b9e8bf182f618b', '1420569168296886273', NULL, '2021-07-29 10:20:39', '0:0:0:0:0:0:0:1');
 INSERT INTO `sys_role_permission` VALUES ('1420570298724728833', 'f6817f48af4fb3af11b9e8bf182f618b', '1420569665158332418', NULL, '2021-07-29 10:22:07', '0:0:0:0:0:0:0:1');
 INSERT INTO `sys_role_permission` VALUES ('1422846634373771266', 'f6817f48af4fb3af11b9e8bf182f618b', '1422846497589129218', NULL, '2021-08-04 17:07:27', '192.168.0.104');
 INSERT INTO `sys_role_permission` VALUES ('cf1feb1bf69eafc982295ad6c9c8d698', 'f6817f48af4fb3af11b9e8bf182f618b', 'a2b11669e98c5fe54a53c3e3c4f35d14', NULL, NULL, NULL);
@@ -1393,16 +1348,32 @@ INSERT INTO `sys_role_permission` VALUES ('1479012049120796674', 'f6817f48af4fb3
 INSERT INTO `sys_role_permission` VALUES ('1501891384792952834', '1501891096828817410', '9502685863ab87f0ad1134142788a385', NULL, '2022-03-10 20:03:05', '116.23.218.77');
 INSERT INTO `sys_role_permission` VALUES ('1501891384809730049', '1501891096828817410', '1415139394194399233', NULL, '2022-03-10 20:03:05', '116.23.218.77');
 INSERT INTO `sys_role_permission` VALUES ('1501891384809730050', '1501891096828817410', '1453933027082489858', NULL, '2022-03-10 20:03:05', '116.23.218.77');
+INSERT INTO `sys_role_permission` VALUES ('1501891384809730051', '1501891096828817410', '1415201088958537730', NULL, '2022-03-10 20:03:05', '116.23.218.77');
 INSERT INTO `sys_role_permission` VALUES ('1501891384809730052', '1501891096828817410', '1415145872468893697', NULL, '2022-03-10 20:03:05', '116.23.218.77');
+INSERT INTO `sys_role_permission` VALUES ('1501891384822312962', '1501891096828817410', '1415206488843919361', NULL, '2022-03-10 20:03:05', '116.23.218.77');
 INSERT INTO `sys_role_permission` VALUES ('1501891384830701569', '1501891096828817410', '1422846497589129218', NULL, '2022-03-10 20:03:05', '116.23.218.77');
 INSERT INTO `sys_role_permission` VALUES ('1501891384830701570', '1501891096828817410', '1456909004028821505', NULL, '2022-03-10 20:03:05', '116.23.218.77');
 INSERT INTO `sys_role_permission` VALUES ('1501891384830701571', '1501891096828817410', '1456909292378832898', NULL, '2022-03-10 20:03:05', '116.23.218.77');
 INSERT INTO `sys_role_permission` VALUES ('1501891384830701572', '1501891096828817410', '1420569665158332418', NULL, '2022-03-10 20:03:05', '116.23.218.77');
+INSERT INTO `sys_role_permission` VALUES ('1501891384830701573', '1501891096828817410', '1420569168296886273', NULL, '2022-03-10 20:03:05', '116.23.218.77');
 INSERT INTO `sys_role_permission` VALUES ('1501891384830701574', '1501891096828817410', '58857ff846e61794c69208e9d3a85466', NULL, '2022-03-10 20:03:05', '116.23.218.77');
 INSERT INTO `sys_role_permission` VALUES ('1501891384830701575', '1501891096828817410', '1415156984451063809', NULL, '2022-03-10 20:03:05', '116.23.218.77');
 INSERT INTO `sys_role_permission` VALUES ('1501891384830701576', '1501891096828817410', '1415277817119023106', NULL, '2022-03-10 20:03:05', '116.23.218.77');
+INSERT INTO `sys_role_permission` VALUES ('1501891384830701577', '1501891096828817410', '1415216128377921537', NULL, '2022-03-10 20:03:05', '116.23.218.77');
 INSERT INTO `sys_role_permission` VALUES ('1501891384830701578', '1501891096828817410', '1419574496959193090', NULL, '2022-03-10 20:03:05', '116.23.218.77');
-INSERT INTO `sys_role_permission` VALUES ('1672125560288784385', 'f6817f48af4fb3af11b9e8bf182f618b', '841057b8a1bef8f6b4b20f9a618a7fa6', NULL, '2023-06-23 14:12:55', '0:0:0:0:0:0:0:1');
+INSERT INTO `sys_role_permission` VALUES ('1524636883174076417', 'f6817f48af4fb3af11b9e8bf182f618b', '08e6b9dc3c04489c8e1ff2ce6f105aa4', NULL, '2022-05-12 14:25:34', '103.10.85.66');
+INSERT INTO `sys_role_permission` VALUES ('1524636883174076418', 'f6817f48af4fb3af11b9e8bf182f618b', 'b1cb0a3fedf7ed0e4653cb5a229837ee', NULL, '2022-05-12 14:25:34', '103.10.85.66');
+INSERT INTO `sys_role_permission` VALUES ('1524636883174076419', 'f6817f48af4fb3af11b9e8bf182f618b', '841057b8a1bef8f6b4b20f9a618a7fa6', NULL, '2022-05-12 14:25:34', '103.10.85.66');
+INSERT INTO `sys_role_permission` VALUES ('1524636883174076420', 'f6817f48af4fb3af11b9e8bf182f618b', '700b7f95165c46cc7a78bf227aa8fed3', NULL, '2022-05-12 14:25:34', '103.10.85.66');
+INSERT INTO `sys_role_permission` VALUES ('1524636883174076421', 'f6817f48af4fb3af11b9e8bf182f618b', '8d1ebd663688965f1fd86a2f0ead3416', NULL, '2022-05-12 14:25:34', '103.10.85.66');
+INSERT INTO `sys_role_permission` VALUES ('1524636883174076422', 'f6817f48af4fb3af11b9e8bf182f618b', '024f1fd1283dc632458976463d8984e1', NULL, '2022-05-12 14:25:34', '103.10.85.66');
+INSERT INTO `sys_role_permission` VALUES ('1524636883174076423', 'f6817f48af4fb3af11b9e8bf182f618b', '8b3bff2eee6f1939147f5c68292a1642', NULL, '2022-05-12 14:25:34', '103.10.85.66');
+INSERT INTO `sys_role_permission` VALUES ('1524636883174076424', 'f6817f48af4fb3af11b9e8bf182f618b', 'd07a2c87a451434c99ab06296727ec4f', NULL, '2022-05-12 14:25:34', '103.10.85.66');
+INSERT INTO `sys_role_permission` VALUES ('1524636883174076425', 'f6817f48af4fb3af11b9e8bf182f618b', 'fc810a2267dd183e4ef7c71cc60f4670', NULL, '2022-05-12 14:25:34', '103.10.85.66');
+INSERT INTO `sys_role_permission` VALUES ('1524636883174076426', 'f6817f48af4fb3af11b9e8bf182f618b', '97c8629abc7848eccdb6d77c24bb3ebb', NULL, '2022-05-12 14:25:34', '103.10.85.66');
+INSERT INTO `sys_role_permission` VALUES ('1524636883174076427', 'f6817f48af4fb3af11b9e8bf182f618b', 'e41b69c57a941a3bbcce45032fe57605', NULL, '2022-05-12 14:25:34', '103.10.85.66');
+INSERT INTO `sys_role_permission` VALUES ('1524636883174076428', 'f6817f48af4fb3af11b9e8bf182f618b', '109c78a583d4693ce2f16551b7786786', NULL, '2022-05-12 14:25:34', '103.10.85.66');
+INSERT INTO `sys_role_permission` VALUES ('1524636883174076429', 'f6817f48af4fb3af11b9e8bf182f618b', '9fe26464838de2ea5e90f2367e35efa0', NULL, '2022-05-12 14:25:34', '103.10.85.66');
 
 -- ----------------------------
 -- Table structure for sys_tenant
@@ -1470,14 +1441,23 @@ CREATE TABLE `sys_user`  (
   `user_identity` decimal(4, 0) NULL DEFAULT NULL COMMENT '身份（1普通成员 2上级）',
   `depart_ids` longtext CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '负责部门',
   `rel_tenant_ids` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '多租户标识',
-  `client_id` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '设备ID'
+  `client_id` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '设备ID',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uniq_sys_user_work_no`(`work_no`) USING BTREE,
+  UNIQUE INDEX `uniq_sys_user_username`(`username`) USING BTREE,
+  UNIQUE INDEX `uniq_sys_user_phone`(`phone`) USING BTREE,
+  UNIQUE INDEX `uniq_sys_user_email`(`email`) USING BTREE,
+  INDEX `idx_su_username`(`username`) USING BTREE,
+  INDEX `idx_su_status`(`status`) USING BTREE,
+  INDEX `idx_su_del_flag`(`del_flag`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用户表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES ('e9ca23d68d884d4ebb19d07889727dae', 'admin', '管理员', 'cb362cfeefbf3d8d', 'RCGTeGiH', '', '2018-12-05 00:00:00', 1, 'jeecg@163.com', '18611111111', 'A01', 1, 0, NULL, NULL, 1, '00001', '总经理', NULL, NULL, '2019-06-21 17:54:10', 'admin', '2021-10-09 21:03:21', 2, 'c6d7cb4deeac411cb3384b1b31278596', NULL, NULL);
+INSERT INTO `sys_user` VALUES ('e9ca23d68d884d4ebb19d07889727dae', 'admin', '管理员', 'cb362cfeefbf3d8d', 'RCGTeGiH', '', '2018-12-05 00:00:00', 1, 'jeecg@163.com', '18611111111', 'A01', 1, 0, NULL, NULL, 1, '00001', '总经理', NULL, NULL, '2019-06-21 17:54:10', 'admin', '2022-03-27 01:50:19', 2, 'f79b7d5a99b1442c876858a6961cb1fb', NULL, NULL);
 INSERT INTO `sys_user` VALUES ('1448560127207559169', 'ceshi', '测试', '8480d522fcf8d62c', 'bslhULTz', NULL, NULL, NULL, NULL, NULL, 'A01', 1, 0, 'bf4ff455bd3344e784cf2ba92ffee2e1', '1', NULL, NULL, NULL, NULL, NULL, '2021-10-14 16:03:41', 'ceshi', '2022-03-22 14:12:52', NULL, NULL, NULL, NULL);
+INSERT INTO `sys_user` VALUES ('1509138755255885826', 'yzg', 'yzg', 'd5f077bb9c4a517e', 'Ga12Hwr9', NULL, NULL, NULL, NULL, NULL, 'A01', 1, 0, NULL, NULL, 1, NULL, NULL, NULL, 'admin', '2022-03-30 20:01:32', 'admin', '2022-06-01 21:25:23', 1, '', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for sys_user_agent
@@ -1518,6 +1498,8 @@ CREATE TABLE `sys_user_depart`  (
 -- Records of sys_user_depart
 -- ----------------------------
 INSERT INTO `sys_user_depart` VALUES ('1506108597582270465', '1448560127207559169', 'f79b7d5a99b1442c876858a6961cb1fb');
+INSERT INTO `sys_user_depart` VALUES ('1507776977473232898', 'e9ca23d68d884d4ebb19d07889727dae', 'f79b7d5a99b1442c876858a6961cb1fb');
+INSERT INTO `sys_user_depart` VALUES ('1531990290499129346', '1509138755255885826', 'f79b7d5a99b1442c876858a6961cb1fb');
 
 -- ----------------------------
 -- Table structure for sys_user_role
@@ -1532,8 +1514,33 @@ CREATE TABLE `sys_user_role`  (
 -- ----------------------------
 -- Records of sys_user_role
 -- ----------------------------
-INSERT INTO `sys_user_role` VALUES ('1446823599141052418', 'e9ca23d68d884d4ebb19d07889727dae', 'f6817f48af4fb3af11b9e8bf182f618b');
 INSERT INTO `sys_user_role` VALUES ('1446823599141052418', 'f6817f48af4fb3af11b9e8bf182f618b', 'f6817f48af4fb3af11b9e8bf182f618b');
 INSERT INTO `sys_user_role` VALUES ('1506108597502578689', '1448560127207559169', '1501891096828817410');
+INSERT INTO `sys_user_role` VALUES ('1507776977431289857', 'e9ca23d68d884d4ebb19d07889727dae', 'f6817f48af4fb3af11b9e8bf182f618b');
+INSERT INTO `sys_user_role` VALUES ('1531990290465574913', '1509138755255885826', '1501891096828817410');
+INSERT INTO `sys_user_role` VALUES ('1531990290486546434', '1509138755255885826', '1531990117173710849');
+
+DROP TABLE IF EXISTS `km_doc_comments`;
+CREATE TABLE `km_doc_comments` (
+  `id` varchar(32) COLLATE utf8mb4_general_ci NOT NULL,
+  `doc_id` varchar(32) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '文档id',
+  `create_by` varchar(32) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '创建人',
+  `comment` longtext COLLATE utf8mb4_general_ci COMMENT '评论内容，5000字以内',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `km_doc_version`;
+CREATE TABLE `km_doc_version` (
+  `id` varchar(32) COLLATE utf8mb4_general_ci NOT NULL,
+  `doc_id` varchar(32) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '文档id',
+  `file_id` varchar(32) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '文件id',
+  `version` int DEFAULT NULL COMMENT '版本号',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `create_by` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '创建用户',
+  `comment` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 SET FOREIGN_KEY_CHECKS = 1;

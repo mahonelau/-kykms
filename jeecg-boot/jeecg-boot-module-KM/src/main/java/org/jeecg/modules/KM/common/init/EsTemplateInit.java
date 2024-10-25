@@ -17,6 +17,6 @@ public class EsTemplateInit implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         log.info("start check ES template and init...");
-        iKmEsMgntService.initTemplate();
+        iKmEsMgntService.initTemplateAndSyncDocs();
     }
 }

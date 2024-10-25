@@ -1,5 +1,7 @@
 package org.jeecg.modules.KM.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +10,9 @@ import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.system.vo.SysCategoryModel;
+import org.jeecg.modules.KM.VO.KmChartVO;
+import org.jeecg.modules.KM.VO.KmDocStatisticsVO;
+import org.jeecg.modules.KM.VO.KmDocSummaryVO;
 import org.jeecg.modules.KM.entity.KmDoc;
 import org.jeecg.modules.KM.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.*;
 
-@Api(tags="首页相关")
+@Api(tags="km_doc")
 @RestController
 @RequestMapping("/KM/HomePage")
 @Slf4j
@@ -26,6 +31,8 @@ public class KmHonePageController extends JeecgController<KmDoc, IKmDocService> 
     private IKmSysConfigService kmSysConfigService;
     @Autowired
     private ISysBaseAPI sysBaseAPI;
+    @Autowired
+    private IKmDocService kmDocService;
 
 
     @ApiOperation(value="km_doc-首页专题", notes="km_doc-首页专题")
@@ -51,7 +58,7 @@ public class KmHonePageController extends JeecgController<KmDoc, IKmDocService> 
             }
             catch (IOException e){
                 e.printStackTrace();
-                return Result.error("io异常");
+                //return Result.error("io异常");
             }
         }
         if(!sysCategoryModelsTarget.isEmpty()) {
@@ -67,12 +74,32 @@ public class KmHonePageController extends JeecgController<KmDoc, IKmDocService> 
     @ApiOperation(value="km_doc-首页业务列表", notes="km_doc-首页业务列表")
     @GetMapping(value = "/listBusinessType")
     public Result<?> listBusinessType( ) {
-        //todo
         List<DictModel> dictModelList = sysBaseAPI.queryDictItemList("km_dict_business");
         if(dictModelList.size()>20)
             dictModelList = dictModelList.subList(0,19);
         return Result.OK(dictModelList);
     }
+
+    @ApiOperation(value="km_doc-后台数据统计页面接口", notes="km_doc-后台数据统计页面接口")
+    @GetMapping(value = "/getCharData")
+    public Result<?> getCharData( ) throws IOException {
+        KmChartVO kmChartVO = new KmChartVO();
+        List<KmDocStatisticsVO> categoryList = kmDocService.queryKmDocStatistics(1);
+        kmChartVO.setCategoryChartList(categoryList);
+        List<KmDocStatisticsVO> businessList = kmDocService.queryKmDocStatistics(4);
+        kmChartVO.setBusinessChartList(businessList);
+        List<KmDocStatisticsVO> topicList = kmDocService.queryKmDocStatistics(5);
+        kmChartVO.setTopicChartList(topicList);
+        List<String> hotKeyword =  kmSearchRecordService.hotKeywordReport();
+        kmChartVO.setHotKeywordList(hotKeyword);
+        List<String> hotTopic =  kmSearchRecordService.hotTopicReport();
+        kmChartVO.setHotTopicList(hotTopic);
+        KmDocSummaryVO kmDocSummaryVO = kmDocService.queryKmDocSummary();
+        kmChartVO.setKmDocSummaryVO(kmDocSummaryVO);
+        return Result.OK(kmChartVO);
+    }
+
+
 
 
 }

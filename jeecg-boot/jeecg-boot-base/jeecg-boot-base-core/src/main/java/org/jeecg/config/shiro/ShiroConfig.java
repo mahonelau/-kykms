@@ -70,6 +70,14 @@ public class ShiroConfig {
                 filterChainDefinitionMap.put(url,"anon");
             }
         }
+        //km免登录接口
+        filterChainDefinitionMap.put("/KM/kmSysConfig/listAllConfig", "anon"); //获取参数
+        filterChainDefinitionMap.put("/category/**", "anon");
+        filterChainDefinitionMap.put("/sys/loginThird", "anon");
+        filterChainDefinitionMap.put("/sys/loginAuto", "anon");
+        filterChainDefinitionMap.put("/KM/EsMgnt/**", "anon");
+        filterChainDefinitionMap.put("/onlyoffice/**", "anon");
+
         // 配置不会被拦截的链接 顺序判断
         filterChainDefinitionMap.put("/sys/cas/client/validateLogin", "anon"); //cas验证登录
         filterChainDefinitionMap.put("/sys/randomImage/**", "anon"); //登录验证码接口排除
@@ -183,9 +191,9 @@ public class ShiroConfig {
     public DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator() {
         DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator = new DefaultAdvisorAutoProxyCreator();
         defaultAdvisorAutoProxyCreator.setProxyTargetClass(true);
-        /*
-          解决重复代理问题 github#994
-          添加前缀判断 不匹配 任何Advisor
+        /**
+         * 解决重复代理问题 github#994
+         * 添加前缀判断 不匹配 任何Advisor
          */
         defaultAdvisorAutoProxyCreator.setUsePrefix(true);
         defaultAdvisorAutoProxyCreator.setAdvisorBeanNamePrefix("_no_advisor");

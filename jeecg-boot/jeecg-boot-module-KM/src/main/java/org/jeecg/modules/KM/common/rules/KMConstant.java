@@ -11,16 +11,26 @@ public class KMConstant {
 
     public static String SearchTermSeprator = " + ";
     public static char fileSeparator = '/';
+
+    //redis prefix
     public static String UserDocVisitHistoryPrefix = "UserDocVisitHistoryPrefix_";
     public static String UserDownloadLimitPrefix = "UserDownloadLimitPerDay_";
     public static String UserSearchLimitPrefix = "UserSearchLimitPerTenSeconds_";
     public static String UserViewLimitPrefix = "UserViewLimitPerTenSeconds_";
-    public static String DocIndexName = "km_doc";
-    public static String DocIndexAliasName = "km_doc_alias";
-    public static String KMSearchRecordIndexName = "log_km_search_record";
-    public static String KMSearchRecordIndexAliasName = "log_km_search_record_alias";
-    public static String DocVisitIndexName = "log_km_doc_visit_record";
-    public static String DocVisitIndexAliasName = "log_km_doc_visit_record_alias";
+
+    //ES prefix
+//    public static String DocIndexPrefix = "test_";
+    public static String DocIndexPrefix = "";
+    public static String DocIndexName = DocIndexPrefix + "km_doc";
+    public static String DocIndexAliasName = DocIndexPrefix + "km_doc_alias";
+    public static String KMSearchRecordIndexName = DocIndexPrefix + "log_km_search_record";
+    public static String KMSearchRecordIndexAliasName = DocIndexPrefix + "log_km_search_record_alias";
+    public static String DocVisitIndexName = DocIndexPrefix + "log_km_doc_visit_record";
+    public static String DocVisitIndexAliasName = DocIndexPrefix + "log_km_doc_visit_record_alias";
+
+    //定时任务相关
+    public static String JobAutoScanFileBasePath = "JobAutoScanFileBasePath";
+
     public static Integer SearchTimeOutSeconds = 10;     //秒
     public static Integer SaveTimeOutHours = 1;     //1小时
     public static Integer SaveTimeOutMinutes = 1;     //1分钟
@@ -90,6 +100,8 @@ public class KMConstant {
     public  boolean isFileTypeSupport(String suffix){
         String fileTypes = kmSysConfigService.getSysConfigValue("supportFileTypes");
         if(fileTypes!=null && !fileTypes.isEmpty() ){
+            if(fileTypes.equals("*"))
+                return true;
             for (String s : fileTypes.split(",")) {
                 if(suffix.toLowerCase().equals(s))
                     return true;

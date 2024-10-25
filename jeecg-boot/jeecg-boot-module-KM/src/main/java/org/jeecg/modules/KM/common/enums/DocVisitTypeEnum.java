@@ -10,7 +10,8 @@ public enum DocVisitTypeEnum {
     Download(4),
     View(5),
     Edit(6),
-    Delete(7);
+    Delete(7),
+    UpdateFile(8);
 
     DocVisitTypeEnum(Integer code) {
         this.code = code;

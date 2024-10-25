@@ -130,7 +130,7 @@
               password: this.model.password,
               captcha: this.model.inputCode,
               checkKey: this.currdatetime,
-              remember_me: rememberMe,
+              // remember_me: rememberMe,
             }
             console.log("登录参数", loginParams)
             this.Login(loginParams).then((res) => {

@@ -3,14 +3,14 @@
     :title="title"
     :width="width"
     :visible="visible"
-
     @ok="handleOk"
     :okButtonProps="{ class:{'jee-hidden': true} }"
     @cancel="handleCancel"
     cancelText="关闭"
      :cancelButtonProps="{ class:{'jee-hidden': false} }">
     <upload-form ref="realForm" @ok="submitCallback"  @nd="Newdate" :disabled="disableSubmit"></upload-form>
-    <span style="float: right">   文件大小限制:<2M</span>
+    <span style="float: left">   请先设定属性，然后选择文件上传</span>
+    <span style="float: right">   文件大小限制:<2G</span>
 
   </j-modal>
 </template>
@@ -26,7 +26,7 @@
     data () {
       return {
         title:'',
-        width:800,
+        width:1000,
         visible: false,
         disableSubmit: false
       }

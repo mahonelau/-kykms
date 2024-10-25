@@ -19,7 +19,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.jeecg.common.aspect.annotation.AutoLog;
 
-@Api(tags="文件")
+@Api(tags="km_file")
 @RestController
 @RequestMapping("/KM/kmFile")
 @Slf4j

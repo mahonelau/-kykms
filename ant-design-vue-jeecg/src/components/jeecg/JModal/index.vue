@@ -227,8 +227,8 @@
     }
     &.no-title{
       .ant-modal-header {
-        padding: 0 24px;
-        border-bottom: 0 !important;
+        padding: 0px 24px;
+        border-bottom: 0px !important;
       }
     }
   }

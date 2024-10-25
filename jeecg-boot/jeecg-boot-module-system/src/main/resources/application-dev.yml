@@ -1,41 +1,21 @@
-server:
-  port: 8080
-  tomcat:
-    max-swallow-size: -1
-  error:
-    include-exception: true
-    include-stacktrace: ALWAYS
-    include-message: ALWAYS
-  servlet:
-    context-path: /ky
-  compression:
-    enabled: true
-    min-response-size: 1024
-    mime-types: application/javascript,application/json,application/xml,text/html,text/xml,text/plain,text/css,image/*
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: metrics,httptrace
-
 ##文件上传和转换工具的配置
 base:
   upload-dir: d:\KM\upload
+  db-backup-dir: c:\KmDocs
   soffice-path: C:\Program Files\LibreOffice\program\soffice.exe
   one-system-url:
 
 ##ElasticSearch服务配置 for highLevelRestClient
 esclient:
-  master-host: 127.0.0.1
+  master-host: xxxxx
   master-port: 9200
+  master-auth: true
   master-user-name: elastic
-  master-user-pwd: xxxxxxxxxxx
+  master-user-pwd: xxxxxxx
 
 spring:
   servlet:
     multipart:
-#      文件上传的大小限制
       max-file-size: 1000MB
       max-request-size: 1000MB
   mail:
@@ -111,9 +91,9 @@ spring:
         connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
       datasource:
         master:
-          url: jdbc:mysql://127.0.0.1:3306/km?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          url: jdbc:mysql://xxxx:3306/km_businesss_dev?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
           username: root
-          password: xxxxxxxxxxxxx
+          password: xxxxxxx
           driver-class-name: com.mysql.cj.jdbc.Driver
   #redis 配置
   redis:
@@ -128,22 +108,6 @@ spring:
       shutdown-timeout: 100ms
     password: ''
     port: 6379
-#mybatis plus 设置
-mybatis-plus:
-  mapper-locations: classpath*:org/jeecg/modules/**/xml/*Mapper.xml
-  global-config:
-    # 关闭MP3.0自带的banner
-    banner: false
-    db-config:
-      #主键类型  0:"数据库ID自增",1:"该类型为未设置主键类型", 2:"用户输入ID",3:"全局唯一ID (数字类型唯一ID)", 4:"全局唯一ID UUID",5:"字符串全局唯一ID (idWorker 的字符串表示)";
-      id-type: ASSIGN_ID
-      # 默认数据库表下划线命名
-      table-underline: true
-  configuration:
-    # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    # 返回类型为Map,显示null对应的字段
-    call-setters-on-nulls: true
 #jeecg专用配置
 jeecg :
   # 本地：local\Minio：minio\阿里云：alioss
@@ -154,7 +118,7 @@ jeecg :
     #webapp文件路径
     webapp: /opt/webapp
   shiro:
-    excludeUrls: /test/jeecgDemo/demo3,/test/jeecgDemo/redisDemo/**,/category/**,/visual/**,/map/**,/jmreport/bigscreen2/**,/sys/category/**,/sys/dictItem/**,/sys/loginThird,/KM/EsMgnt/**
+    excludeUrls: /category/**,/sys/category/**,/sys/dictItem/**,/sys/loginThird,/KM/EsMgnt/**,/KM/kmSysConfig/querySiteInfo
   #阿里云oss存储和大鱼短信秘钥配置
   oss:
     accessKey: ??

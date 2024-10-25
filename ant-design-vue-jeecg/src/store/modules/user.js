@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import { login, logout, phoneLogin, thirdLogin ,loginFun} from "@/api/login"
 import { ACCESS_TOKEN, USER_NAME,USER_INFO,USER_AUTH,SYS_BUTTON_AUTH,UI_CACHE_DB_DICT_DATA,TENANT_ID,CACHE_INCLUDED_ROUTES } from "@/store/mutation-types"
-import { welcome } from "@/utils/util"
+// import { welcome } from "@/utils/util"
 import { queryPermissionsByUser } from '@/api/api'
 import { getAction } from '@/api/manage'
 
@@ -21,10 +21,10 @@ const user = {
     SET_TOKEN: (state, token) => {
       state.token = token
     },
-    SET_NAME: (state, { username, realname, welcome }) => {
+    SET_NAME: (state, { username, realname }) => {
       state.username = username
       state.realname = realname
-      state.welcome = welcome
+      // state.welcome = welcome
     },
     SET_AVATAR: (state, avatar) => {
       state.avatar = avatar
@@ -54,7 +54,7 @@ const user = {
             Vue.ls.set(USER_INFO, userInfo, 7 * 24 * 60 * 60 * 1000)
             commit('SET_TOKEN', result.token)
             commit('SET_INFO', userInfo)
-            commit('SET_NAME', { username: userInfo.username,realname: userInfo.realname, welcome: welcome() })
+            commit('SET_NAME', { username: userInfo.username,realname: userInfo.realname })
             commit('SET_AVATAR', userInfo.avatar)
             resolve(response)
           }else{
@@ -78,7 +78,7 @@ const user = {
             Vue.ls.set(UI_CACHE_DB_DICT_DATA, result.sysAllDictItems, 7 * 24 * 60 * 60 * 1000)
             commit('SET_TOKEN', result.token)
             commit('SET_INFO', userInfo)
-            commit('SET_NAME', { username: userInfo.username,realname: userInfo.realname, welcome: welcome() })
+            commit('SET_NAME', { username: userInfo.username,realname: userInfo.realname })
             commit('SET_AVATAR', userInfo.avatar)
             resolve(response)
           }else{
@@ -103,7 +103,7 @@ const user = {
             Vue.ls.set(UI_CACHE_DB_DICT_DATA, result.sysAllDictItems, 7 * 24 * 60 * 60 * 1000)
             commit('SET_TOKEN', result.token)
             commit('SET_INFO', userInfo)
-            commit('SET_NAME', { username: userInfo.username,realname: userInfo.realname, welcome: welcome() })
+            commit('SET_NAME', { username: userInfo.username,realname: userInfo.realname })
             commit('SET_AVATAR', userInfo.avatar)
             resolve(response)
           }else{
@@ -129,7 +129,7 @@ const user = {
         Vue.ls.set(UI_CACHE_DB_DICT_DATA, result.sysAllDictItems, 7 * 24 * 60 * 60 * 1000)
         commit('SET_TOKEN', result.token)
         commit('SET_INFO', userInfo)
-        commit('SET_NAME', { username: userInfo.username,realname: userInfo.realname, welcome: welcome() })
+        commit('SET_NAME', { username: userInfo.username,realname: userInfo.realname })
         commit('SET_AVATAR', userInfo.avatar)
         resolve(response)
       }else{
@@ -211,7 +211,7 @@ const user = {
             Vue.ls.set(USER_INFO, userInfo, 7 * 24 * 60 * 60 * 1000)
             commit('SET_TOKEN', result.token)
             commit('SET_INFO', userInfo)
-            commit('SET_NAME', { username: userInfo.username,realname: userInfo.realname, welcome: welcome() })
+            commit('SET_NAME', { username: userInfo.username,realname: userInfo.realname })
             commit('SET_AVATAR', userInfo.avatar)
             resolve(response)
           }else{

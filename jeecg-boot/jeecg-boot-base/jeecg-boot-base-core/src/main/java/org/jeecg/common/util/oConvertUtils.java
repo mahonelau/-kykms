@@ -21,7 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
+ * 
  * @Author  张代浩
  *
  */
@@ -39,7 +39,7 @@ public class oConvertUtils {
 		}
 		return (false);
 	}
-
+	
 	public static boolean isNotEmpty(Object object) {
 		if (object != null && !object.equals("") && !object.equals("null")) {
 			return (true);
@@ -163,7 +163,7 @@ public class oConvertUtils {
 			return (defval);
 		}
 	}
-
+	
 	public static Integer getInt(Object object) {
 		if (isEmpty(object)) {
 			return null;
@@ -199,7 +199,15 @@ public class oConvertUtils {
 		return (getString(s, ""));
 	}
 
-
+	/**
+	 * 转义成Unicode编码
+	 * @param s
+	 * @return
+	 */
+	/*public static String escapeJava(Object s) {
+		return StringEscapeUtils.escapeJava(getString(s));
+	}*/
+	
 	public static String getString(Object object) {
 		if (isEmpty(object)) {
 			return "";
@@ -255,7 +263,7 @@ public class oConvertUtils {
 
 	/**
 	 * 判断一个类是否为基本数据类型。
-	 *
+	 * 
 	 * @param clazz
 	 *            要判断的类。
 	 * @return true 表示为基本数据类型。
@@ -318,7 +326,7 @@ public class oConvertUtils {
 
 	/**
 	 * java去除字符串中的空格、回车、换行符、制表符
-	 *
+	 * 
 	 * @param str
 	 * @return
 	 */
@@ -335,7 +343,7 @@ public class oConvertUtils {
 
 	/**
 	 * 判断元素是否在数组内
-	 *
+	 * 
 	 * @param substring
 	 * @param source
 	 * @return
@@ -362,8 +370,8 @@ public class oConvertUtils {
 
 	/**
 	 * SET转换MAP
-	 *
-	 * @param setobj
+	 * 
+	 * @param str
 	 * @return
 	 */
 	public static Map<Object, Object> SetToMap(Set<Object> setobj) {
@@ -379,9 +387,9 @@ public class oConvertUtils {
 	public static boolean isInnerIP(String ipAddress) {
 		boolean isInnerIp = false;
 		long ipNum = getIpNum(ipAddress);
-		/*
-		  私有IP：A类 10.0.0.0-10.255.255.255 B类 172.16.0.0-172.31.255.255 C类 192.168.0.0-192.168.255.255 当然，还有127这个网段是环回地址
-		 */
+		/**
+		 * 私有IP：A类 10.0.0.0-10.255.255.255 B类 172.16.0.0-172.31.255.255 C类 192.168.0.0-192.168.255.255 当然，还有127这个网段是环回地址
+		 **/
 		long aBegin = getIpNum("10.0.0.0");
 		long aEnd = getIpNum("10.255.255.255");
 		long bBegin = getIpNum("172.16.0.0");
@@ -406,12 +414,12 @@ public class oConvertUtils {
 	private static boolean isInner(long userIp, long begin, long end) {
 		return (userIp >= begin) && (userIp <= end);
 	}
-
+	
 	/**
 	 * 将下划线大写方式命名的字符串转换为驼峰式。
 	 * 如果转换前的下划线大写方式命名的字符串为空，则返回空字符串。</br>
 	 * 例如：hello_world->helloWorld
-	 *
+	 * 
 	 * @param name
 	 *            转换前的下划线大写方式命名的字符串
 	 * @return 转换后的驼峰式命名的字符串
@@ -448,13 +456,13 @@ public class oConvertUtils {
 		}
 		return result.toString();
 	}
-
+	
 	/**
 	 * 将下划线大写方式命名的字符串转换为驼峰式。
 	 * 如果转换前的下划线大写方式命名的字符串为空，则返回空字符串。</br>
 	 * 例如：hello_world,test_id->helloWorld,testId
-	 *
-	 * @param names
+	 * 
+	 * @param name
 	 *            转换前的下划线大写方式命名的字符串
 	 * @return 转换后的驼峰式命名的字符串
 	 */
@@ -471,13 +479,13 @@ public class oConvertUtils {
 		String result = sf.toString();
 		return result.substring(0, result.length() - 1);
 	}
-
+	
 	//update-begin--Author:zhoujf  Date:20180503 for：TASK #2500 【代码生成器】代码生成器开发一通用模板生成功能
 	/**
 	 * 将下划线大写方式命名的字符串转换为驼峰式。(首字母写)
 	 * 如果转换前的下划线大写方式命名的字符串为空，则返回空字符串。</br>
 	 * 例如：hello_world->HelloWorld
-	 *
+	 * 
 	 * @param name
 	 *            转换前的下划线大写方式命名的字符串
 	 * @return 转换后的驼峰式命名的字符串
@@ -506,7 +514,7 @@ public class oConvertUtils {
 		return result.toString();
 	}
 	//update-end--Author:zhoujf  Date:20180503 for：TASK #2500 【代码生成器】代码生成器开发一通用模板生成功能
-
+	
 	/**
 	 * 将驼峰命名转化成下划线
 	 * @param para
@@ -514,18 +522,18 @@ public class oConvertUtils {
 	 */
 	public static String camelToUnderline(String para){
         if(para.length()<3){
-        	return para.toLowerCase();
+        	return para.toLowerCase(); 
         }
         StringBuilder sb=new StringBuilder(para);
         int temp=0;//定位
-        //从第三个字符开始 避免命名不规范
+        //从第三个字符开始 避免命名不规范 
         for(int i=2;i<para.length();i++){
             if(Character.isUpperCase(para.charAt(i))){
                 sb.insert(i+temp, "_");
                 temp+=1;
             }
         }
-        return sb.toString().toLowerCase();
+        return sb.toString().toLowerCase(); 
 	}
 
 	/**
@@ -541,10 +549,10 @@ public class oConvertUtils {
 		}
 		return sb.toString();
 	}
-
+	
 	/**
 	 * 获取类的所有属性，包括父类
-	 *
+	 * 
 	 * @param object
 	 * @return
 	 */
@@ -559,7 +567,7 @@ public class oConvertUtils {
 		fieldList.toArray(fields);
 		return fields;
 	}
-
+	
 	/**
 	  * 将map的key全部转成小写
 	 * @param list
@@ -569,10 +577,10 @@ public class oConvertUtils {
 		List<Map<String, Object>> select = new ArrayList<>();
 		for (Map<String, Object> row : list) {
 			 Map<String, Object> resultMap = new HashMap<>();
-			 Set<String> keySet = row.keySet();
-			 for (String key : keySet) {
-				 String newKey = key.toLowerCase();
-				 resultMap.put(newKey, row.get(key));
+			 Set<String> keySet = row.keySet(); 
+			 for (String key : keySet) { 
+				 String newKey = key.toLowerCase(); 
+				 resultMap.put(newKey, row.get(key)); 
 			 }
 			 select.add(resultMap);
 		}

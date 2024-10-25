@@ -127,9 +127,10 @@ service.interceptors.request.use(config => {
 service.interceptors.response.use((response) => {
 
   if (response.config.responseType === "blob") {
-    let subUrl = response.config.url.substring(response.config.url.length - 13)
+    // let subUrl = response.config.url.substring(response.config.url.length - 13)
     // 自定义判断请求路径，可以拿到headers的值
-    if (subUrl === 'downloadKmDoc') {
+    if (response.config.url.substring(response.config.url.length - 13) === 'downloadKmDoc'
+      || response.config.url.substring(response.config.url.length - 12) === 'downloadById' ) {
       return response
     }
   }

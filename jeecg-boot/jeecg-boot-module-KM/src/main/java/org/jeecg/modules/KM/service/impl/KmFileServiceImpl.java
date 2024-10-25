@@ -33,7 +33,10 @@ public class KmFileServiceImpl extends ServiceImpl<KmFileMapper, KmFile> impleme
         try {
             File todayDir=baseConfig.getTodayUploadDir();
             String fileId = UUIDGenerator.generate();
-            String suffix= StringUtils.getFileSuffix(file.getOriginalFilename());
+            String s = file.getOriginalFilename();
+            String sf = file.getName();
+            String suffix= StringUtils.getFileSuffix( (file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty() ) ? file.getName() : file.getOriginalFilename());
+//            String suffix= StringUtils.getFileSuffix(file.getOriginalFilename());
             File dist=new File(todayDir,fileId+"."+suffix);
             file.transferTo(dist);
             KmFile kmFile=new KmFile();
@@ -50,7 +53,30 @@ public class KmFileServiceImpl extends ServiceImpl<KmFileMapper, KmFile> impleme
     }
 
     @Override
-    public KmFile saveFile(String content,String suffix) {
+    public KmFile transferExternalFile(File file) {
+        try {
+            File todayDir=baseConfig.getTodayUploadDir();
+            String fileId = UUIDGenerator.generate();
+            String s = file.getName();
+            String sf = file.getName();
+            String suffix= StringUtils.getFileSuffix(file.getName());
+            File dist=new File(todayDir,fileId+"."+suffix);
+            file.renameTo(dist);
+            KmFile kmFile=new KmFile();
+            kmFile.setId(fileId);
+            kmFile.setOriginalName(file.getName());
+            kmFile.setPhysicalPath(baseConfig.getRelativePath(dist));
+            kmFile.setSha256(HashUtil.sha256(dist));
+            baseMapper.insert(kmFile);
+            file.delete();
+            return kmFile;
+        } catch (Exception e) {
+            logger.error("文件保存-transferExternalFile错误",e);
+        }
+        return null ;
+    }
+    @Override
+    public KmFile transferExternalFile(String content, String suffix) {
         try {
             File todayDir=baseConfig.getTodayUploadDir();
             String fileId = UUIDGenerator.generate();

@@ -1,18 +1,17 @@
 <template>
   <a-layout class="layout">
-
-    <a-layout-header  class="searchHeader" style=" background-color: #1a53ba;width: 100%; height: 60px" >
-
-      <SearchHeader :title='pageTitle'/>
-
+    <a-layout-header class="searchHeader header-shadow"
+                     :style="{background: kmConfig.HeaderBackgroundColor,width: '100%', height: '64px',position: 'fixed',top:'0',zIndex:'999'}">
+      <SearchHeader  :title='pageTitle'/>
     </a-layout-header>
-    <a-layout-content :style="{ background: '#fff',  minHeight: '680px' }">
 
-      <div :bordered="false" :style="{backgroundColor: '#f2f2f2',height: '100%'}">
-        <!--<SearchHeader/>-->
-        <div  :style="{backgroundColor: '#1a53ba',padding: '10px',minWidth: '900px',height: '150px'}">
+    <a-layout-content >
+
+      <div style="background-color: white;margin-top: 60px" :bordered="false">
+        <div style="text-align:center;padding-top:30px;padding-bottom:20px;">
       <!-- 查询区域 -->
       <div class="table-page-search-wrapper">
+        <!--<p></p>-->
         <a-form layout="inline">
           <a-row>
             <a-col :span="24" style="text-align: center;">
@@ -20,18 +19,34 @@
                 <div style="float: left">
                   <a-input style="width: 800px;" size="large" placeholder="标题、关键字、全文" v-model="content"
                            @pressEnter="pressEnterFun">
-
-                    <a-icon slot="suffix" @click="searchDocFun('0')" type="search" style="color:#1890FF;fontSize:22px"/>
+                    <a-dropdown slot="addonBefore" >
+                        <span>
+                          {{knowledgeTitle}}
+                          <a-icon type="down" />
+                        </span>
+                      <a-menu slot="overlay" style="margin-top: 8px;margin-left: -12px;min-width: 200px">
+                        <a-tree
+                          checkStrictly
+                          checkable
+                          v-model="topicCodesTree"
+                          @check="onTopicNodeCheck"
+                          :selectable="boolSelect"
+                          :tree-data="treeData"
+                        />
+                      </a-menu>
+                    </a-dropdown>
+                    <a slot="addonAfter" style="color: #303133" @click="searchDocFun(true)">结果中检索</a>
+                    <a-icon slot="suffix" @click="searchDocFun(false)" type="search" style="color:#1890FF;fontSize:22px"/>
                   </a-input>
-                  <div class="checkbox" style="width: 750px;text-align: center;margin-top: 10px;margin-left: 20px">
-                    <a-checkbox-group :options="options" v-model="checkboxVuale" @change="onChange"/>
+                  <div style="width: 750px;text-align: center;margin-top: 10px;margin-left: 20px">
+                    <a-checkbox-group :options="dicCategoryOptions" v-model="category" @change="onCategoryChange"/>
                   </div>
                 </div>
                 <div style="float: left;width: 100px;text-align: left;margin-top: -2px">
-                  <span style="color: white;margin-left: 20px">
-                   <span>全文检索</span>
-                   <a-checkbox class="checkbox" v-model="boolCheckChange" style="margin-left: 8px"
-                               @change="onCheckChange"/>
+                  <a @click="advancedSearch" style="color: black;margin-left: 20px;">高级检索&nbsp;&nbsp;&nbsp;></a>
+                  <span style="margin-left: 20px">
+                   <span>精确匹配</span>
+                      <a-checkbox  class="checkbox" v-model="phraseMatchSearchFlag" style="margin-left: 8px"  />
                   </span>
                 </div>
               </div>
@@ -41,10 +56,49 @@
       </div>
       <!-- 查询区域-END -->
     </div>
-    <!-- 表格区域 -->
-    <div style="background-color:white;margin: 15px;padding: 15px">
+
+        <div class="paramPathDiv">
+
+          <div class="paramPathTitle"><span v-if="itemList.length >= 0">检索历史：</span></div>
+          <div v-for="(item,index) in itemList" :key="index" class="paramPathContainer">
+
+            <div class="paramPath">
+              <a href="#" class="historySearchHref" @click="historySearch(index)"> {{ item }} </a>
+            </div>
+            <template v-if="index != itemList.length-1">
+              <div style="float:left;display: inline-flex;font-size: x-small">></div>
+            </template>
+
+        </div>
+      </div>
+
+        <!-- 详情区域-BEGIN -->
+        <a-drawer
+          :title="docTitleOriginal"
+          :width="720"
+          :visible="drawerVisible"
+          :body-style="{ paddingBottom: '80px' }"
+          :footer-style="{ textAlign: 'right' }"
+          @close="onDrawerClose"
+        >
+          <doc-detail ref="docDetailRef" :record="showDocDetail"></doc-detail>
+          <br/>
+
+          <a-divider style="margin: 5px 0 15px 0 "></a-divider>
+
+          <doc-comments
+            ref="comments"
+            @new="refreshDocDetail"
+            :doc-id="showDocDetail.id">
+          </doc-comments>
+
+        </a-drawer>
+        <!-- 详情区域-END -->
+        <!-- 表格区域 -->
+    <div style="background-color:white;margin: 2px 1px 1px 1px;padding: 0px 0px 1px 0px">
+
       <!-- 操作按钮区域 -->
-      <div class="table-operator">
+      <div class="table-operator" >
         <!--      <a-button type="primary" icon="download" @click="handleExportXls('草稿文件夹')">导出</a-button>-->
         <a-dropdown v-has="'searchList:batchDownload'" v-if="selectedRowKeys.length > 0">
           <a-menu slot="overlay">
@@ -61,23 +115,6 @@
 
       <!-- table区域-begin -->
       <div>
-        <div  class="ant-alert ant-alert-info" style="margin-bottom: 15px;color: #303133;">
-          <span v-for="(item,index) in itemList" :key="index">
-            <span><b v-if="index==0">检索范围: </b><span v-if="index==itemList.length-1">{{item}}</span> <span v-else>{{item}}<span
-              style="font-weight: bold;color: red">-></span>  </span></span>
-          </span>
-        </div>
-
-        <!--<div v-else class="ant-alert ant-alert-info" style="margin-bottom: 15px;color: #303133;">-->
-          <!--<span v-for="(item,index) in defaultBusinessTypeList" :xl="4" :lg="4" :md="4" :sm="4" :key="index">-->
-            <!--<span style="text-align: left;margin-left: 10px">-->
-              <!--<span @click="searchBusinessType(item.value)">-->
-                <!--<a v-if="item.value === businessTypes" style="color: #303133;font-weight: bold">{{item.text}}</a>-->
-                <!--<a v-else style="color: #303133">{{item.text}}</a></span>-->
-            <!--</span>-->
-          <!--</span>-->
-        <!--</div>-->
-
         <a-table
           ref="table"
           size="middle"
@@ -89,6 +126,12 @@
           :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
           @change="handleTableChange">
 
+          <span slot="docTitle" slot-scope="text,record">
+            <a @click="showDrawer(record)"  :title ="[ record.fileType + '文件 - 大小:' + record.fileSize +'B, By ' + record.createBy + '/' + record.orgCode_dictText + ' 下载  ' + record.downloads + ' 次' ] ">
+              <span style="color: #303133" v-html="concatTitleContent(record)"> </span>
+<!--              <span style="color: #303133" v-html=" record.title "> </span>-->
+            </a>
+          </span>
 
           // 添加自定义列表插槽
           <div slot="filterDropdown">
@@ -113,31 +156,25 @@
                   <p>{{index+1+(ipagination.current-1)*ipagination.pageSize}}</p>
                </span>
           <span slot="action" slot-scope="text, record">
-
-           <!--<a-icon type="read" title="预览" @click="previewKmDoc(record)"-->
-            <!--:style="{ fontSize: '18px', color: '#1890FF', }"/>-->
-
-
-          <a-icon v-if="record.downloadFlag==1" type="download" title="下载" @click="downloadKmDoc(record)"
-                  :style="{ fontSize: '18px', color: '#1890FF'}"/>
-          <a-icon v-else type="download" title="禁止下载" :style="{ fontSize: '18px', color: '#909399'}"/>
-
-          <a-divider type="vertical"/>
-
-          <a-icon v-if="record.favourite==0" type="star" title="收藏" @click="addFavouriteKmDoc(record)"
-                  :style="{ fontSize: '18px', color: '#1890FF', }"/>
-          <a-icon v-else type="star" theme="filled" title="取消收藏" @click="delFavouriteKmDoc(record)"
-                  :style="{ fontSize: '18px', color: '#1890FF', }"/>
-
-        </span>
-
-          <span slot="docTitle" slot-scope="text,record">
-           <span @click="previewKmDoc(record,true)"><a style="color: #303133">
-             <span v-html=" record.title "></span></a></span>
-        </span>
-          <!--<span slot="test" slot-scope="text, record">-->
-          <!--<span v-html="record.title"></span>-->
-          <!--</span>-->
+                  <a-space>
+                            <a-popover content="预览">
+                             <a-icon  type="read" title="预览" @click="previewKmDoc(record)"
+                                      :style="{ fontSize: '16px', color: '#1890FF'}"/>
+                            </a-popover>
+                            <a-popover  :content="record.downloadFlag===1?'下载':'禁止下载'">
+                               <a-icon v-if="record.downloadFlag===1" type="download" title="下载" @click="downloadKmDoc(record)"
+                                       :style="{ fontSize: '16px', color: '#1890FF'}"/>
+                               <a-icon v-else type="download" title="禁止下载"
+                                       :style="{ fontSize: '16px', color: '#909399'}"/>
+                            </a-popover>
+                            <a-popover  :content="record.favourite===0?'收藏':'取消收藏'">
+                             <a-icon v-if="record.favourite===0" type="star"  @click="addFavouriteKmDoc(record)"
+                                     :style="{ fontSize: '18px', color: '#1890FF', }"/>
+                             <a-icon v-else type="star" theme="filled"  @click="delFavouriteKmDoc(record)"
+                                     :style="{ fontSize: '18px', color: '#1890FF', }"/>
+                            </a-popover>
+                    </a-space>
+               </span>
 
         </a-table>
       </div>
@@ -151,6 +188,10 @@
         <p-d-f-modal :p-d-furl="PDFurl" :iframeWidth="width"/>
       </b-j-modal>
 
+      <a-layout-footer >
+        <global-footer/>
+      </a-layout-footer>
+
     </div>
   </div>
     </a-layout-content>
@@ -158,22 +199,25 @@
 </template>
 
 <script>
-  import {ajaxGetDictItems, getDictItemsFromCache} from '@/api/api'
-  import {ACCESS_TOKEN} from "@/store/mutation-types"
-  import {httpPostAction, getAction, downloadFileName, getActionPDF} from "../../../api/manage";
-  import {AJeecgListMixin} from '@/mixins/AJeecgListMixin'
-  import Vue from "vue";
-  import IframePageContent from "../../../components/layouts/IframeFReportView";
-  import SearchHeader from '../Common/SearchHeader'
+import {ajaxGetDictItems, getDictItemsFromCache} from '@/api/api'
+import {ACCESS_TOKEN} from "@/store/mutation-types"
+import {downloadFileName, getAction, httpPostAction, postAction} from "../../../api/manage";
+import {AJeecgListMixin} from '@/mixins/AJeecgListMixin'
+import Vue from "vue";
+import IframePageContent from "../../../components/layouts/IframeFReportView";
+import SearchHeader from '../Common/SearchHeader'
+import GlobalFooter from '@/components/page/GlobalFooter'
+import DocComments from '@views/km/Common/Comments.vue'
+import DocDetail from '@views/km/Common/DocDetail.vue'
 
-  export default {
+export default {
     name: "docSearch",
     mixins: [AJeecgListMixin],
-    components: {IframePageContent,SearchHeader},
+    components: { DocDetail, DocComments, IframePageContent,SearchHeader,GlobalFooter},
     data() {
       return {
         pageTitle:"检索结果",
-        boolCheckChange: true,
+        phraseMatchSearchFlag: false,
         knowledgeTitle: "知识专题",
         checkedArray: [],
         topicCodesTree: {
@@ -201,17 +245,19 @@
           xs: {span: 24},
           sm: {span: 16},
         },
-        checkboxVuale: [],
+        category: [],
         title: "预览",
-        width: 900,
+        width: "900",
         // hotTopicReportList: [],
         defaultBusinessTypeList: [],
         docDataSource: [],
-        loadedRatio: 0,
-        isSearchResult: false,
+        withInSearchFlag: false,
         filterOptions:[],
         //要filter的字段
         filterDictCode: 'km_dict_source',
+        //结果中搜索的参数列表
+        filterParamArray:[],
+        filterParamPaths:[],
         //表头
         columns: [],
         //列设置
@@ -269,7 +315,7 @@
             dataIndex: 'action',
             align: "center",
             fixed: "right",
-            width: 80,
+            width: 100,
             scopedSlots: {
               filterDropdown: 'filterDropdown',
               filterIcon: 'filterIcon',
@@ -277,12 +323,12 @@
             }
           },
         ],
-        options: [],
+        dicCategoryOptions: [],
         content: '',
         checkedValues: '',
         itemList: [],
         // 要加载多选的字典
-        dictCode: 'km_dict_category',
+        categoryDict: 'km_dict_category',
 
         url: {
           rootList: "/sys/category/loadTreeRoot",
@@ -293,87 +339,133 @@
           downloadKmDoc: "/KM/kmDoc/downloadKmDoc",
           addFavouriteKmDoc: '/KM/kmDocFavourite/add',
           delFavouriteKmDoc: '/KM/kmDocFavourite/delete',
-        }
+        },
+        showDocDetail:{},
+        docTitleOriginal:'',
+        drawerVisible: false,
+        indexUrl:'/front/DefaultDocSearch',
+        kmConfig: {},
       }
     },
     created() {
-      this.loadTree();
+      this.kmConfig = this.$store.getters.kmConfig
+      this.loadTree()
       // 调用初始化自定义table列表函数
-      this.initColumns();
-      this.initFilterDict();
+      this.initColumns()
+      this.initFilterDict()
+      if(this.kmConfig !== undefined && this.kmConfig.DefaultPageUseTopicList === '1')
+        this.indexUrl = '/RecommendTopicList'
 
       //设置全局token
-      Vue.prototype.token = Vue.ls.get(ACCESS_TOKEN);
-      window._CONFIG['token'] = Vue.prototype.token;
-      // this.hotTopicReportFun();
-      this.initDict();
-      let params = this.$route.params;
-      console.log("params：", params);
-      this.topicCodes=params.topicCodes;
-      this.businessTypes=params.businessTypes;
+      Vue.prototype.token = Vue.ls.get(ACCESS_TOKEN)
+      window._CONFIG['token'] = Vue.prototype.token
+      this.initDict(this.categoryDict)
+      let params = this.$route.params
+      this.topicCodes = params.topicCodes
+      this.category = params.category
+      this.businessTypes = params.businessTypes
+      console.log('this.$route.params:',this.$route.params)
+      console.log('this.topicCodes:',this.topicCodes)
 
-      // if(this.businessTypes)
-      //   this.loadDefaultBusinessTypeFunc()
-
-      if(this.topicCodes==null){
+      if(!this.topicCodes ){
         if (Object.keys(params).length > 0) {
-          this.boolCheckChange = params.boolCheckChange;
-          this.content = params.content;
-          let replaceTitle=this.content;
-          if(replaceTitle)
-            replaceTitle = replaceTitle.replace(/，/g, ',');
-          // replaceTitle = replaceTitle.replace(/\[/g, '%5B');
-          // replaceTitle = replaceTitle.replace(/\]/g, '%5D');
-          if(this.boolCheckChange){
-            params["content"] = replaceTitle;
-          }else{
-            delete params["content"];
-            delete params["boolCheckChange"];
-          }
-          params["title"] = replaceTitle;
-          params["keywords"] = replaceTitle;
-          params["advSearchFlag"] = 0;
+          this.phraseMatchSearchFlag = params.phraseMatchSearchFlag
+          this.content = params.content
 
-          if (params.category !== "" && params.category != null) {
-            this.checkboxVuale = params.category.split(",");
-            this.checkedValues = params.category
+          let replaceTitle=this.content
+          if(replaceTitle)
+            replaceTitle = replaceTitle.replace(/，/g, ',')
+          if(this.phraseMatchSearchFlag){
+            params.phraseMatchSearchFlag = this.phraseMatchSearchFlag
           }
-          this.searchFun(params);
+          params.content = this.content
+          params.title = replaceTitle
+          params.keywords = this.content
+          params.advSearchFlag = false
+
+          if (params.topicCodes != null) {
+            params.topicCodes = params.topicCodes.split(',')
+          }
+          if (params.businessTypes != null) {
+            params.businessTypes = params.businessTypes.split(',')
+          }
+          if (params.keywords != null) {
+            params.keywords = params.keywords.split(',')
+          }
         }
       }else{
-        this.topicCodesTree=params.topicCodesTree;
-        this.knowledgeTitle=params.knowledgeTitle;
-        let param={};
-        param["topicCodes"]=this.topicCodes;
-        this.searchFun(param);
+        this.topicCodesTree = params.topicCodesTree
+        this.knowledgeTitle = params.knowledgeTitle
+        params.topicCodes = this.topicCodes.split(',')
       }
+      this.searchDoSend(params)
     },
 
-    watch: {
-      loadedRatio: {
-        handler(newVal, oldVal) {
-          console.log(newVal)
-          if (newVal === 1) {
-            this.pdfLoading = false;
-          }
-        }
-      }
-    },
     methods: {
+      concatTitleContent(record){
+        return '<h4 class="result_title">' +record.title  +'</h4>' + '<span style="font-size: xx-small">'  + record.content + '</span>'
+      },
+      //打开文档详情
+      showDrawer(record) {
+        this.showDocDetail = record
+        this.docTitleOriginal = this.removeHTMLTag(record.title)
+        this.drawerVisible = true
+      },
+      removeHTMLTag(title){
+        var regex = /(<([^>]+)>)/ig
+        return title.replace(regex, "")
+      },
+      onDrawerClose() {
+        this.drawerVisible = false
+      },
+      // 加载 分类数据
+      initDict(dictCode) {
+        this.dicCategoryOptions = this.getDictOptions(dictCode)
+      },
+
+      getDictOptions(dictCode){
+        let dictOptions = []
+        //优先从缓存中读取字典配置
+        if (getDictItemsFromCache(dictCode)) {
+          let options = getDictItemsFromCache(dictCode)
+          options.forEach((item, index) => {
+            let person = {}
+            person.label = item.title
+            person.value = item.value
+            dictOptions.push(person)
+          })
+          return dictOptions
+        }
+
+        //根据字典Code, 初始化字典数组
+        ajaxGetDictItems(dictCode, null).then((res) => {
+          if (res.success) {
+            let options = res.result
+            options.forEach((item, index) => {
+              let person = {}
+              person.label = item.title
+              person.value = item.value
+              dictOptions.push(person)
+            })
+          }
+        })
+        return dictOptions
+      },
+
       // 加载filter字段选项
       initFilterDict() {
         //优先从缓存中读取字典配置
-        // if (getDictItemsFromCache(this.dictCode)) {
+        // if (getDictItemsFromCache(this.categoryDict)) {
         let options = getDictItemsFromCache(this.filterDictCode)
         if(options){
           options.forEach((item, index) => {
-            let filterOption = {};
-            filterOption.text = item.title;
-            filterOption.value = item.value;
-            this.filterOptions.push(filterOption);
-          });
-          console.log(this.filterOptions);
-          this.defColumns[2].filters =this.filterOptions;
+            let filterOption = {}
+            filterOption.text = item.title
+            filterOption.value = item.value
+            this.filterOptions.push(filterOption)
+          })
+          //console.log(this.filterOptions)
+          this.defColumns[2].filters =this.filterOptions
           return
         }
 
@@ -381,23 +473,23 @@
         ajaxGetDictItems(this.filterDictCode, null).then((res) => {
           if (res.success) {
             let options = res.result
-            console.log(options);
+            // console.log(options)
             options.forEach((item, index) => {
-              let filterOption = {};
-              filterOption.text = item.title;
-              filterOption.value = item.value;
-              this.filterOptions.push(filterOption);
-            });
-            this.defColumns[2].filters =this.filterOptions;
+              let filterOption = {}
+              filterOption.text = item.title
+              filterOption.value = item.value
+              this.filterOptions.push(filterOption)
+            })
+            this.defColumns[2].filters =this.filterOptions
           }
         })
 
       },
 
       // 是否全文检索
-      onCheckChange(e) {
-        this.boolCheckChange = e.target.checked
-        console.log(`checked = ${e.target.checked}`);
+      onFTSCheck(e) {
+        this.phraseMatchSearchFlag = e.target.checked
+        //console.log(`checked = ${e.target.checked}`)
       },
 
       // 加载树节点，获取树数据
@@ -405,7 +497,7 @@
         let params = {
           async: false,
           pcode: ""
-        };
+        }
         getAction(this.url.rootList, params).then(res => {
           if (res.success) {
             if (res.result && res.result.length > 0) {
@@ -422,85 +514,89 @@
 
       // 查找一个节点的所有父节点
       familyTree(treeData, id) {
-        var arrTree = [];
+        var arrTree = []
         var forFn = function (arr, key) {
           for (var i = 0; i < arr.length; i++) {
             var item = arr[i]
             if (item.key === key) {
               if (item.parentId === "0") {
-                break;
+                break
               } else {
-                console.log("父节点", item.parentId);
-                arrTree.push(item.parentId);
-                forFn(treeData, item.parentId);
+                //console.log("父节点", item.parentId)
+                arrTree.push(item.parentId)
+                forFn(treeData, item.parentId)
               }
               break
             } else {
               if (item.children != null) {
-                forFn(item.children, key);
+                forFn(item.children, key)
               }
             }
           }
         }
-        forFn(treeData, id);
+        forFn(treeData, id)
         return arrTree
       },
 
       // 树节点选择触发
-      onCheck(checkedKeys, checkedNodes) {
+      onTopicNodeCheck(checkedKeys, checkedNodes) {
         if (checkedKeys.checked.length > 1) {
-          let checkKeys = checkedKeys.checked[1];
-          checkedKeys.checked = [];
-          checkedKeys.checked.push(checkKeys);
-          let checkNodesTitle = checkedNodes.checkedNodes[1];
-          checkedNodes.checkedNodes = [];
-          checkedNodes.checkedNodes.push(checkNodesTitle);
+          let checkKeys = checkedKeys.checked[1]
+          checkedKeys.checked = []
+          checkedKeys.checked.push(checkKeys)
+          let checkNodesTitle = checkedNodes.checkedNodes[1]
+          checkedNodes.checkedNodes = []
+          checkedNodes.checkedNodes.push(checkNodesTitle)
         }
-        console.log("checkedKeys", checkedKeys);
-        console.log("checkedNodes", checkedNodes);
-        let temp = new Array();
-        let tempArray = new Array();
-        this.checkedArray = checkedKeys.checked;
+        //console.log("checkedKeys", checkedKeys)
+        //console.log("checkedNodes", checkedNodes)
+        let temp = new Array()
+        let tempArray = new Array()
+        this.checkedArray = checkedKeys.checked
 
         for (let i = 0; i < this.checkedArray.length; i++) {
-          let arrTemp = this.familyTree(this.treeData, this.checkedArray[i]);
-          temp = temp.concat(arrTemp);
+          let arrTemp = this.familyTree(this.treeData, this.checkedArray[i])
+          temp = temp.concat(arrTemp)
         }
         // 数组去重
-        tempArray = [...new Set(temp)];
-        console.log("tempArray", tempArray);
-        checkedKeys.halfChecked = tempArray;
-        let checkedTitle = checkedNodes.checkedNodes;
-        this.knowledgeTitle = "";
+        tempArray = [...new Set(temp)]
+        // console.log("tempArray", tempArray)
+        checkedKeys.halfChecked = tempArray
+        let checkedTitle = checkedNodes.checkedNodes
+        this.knowledgeTitle = ""
         for (let i = 0; i < checkedTitle.length; i++) {
           if (this.knowledgeTitle === "") {
-            this.knowledgeTitle = checkedTitle[i].data.props.title;
+            this.knowledgeTitle = checkedTitle[i].data.props.title
           } else {
             if (checkedTitle[i].data.props.data != null) {
-              this.knowledgeTitle = this.knowledgeTitle + "," + checkedTitle[i].data.props.title;
+              this.knowledgeTitle = this.knowledgeTitle + "," + checkedTitle[i].data.props.title
             }
           }
         }
         if (this.knowledgeTitle === "") {
           this.knowledgeTitle = "知识专题"
-          this.topicCodes = null;
+          this.topicCodes = null
         }
-        let param = this.getQueryParams();//查询条件互相影响
-        // let param={};
-        this.topicCodes=checkedTitle[0].data.props.code;
-        param["topicCodes"]=this.topicCodes;
-        this.searchFun(param);
-        // this.businessTypes=null;
+        if(checkedTitle.length <=0 )
+        {
+          return
+        }
+        let param = this.getQueryParams()//查询条件互相影响
+        // let param={}
+        this.topicCodes=checkedTitle[0].data.props.code
+        param["topicCodes"]=this.topicCodes.split(',')
+        this.searchDoSend(param)
+        // this.businessTypes=null
 
       },
       // 自定义列表  列设置更改事件
       onColSettingsChange(checkedValues) {
-        var key = this.$route.name + ":colsettings";
-        console.log("colsettings", key);
+        var key = this.$route.name + ":colsettings"
+        //console.log("colsettings", key)
         Vue.ls.set(key, checkedValues, 30 * 7 * 24 * 60 * 60 * 1000)
-        this.settingColumns = checkedValues;
+        this.settingColumns = checkedValues
         const cols = this.defColumns.filter(item => {
-          if (item.key == 'rowIndex' || item.dataIndex == 'action') {
+          if (item.key === 'rowIndex' || item.dataIndex === 'action') {
             return true
           }
           if (this.settingColumns.includes(item.dataIndex)) {
@@ -508,181 +604,284 @@
           }
           return false
         })
-        this.columns = cols;
+        this.columns = cols
       },
       // 自定义列表  初始化
       initColumns() {
         //权限过滤（列权限控制时打开，修改第二个参数为授权码前缀）
-        //this.defColumns = colAuthFilter(this.defColumns,'testdemo:');
+        //this.defColumns = colAuthFilter(this.defColumns,'testdemo:')
 
-        var key = this.$route.name + ":colsettings";
-        console.log("colsettings", key);
-        let colSettings = Vue.ls.get(key);
-        if (colSettings == null || colSettings == undefined) {
-          let allSettingColumns = [];
+        var key = this.$route.name + ":colsettings"
+        //console.log("colsettings", key)
+        let colSettings = Vue.ls.get(key)
+        if (colSettings === null || colSettings === undefined) {
+          let allSettingColumns = []
           this.defColumns.forEach(function (item, i, array) {
-            allSettingColumns.push(item.dataIndex);
+            allSettingColumns.push(item.dataIndex)
           })
-          this.settingColumns = allSettingColumns;
-          this.columns = this.defColumns;
+          this.settingColumns = allSettingColumns
+          this.columns = this.defColumns
         } else {
-          this.settingColumns = colSettings;
+          this.settingColumns = colSettings
           const cols = this.defColumns.filter(item => {
-            if (item.key == 'rowIndex' || item.dataIndex == 'action') {
-              return true;
+            if (item.key === 'rowIndex' || item.dataIndex === 'action') {
+              return true
             }
             if (colSettings.includes(item.dataIndex)) {
-              return true;
+              return true
             }
-            return false;
+            return false
           })
-          this.columns = cols;
+          this.columns = cols
         }
-      },
-
-      searchFun(params) {
-        getAction(this.url.list, params).then((res) => {
-          if (res.success) {
-            this.dataSource = res.result.kmSearchResultVOPage.records;
-            this.itemList = res.result.paramPath;
-            if (res.result.kmSearchResultVOPage.total) {
-              this.ipagination.total = res.result.kmSearchResultVOPage.total;
-            } else {
-              this.ipagination.total = 0;
-            }
-          } else {
-            this.$message.error("检索失败");
-          }
-        })
       },
 
       loadData() {
-        this.searchDocFun('2');
-      },
-
-      // 加载 分类数据
-      initDict() {
-        this.options = [];
-
-        //优先从缓存中读取字典配置
-        if (getDictItemsFromCache(this.dictCode)) {
-          let options = getDictItemsFromCache(this.dictCode)
-          options.forEach((item, index) => {
-            let person = {};
-            person.label = item.title;
-            person.value = item.value;
-            this.options.push(person);
-          });
-          return
-        }
-
-        //根据字典Code, 初始化字典数组
-        ajaxGetDictItems(this.dictCode, null).then((res) => {
-          if (res.success) {
-            let options = res.result
-            options.forEach((item, index) => {
-              let person = {};
-              person.label = item.title;
-              person.value = item.value;
-              this.options.push(person);
-            });
-          }
-        })
-
-
+        this.searchDocFun(false)
       },
 
       // 多选框选择触发
-      onChange(checkedValues) {
-        this.checkedValues = checkedValues.toString();
-        console.log('checked = ', checkedValues);
+      onCategoryChange(checkedValues) {
+        this.checkedValues = checkedValues.toString()
       },
       // 按回车键触发方法
       pressEnterFun(e) {
         this.$nextTick(() => {
-          this.searchDocFun('0');
+          this.searchDocFun(false)
         })
       },
-      // 检索
-      searchDocFun(type) {
-        // this.businessTypes=null;
+      //处理检索条件历史
+      handleParamHistory(params){
+        if(params.withinSearchFlag === undefined || !params.withinSearchFlag) {
+          //首次检索，清空历史路径
+          this.filterParamPaths = []
+          this.filterParamArray = []
+        }
+        //结果中检索
+         let hisParam = this.buildHisFilterParams(params)
+        this.filterParamArray.push(hisParam)
+        let paramPath = this.buildParamPath(hisParam)
+        this.filterParamPaths.push(paramPath)
+      },
+      //建立历史条件，为结果中查询服务
+      buildHisFilterParams(params){
+        let hisParam = {}
+        hisParam.phraseMatchSearchFlag = params.phraseMatchSearchFlag
+        for (let key in params) {
+          if (params[key] !== '' && params[key] !== null) {
+            if(key === "title"
+              || key === "keywords"
+              || key === "content"
+              || key === "category"
+              || key === "businessTypes"
+              || key === "topicCodes"
+              || key === "advSearchFlag"
+              || key === "createTimeStart"
+              || key === "createTimeEnd" ){
+              hisParam[key] = params[key]
+            }
+            }
+          }
+        return hisParam
+      },
+      //组装参数路径
+      buildParamPath(params) {
+        let paramPath = ""
+        // console.log("buildParamPath",params)
+        if (!params.advSearchFlag  && params.content !== undefined) {
+          paramPath = "综合:" + params.content + "；"
+        }
+        let dictNames = ""
+        for (let key in params) {
+          if (params[key] !== '' && params[key] !== null) {
+            switch (key) {
+              case "title":
+                if(params.advSearchFlag )
+                  paramPath = paramPath + "标题:" + params.title + "；"
+                break
+              case "keywords":
+                if(params.advSearchFlag )
+                  paramPath = paramPath + "关键字:" + params.keywords + "；"
+                break
+              case "content":
+                if(params.advSearchFlag )
+                  paramPath = paramPath +"全文:"+ params.content + "；"
+                break
+              case "category":
+                if(params.category.length > 0) {
+                  dictNames = this.convertDictCodeToName("km_dict_category",params.category )
+                  paramPath = paramPath +"分类:" + dictNames + "；"
+                }
+                break
+              case "businessTypes":
+                dictNames = this.convertDictCodeToName("km_dict_business",params.businessTypes  )
+                paramPath = paramPath +"标签:" + dictNames + "；"
+                break
+              case "topicCodes":
+                //console.log("params.topicCodes",params.topicCodes)
+                dictNames = this.convertTreeDateToName(params.topicCodes )
+                paramPath = paramPath +"专题:" + dictNames + "；"
+                break
+              case "createTimeStart":
+                paramPath = paramPath +"时间起:" + params.createTimeStart + "；"
+                break
+              case "createTimeEnd":
+                paramPath = paramPath +"时间止:" + params.createTimeEnd + "；"
+                break
+            }
+          }
+        }
+        if(paramPath.length > 0){
+          paramPath = paramPath.substring(0,paramPath.length -1)
+        }
+        return paramPath
+      },
+      //树code转name
+      convertTreeDateToName(codes){
+        let dictNames = ""
+        if(this.treeData.length>0){
+          for(let code of codes) {
+            for (let item of this.treeData) {
+              if (item.code === code) {
+                dictNames = dictNames + item.title + "|"
+              }
+            }
+          }
+        }
+        if(dictNames.length >0)
+          dictNames = dictNames.substring(0,dictNames.length -1)
 
-        let params = {};
-        params = this.getQueryParams();//查询条件
-        if (type === '0') {
-          this.isSearchResult = false;
-          this.ipagination.current = 1;
+        return dictNames
+      },
+      //转换dict
+      convertDictCodeToName(dictCode,codes){
+        let dictOptions  = this.getDictOptions(dictCode)
+        let dictNames = ""
+        //console.log("convertDictCodeToName-----------",dictOptions)
+        //console.log("codes-----------",codes)
+        // debugger
+        if (dictOptions.length > 0) {
+          for(let code of codes) {
+            for (let item of dictOptions) {
+              if (item.value === code) {
+                dictNames = dictNames + item.label + "|"
+              }
+            }
+          }
+        }
+        if(dictNames.length >0)
+          dictNames = dictNames.substring(0,dictNames.length -1)
+
+        return dictNames
+      },
+      // 检索
+      searchDocFun(withInSearchFlag) {
+        this.withInSearchFlag = withInSearchFlag
+        let searchParam = this.getQueryParams()//查询条件
+        if (withInSearchFlag) {
           //启用用过滤
-          this.defColumns[2].filters =this.filterOptions;
-        } else if (type === '1') {
-          this.isSearchResult = true;
-          this.ipagination.current = 1;
+          this.defColumns[2].filters =this.filterOptions
+        } else if (withInSearchFlag) {
+          //结果中搜索嵌套限制
+          if(this.filterParamArray.length>=50){
+            alert("查询条件过多！请勿过度使用结果中检索")
+            this.loading = false
+            return
+          }
           //禁用过滤
-          this.defColumns[2].filters = [];
+          this.defColumns[2].filters = []
         }
 
-        this.loading = true;
-
+        // this.ipagination.current = 1
+        this.loading = true
         if (this.content !== "" && this.content != null) {
           let replaceTitle=this.content
-          if(replaceTitle)
-            replaceTitle = replaceTitle.replace(/，/g, ',');
-          // replaceTitle = replaceTitle.replace(/\[/g, '%5B');
-          // replaceTitle = replaceTitle.replace(/\]/g, '%5D');
-          if(this.boolCheckChange){
-            params["content"] = replaceTitle;
-          }else{
-            delete params["content"];
-          }
-          params["title"] = replaceTitle;
-          params["keywords"] = replaceTitle;
+          if(this.content)
+            replaceTitle = replaceTitle.replace(/，/g, ',').replace(' ',',')
+          // if(this.phraseMatchSearchFlag){
+          //   searchParam.content = replaceTitle
+          // }else{
+          //   delete searchParam["content"]
+          // }
+          searchParam.content = this.content
+          searchParam.title = replaceTitle
+          searchParam.keywords =  replaceTitle.split(',')
         }
-        params["advSearchFlag"] = 0;
-        if (this.checkedValues !== "" && this.checkedValues != null) {
-          params['category'] = this.checkedValues;
+        searchParam.advSearchFlag = false
+        searchParam.phraseMatchSearchFlag = this.phraseMatchSearchFlag
+        if (this.category !== undefined && this.category.length > 0) {
+          searchParam['category'] = this.category
         }
         if( this.topicCodes!=null){
-          params['topicCodes']=this.topicCodes;
+          searchParam['topicCodes']=this.topicCodes.split(',')
         }
         if(this.businessTypes!=null){
-          params['businessTypes']=this.businessTypes;
+          searchParam['businessTypes']=this.businessTypes.split(',')
         }
 
-        // 判断参数是否为空
-        if (this.empty(params)) {
-          if (this.isSearchResult) {
-            params.withinSearchFlag = '1';
+        if (!this.empty(searchParam)) {
+          if (this.withInSearchFlag) {
+            searchParam.withinSearchFlag = true
+            searchParam.filterParams = this.filterParamArray
           }
-          params.field = this.getQueryField();
-          params.pageNo = this.ipagination.current;
-          params.pageSize = this.ipagination.pageSize;
-          this.loading = true;
-          getAction(this.url.list, params).then((res) => {
-            if (res.success) {
-              this.dataSource = res.result.kmSearchResultVOPage.records;
-              this.itemList = res.result.paramPath;
-              if (res.result.kmSearchResultVOPage.total) {
-                this.ipagination.total = res.result.kmSearchResultVOPage.total;
-              } else {
-                this.ipagination.total = 0;
-              }
-            } else {
-              this.$message.error("检索失败");
-            }
-            this.loading = false;
-          })
+
+          //准备搜索接口参数
+          searchParam.pageNo = this.ipagination.current
+          searchParam.pageSize = this.ipagination.pageSize
+          this.loading = true
+          this.searchDoSend(searchParam)
         } else {
-          this.loading = false;
-          this.$message.info("请输入搜索条件");
+          this.loading = false
+          this.$message.info("请输入搜索条件")
         }
+      },
+
+      //发送检索请求和处理结果
+      searchDoSend(params) {
+        postAction(this.url.list, params).then((res) => {
+          if (res.success) {
+            this.handleParamHistory(params)
+            this.dataSource = res.result.kmSearchResultVOPage.records
+            this.itemList = this.filterParamPaths
+            if (res.result.kmSearchResultVOPage.total) {
+              this.ipagination.total = res.result.kmSearchResultVOPage.total
+            } else {
+              this.ipagination.total = 0
+            }
+          } else {
+            this.$message.error(res.message)
+          }
+          this.loading = false
+        })
+      },
+
+      //历史条件搜索
+      historySearch(paramIndex){
+        let hisParams = this.filterParamArray
+        if(hisParams.length === 0 ||paramIndex<0 || paramIndex>=hisParams.length)
+          return
+        let newParam = hisParams[paramIndex]
+        this.filterParamArray.splice(paramIndex)
+        this.filterParamPaths.splice(paramIndex)
+        newParam.filterParams = this.filterParamArray
+        this.content = newParam.content
+        this.category = newParam.category
+        this.topicCodes = newParam.topicCodes
+        newParam.withinSearchFlag = true
+        newParam.advSearchFlag = false
+        newParam.pageNo = this.ipagination.current
+        newParam.pageSize = this.ipagination.pageSize
+        this.loading = true
+
+        this.searchDoSend(newParam)
       },
 
       loadDefaultBusinessTypeFunc(){
         getAction(this.url.defaultBusinessTypeList).then(res => {
           if (res.success) {
-            this.defaultBusinessTypeList = res.result;
+            this.defaultBusinessTypeList = res.result
           } else {
-            this.$message.error("业务加载失败");
+            this.$message.error("业务加载失败")
           }
         })
       },
@@ -690,117 +889,129 @@
       //  判断对象是否为空
       empty(obj) {
         for (let key in obj) {
-          return true;
+          return false
         }
-        return false;
+        return true
       },
 
       //批量下载
       downloadKmDocBatch() {
-        console.log("批量下载")
+        //console.log("批量下载")
         if (!this.url.downloadKmDoc) {
           this.$message.error("请设置url.downloadKmDoc属性!")
           return
         }
         if (this.selectionRows.length <= 0) {
-          this.$message.warning('请选择一条记录！');
-          return;
+          this.$message.warning('请选择一条记录！')
+          return
         } else {
-          var that = this;
+          var that = this
           this.$confirm({
             title: "确认下载",
             content: "是否下载选中数据?",
             onOk: function () {
               for (var i = 0; i < that.selectionRows.length; i++) {
-                let fileName = i;
+                let fileName = i
                 downloadFileName(that.url.downloadKmDoc, {docId: that.selectionRows[i].id})
               }
-              that.onClearSelected();
+              that.onClearSelected()
             }
-          });
+          })
         }
       },
       //加收藏夹
       addFavouriteKmDoc(record) {
-        let httpurl = '';
-        let method = '';
-        httpurl += this.url.addFavouriteKmDoc;
-        method = 'post';
+        let httpurl = ''
+        let method = ''
+        httpurl += this.url.addFavouriteKmDoc
+        method = 'post'
         httpPostAction(httpurl, {docId: record.id}, method).then((res) => {
           if (res.success) {
-            this.$message.success("收藏成功!");
-            //this.loadData();
-            record.favourite = 1;
+            this.$message.success("收藏成功!")
+            //this.loadData()
+            record.favourite = 1
           } else {
-            this.$message.warning("收藏失败!");
+            this.$message.warning("收藏失败!")
           }
         }).finally(() => {
         })
       },
       //取消收藏夹
       delFavouriteKmDoc(record) {
-        let httpurl = '';
-        let method = '';
-        httpurl += this.url.delFavouriteKmDoc;
-        method = 'delete';
+        let httpurl = ''
+        let method = ''
+        httpurl += this.url.delFavouriteKmDoc
+        method = 'delete'
         httpPostAction(httpurl, {docId: record.id}, method).then((res) => {
           if (res.success) {
-            this.$message.success("取消收藏成功!");
-            // this.loadData();
-            record.favourite = 0;
+            this.$message.success("取消收藏成功!")
+            // this.loadData()
+            record.favourite = 0
           } else {
-            this.$message.warning("取消收藏失败!");
+            this.$message.warning("取消收藏失败!")
           }
         }).finally(() => {
         })
       },
-
       // 显示预览窗口，初始化
       previewKmDoc(record) {
-        // this.PDFurl = window._CONFIG['domianURL'] + this.url.previewKmDoc + "?docId=" + record.id;
-        this.PDFurl =  this.url.previewKmDoc + "?docId=" + record.id;
-        this.visible = true;
-        this.pdfLoading = true;
-        this.pdfShow = true;
+        let kmTitle = record.title.replace(/<[^>]+>/g, '')
+        this.PDFurl =  this.url.previewKmDoc + "?docId=" + record.id
+        this.title ='预览 - ' + kmTitle
+        this.visible = true
+        this.pdfLoading = true
+        this.pdfShow = true
       },
       //关闭预览窗口
       handleCancel() {
-        this.visible = false;
+        this.visible = false
       },
-
       //下载文件
       downloadKmDoc(record) {
         this.$notification.success({
           message: '文件开始下载...',
           duration: 1,
-        });
+        })
         downloadFileName(this.url.downloadKmDoc, {docId: record.id})
       },
 
+      advancedSearch() {
+        let params = {
+          content: this.content,
+          phraseMatchSearchFlag: this.phraseMatchSearchFlag
+        }
+        this.$router.push({name:'advancedSearch',params:params})
+      },
       // 返回
       backHomepage() {
-        this.$router.push('/defaultDocSearch');
+        this.$router.push(this.indexUrl)
       },
       // 跳转到收藏夹
       jumpKmDocFavouritePage(){
-        this.$router.push('/km/filemanagement/KmDocFavouriteList');
+        this.$router.push('/km/filemanagement/KmDocFavouriteList')
       },
       // 跳转到个人草稿文件夹
       jumpDraftsPage(){
-        this.$router.push('/km/filemanagement/DraftsList');
+        this.$router.push('/km/filemanagement/DraftsList')
       },
       historyBack(){
         history.back()
       },
       // 点击个人登录，跳转页面
       login() {
-        this.$router.push('/dashboard/analysis');
+        this.$router.push('/dashboard/analysis')
       },
-
+      refreshDocDetail(){
+        this.$refs.docDetailRef.refreshDocDetail()
+      }
     }
   }
 </script>
 
-<style scoped>
-  @import '~@assets/less/common.less';
+<style  type="text/css">
+@import '~@assets/less/common.less';
+
+.result_title {
+  font-weight: bold;
+}
 </style>

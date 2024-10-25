@@ -1,5 +1,5 @@
 <template>
-  <div class="user-wrapper" :class="theme">
+  <div class="user-wrapper user-menu-dropdown" :class="theme">
     <a-dropdown>
       <span class="action action-full ant-dropdown-link user-dropdown-menu">
 <!--        <a-avatar class="avatar" size="small" :src="getAvatar()"/>-->
@@ -27,6 +27,12 @@
             <span>退出登录</span>
           </a>
         </a-menu-item>
+
+        <!--<a-menu-item key="3"  @click="systemSetting">-->
+          <!--<a-icon type="tool"/>-->
+          <!--<span>系统设置</span>-->
+        <!--</a-menu-item>-->
+
       </a-menu>
     </a-dropdown>
     <user-password ref="userPassword"></user-password>
@@ -134,7 +140,7 @@
           onOk() {
             return that.Logout({}).then(() => {
               // update-begin author:wangshuai date:20200601 for: 退出登录跳转登录页面
-              that.$router.push({ path: '/user/login' });
+              that.$router.push({ path: '/front/user/login' });
               window.location.reload()
               // update-end author:wangshuai date:20200601 for: 退出登录跳转登录页面
             }).catch(err => {
@@ -237,5 +243,9 @@
   .logout_title {
     color: inherit;
     text-decoration: none;
+  }
+  .user-dropdown-menu{
+    line-height:64px!important;
+    background: darkorange;
   }
 </style>

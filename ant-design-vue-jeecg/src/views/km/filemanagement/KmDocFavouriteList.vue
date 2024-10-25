@@ -18,28 +18,15 @@
             </a-form-item>
           </a-col>
           <template v-if="toggleSearchStatus">
+<!--            <a-col :xl="6" :lg="7" :md="8" :sm="24">-->
+<!--              <a-form-item label="编号">-->
+<!--                <a-input placeholder="请输入编号" v-model="queryParam.serialNumber"></a-input>-->
+<!--              </a-form-item>-->
+<!--            </a-col>-->
             <a-col :xl="6" :lg="7" :md="8" :sm="24">
-              <a-form-item label="编号">
-                <a-input placeholder="请输入编号" v-model="queryParam.serialNumber"></a-input>
-              </a-form-item>
-            </a-col>
-            <a-col :xl="6" :lg="7" :md="8" :sm="24">
-              <a-form-item label="来源">
-                <j-multi-select-tag type="list_multi" placeholder="请选择来源" v-model="queryParam.sourceList"
-                                    dictCode="km_dict_source"></j-multi-select-tag>
-
-              </a-form-item>
-            </a-col>
-            <a-col :xl="6" :lg="7" :md="8" :sm="24">
-              <a-form-model-item label="版本状态">
-                <j-multi-select-tag type="list_multi" v-model="queryParam.versionList" :trigger-change="true"
-                                    placeholder="请选择版本状态" dictCode="km_dict_versions"></j-multi-select-tag>
-              </a-form-model-item>
-            </a-col>
-            <a-col :xl="6" :lg="7" :md="8" :sm="24">
-              <a-form-model-item label="涉及业务">
+              <a-form-model-item label="标签">
                 <j-multi-select-tag type="list_multi" v-model="queryParam.businessTypeList" :trigger-change="true"
-                                    placeholder="请选择涉及业务" dictCode="km_dict_business"></j-multi-select-tag>
+                                    placeholder="请选择标签" dictCode="km_dict_business"></j-multi-select-tag>
               </a-form-model-item>
             </a-col>
 
@@ -50,25 +37,11 @@
             </a-col>
 
             <a-col :xl="6" :lg="7" :md="8" :sm="24">
-              <a-form-item label="文号">
-                <a-input placeholder="请输入文号" v-model="queryParam.fileNo" @change="transitionQueryFileNo"></a-input>
-              </a-form-item>
-            </a-col>
-
-            <a-col :xl="6" :lg="7" :md="8" :sm="24">
               <a-form-item label="文件类型">
                 <a-input placeholder="请输入文件类型" v-model="queryParam.fileType"></a-input>
               </a-form-item>
             </a-col>
-            <a-col :xl="12" :lg="14" :md="16" :sm="48">
-              <a-form-item label="发文时间">
-                <j-dict-select-tag type="list" placeholder="请选择开始时间" v-model="queryParam.pubTimeStart" style="width:40%"
-                                   dictCode="km_dict_year"></j-dict-select-tag>
-                <span class="query-group-split-cust"></span>
-                <j-dict-select-tag type="list" placeholder="请选择结束时间" v-model="queryParam.pubTimeEnd" style="width: 40%"
-                                   dictCode="km_dict_year"></j-dict-select-tag>
-              </a-form-item>
-            </a-col>
+
             <a-col :xl="12" :lg="14" :md="16" :sm="48">
               <a-form-item label="上传时间">
                 <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择开始时间"
@@ -94,7 +67,28 @@
       </a-form>
     </div>
     <!-- 查询区域-END ant-alert ant-alert-info -->
+    <!-- 详情区域-BEGIN -->
+    <a-drawer
+      :title="showDocDetail.title"
+      :width="720"
+      :visible="drawerVisible"
+      :body-style="{ paddingBottom: '80px' }"
+      :footer-style="{ textAlign: 'right' }"
+      @close="onDrawerClose"
+    >
+      <doc-detail ref="docDetailRef" :record="showDocDetail"></doc-detail>
+      <br/>
 
+      <a-divider style="margin: 5px 0 15px 0 "></a-divider>
+
+      <doc-comments
+        ref="comments"
+        @new="refreshDocDetail"
+        :doc-id="showDocDetail.id">
+      </doc-comments>
+
+    </a-drawer>
+    <!-- 详情区域-END -->
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <!--      <a-button type="primary" icon="download" @click="handleExportXls('草稿文件夹')">导出</a-button>-->
@@ -172,29 +166,26 @@
             下载
           </a-button>
         </template>
-
         <span slot="action" slot-scope="text, record">
+          <a-space>
+          <a-icon type="read" title="预览" @click="previewKmDoc(record)"
+                  :style="{ fontSize: '18px', color: '#1890FF', }" style="margin-left: 5px"/>
           <a-popconfirm title="确定取消收藏吗?" @confirm="() => delFavouriteKmDoc(record)">
           <a-icon type="delete" title="取消收藏" :style="{ fontSize: '18px', color: '#1890FF', }" style="margin-left: 5px"/>
           </a-popconfirm>
-
-          <!--<a-icon type="read" title="预览" @click="previewKmDoc(record,true)"-->
-                  <!--:style="{ fontSize: '18px', color: '#1890FF', }" style="margin-left: 5px"/>-->
-
           <a-icon type="download" title="下载" @click="downloadKmDoc(record)"
                   :style="{ fontSize: '18px', color: '#1890FF'}" style="margin-left: 5px"/>
+          </a-space>
         </span>
-
         <span slot="docTitle" slot-scope="text,record">
-          <span @click="previewKmDoc(record,true)"><a style="color: #303133">{{ record.title}}</a></span>
+          <span @click="showDrawer(record,true)"  :title ="[ record.fileType + '文件-大小:'+ record.fileSize +' B'] "><a style="color: #303133">{{ record.title}}</a></span>
         </span>
-
       </a-table>
     </div>
 
-    <b-j-modal :title="title"
+    <b-j-modal :title="previewTitle"
                :width="width"
-               :visible="visibleB"
+               :visible="previewVisible"
                @cancel="handleCancel"
                cancelText="关闭"
                :okButtonProps="{ class:{'jee-hidden': true} }">
@@ -209,30 +200,26 @@
 
 <script>
   import {ajaxGetDictItems, getDictItemsFromCache} from '@/api/api'
-  import {ACCESS_TOKEN} from "@/store/mutation-types"
+  import {ACCESS_TOKEN, USER_INFO} from "@/store/mutation-types"
   import '@/assets/less/TableExpand.less'
   import {mixinDevice} from '@/utils/mixin'
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
-  import SubjectModal from "./modules/SubjectModal";
-  import UploadModal from "./modules/UploadModal";
   import {httpPostAction, httpAction, getAction, downloadFileName} from '@/api/manage'
   import Vue from "vue";
+  import DocComments from '@/views/km/Common/Comments'
+  import DocDetail from '@/views/km/Common/DocDetail'
+  import store from "@comp/tools/HeaderNotice";
 
 
   export default {
     name: 'FavouriteList',
     mixins: [JeecgListMixin, mixinDevice],
-    components: {
-      UploadModal,
-      SubjectModal,
+    components:{
+      DocComments,
+      DocDetail
     },
     data() {
       return {
-        // switch 是否公开按钮的的状态
-        switchPublicFlag: true,
-        // switch 是否允许下载按钮的的状态
-        switchDownloadFlag: true,
-        description: '收藏夹',
         //表头
         columns: [],
         //列设置
@@ -248,25 +235,12 @@
             dataIndex: 'action',
             align: "center",
             fixed: "left",
-            width: 65,
+            width: 80,
             scopedSlots: {
               filterDropdown: 'filterDropdown',
               filterIcon: 'filterIcon',
               customRender: 'action'
             }
-          },
-          {
-            title: '分类',
-            align: "center",
-            sorter: true,
-            customCell: () => {
-              return {
-                style: {
-                  'max-width': '8em',
-                },
-              };
-            },
-            dataIndex: 'category_dictText'
           },
           {
             title: '标题',
@@ -282,74 +256,51 @@
             dataIndex: 'title'
           },
           {
-            title: '来源',
-            align: "center",
-            customCell: () => {
-              return {
-                style: {
-                  'max-width': '7em',
-                },
-              };
-            },
-            filters: [],
-            dataIndex: 'source_dictText'
-          },
-          {
-            title: '发文时间',
+            title: '分类',
             align: "center",
             sorter: true,
             customCell: () => {
               return {
                 style: {
-                  'max-width': '11em',
+                  'max-width': '8em',
                 },
               };
             },
-            dataIndex: 'pubTimeTxt'
-          },
-          {
-            title: '版本状态',
-            align: "center",
-            customCell: () => {
-              return {
-                style: {
-                  'max-width': '12em',
-                },
-              };
-            },
-            dataIndex: 'versions_dictText'
-          },
-          {
-            title: '涉及业务',
-            align: "center",
-            customCell: () => {
-              return {
-                style: {
-                  'max-width': '12em',
-                },
-              };
-            },
-            dataIndex: 'businessTypes_dictText'
-          },
-          {
-            title: '文号',
-            align: "center",
-            customCell: () => {
-              return {
-                style: {
-                  'max-width': '12em',
-                },
-              };
-            },
-            dataIndex: 'fileNo'
+            dataIndex: 'category_dictText'
           },
 
+          {
+            title: '标签',
+            align: "center",
+            dataIndex: 'businessTypes_dictText',
+            customCell: () => {
+              return {
+                style: {
+                  'max-width': '10em',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  textOverflow:'ellipsis'
+                },
+              };
+            },
+          },
+          {
+            title: '关键字',
+            align: "center",
+            dataIndex: 'keywords',
+            customCell: () => {
+              return {
+                style: {
+                  'max-width': '10em',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  textOverflow:'ellipsis'
+                },
+              };
+            }
+          }
         ],
         PDFurl: '',
-        visible: false,
-        visibleB: false,
-        model: {},
-        urlAction: window._CONFIG['domianURL'] + "/KM/kmDoc/changePreviewFile?docId=",
         headers: {
           authorization: 'authorization-text',
           'X-Access-Token': Vue.ls.get(ACCESS_TOKEN)
@@ -370,17 +321,7 @@
           xs: {span: 12},
           sm: {span: 12},
         },
-        confirmLoading: false,
-        loadedRatio: 0,
-        pdfLoading: false,
-        pdfShow: true,
-        resetPreviewShow: false,
-        validatorRules: {},
-        formDisabled: false,
-        versions: '',
-        businessTypes: '',
-        title: "编辑",
-        width: 900,
+        width: "900",
         url: {
           list: "/KM/kmDocFavourite/list",
           delFavouriteKmDoc: '/KM/kmDocFavourite/delete',
@@ -390,37 +331,30 @@
         },
         dictOptions: {},
         superFieldList: [],
-      }
+
+        uid: '',
+        userInfo: {},
+        showDocDetail: {},
+        drawerVisible: false,
+        previewVisible: false,
+        previewTitle: "预览 - ",      }
     },
     created() {
-
-      this.getSuperFieldList();
       //设置全局token
       Vue.prototype.token = Vue.ls.get(ACCESS_TOKEN);
       window._CONFIG['token'] = Vue.prototype.token;
-
       // 调用初始化自定义table列表函数
       this.initColumns();
       this.initFilterDict();
-    },
-    computed: {
-      importExcelUrl: function () {
-        return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
-      },
-    },
-    watch: {
-      loadedRatio: {
-        handler(newVal, oldVal) {
-          if (newVal === 1) {
-            this.pdfLoading = false;
-          }
-        }
-      }
+      // let userInfo = Vue.ls.get(USER_INFO)
+      let userInfo = this.$store.getters.userInfo
+      this.uid = userInfo.id
+      this.userInfo = userInfo
     },
     methods: {
+
       // 加载filter字段选项
       initFilterDict() {
-
         //根据字典Code, 初始化字典数组
         ajaxGetDictItems(this.filterDictCode, null).then((res) => {
           if (res.success) {
@@ -435,7 +369,6 @@
             this.defColumns[3].filters =this.filterOptions;
           }
         })
-
       },
       // 自定义列表  列设置更改事件
       onColSettingsChange(checkedValues) {
@@ -456,7 +389,6 @@
       },
       // 自定义列表  初始化
       initColumns() {
-
         var key = this.$route.name + ":colsettings";
         console.log("colsettings", key);
         let colSettings = Vue.ls.get(key);
@@ -481,24 +413,6 @@
           this.columns = cols;
         }
       },
-
-      initDictConfig() {
-      },
-      getSuperFieldList() {
-        let fieldList = [];
-        fieldList.push({type: 'string', value: 'serialNumber', text: '编号', dictCode: ''})
-        fieldList.push({type: 'string', value: 'category', text: '分类', dictCode: ''})
-        fieldList.push({type: 'string', value: 'title', text: '标题', dictCode: ''})
-        fieldList.push({type: 'string', value: 'source', text: '来源', dictCode: ''})
-        fieldList.push({type: 'datetime', value: 'pubTime', text: '发文时间'})
-        fieldList.push({type: 'string', value: 'versions', text: '版本状态', dictCode: ''})
-        fieldList.push({type: 'string', value: 'businessTypes', text: '涉及业务', dictCode: ''})
-        fieldList.push({type: 'string', value: 'keywords', text: '关键字', dictCode: ''})
-        fieldList.push({type: 'datetime', value: 'createTime', text: '上传时间'})
-        fieldList.push({type: 'string', value: 'fileType', text: '文件类型', dictCode: ''})
-        this.superFieldList = fieldList
-      },
-
       // 下载文件
       downloadKmDoc(record) {
         this.$notification.success({
@@ -533,53 +447,33 @@
           });
         }
       },
+      showDrawer(record) {
+        this.showDocDetail = record
+        this.drawerVisible = true
+      },
+      onDrawerClose() {
+        this.drawerVisible = false
+      },
+      //编辑源文件
+      editKmDoc(record){
+        let editorUrl = window._CONFIG['domianURL'] + '/onlyoffice/editor?'
+        editorUrl = editorUrl + 'docId=' + record.id
+        editorUrl = editorUrl + '&uid=' + this.uid
+        editorUrl = editorUrl + '&fileName=' + record.title + '.'+ record.fileType
+        window.open(editorUrl,"_blank")
+      },
       //显示预览窗口，并初始化配置
-      previewKmDoc(record, boolFormDisabled) {
-        if (boolFormDisabled) {
-          this.title = "预览"
-          this.visibleB = true;
-        } else {
-          this.title = "编辑";
-          this.visible = true;
-        }
-        this.model = {};
-        this.model = Object.assign({}, record);
-        console.log("model", this.model);
-        if (this.model.depId == null || this.model.depId === "") {
-          var depId = Vue.ls.get("Dep_ID");
-          console.log("部门数据为空,从本地中获取数据", depId);
-          this.model.depId = depId
-        }
-        this.versions = this.model.versions;
-        this.formDisabled = boolFormDisabled;
-        this.businessTypes = this.model.businessTypes;
-        // this.PDFurl = window._CONFIG['domianURL'] + this.url.previewKmDoc + "?docId=" + record.id;
+      previewKmDoc(record) {
         this.PDFurl =  this.url.previewKmDoc + "?docId=" + record.id;
         this.pdfLoading = true;
-        this.pdfShow = true;
-        if (this.model.previewFileId != this.model.originalPreviewFileId) {
-          this.resetPreviewShow = true;
-        }
-
-        //   将是否公开状态从 1 和 0 转为 switch的true和false
-        if (this.model.publicFlag === 1) {
-          this.switchPublicFlag = true;
-        } else {
-          this.switchPublicFlag = false;
-        }
-
-        //  将是否允许下载状态从 1 和 0 转为 switch的true和false
-        if (this.model.downloadFlag === 1) {
-          this.switchDownloadFlag = true;
-        } else {
-          this.switchDownloadFlag = false;
-        }
+        this.previewVisible = true;
+        this.previewTitle = "预览 - " + record.title
       },
-      //关闭预览窗口
+      //关闭窗口
       handleCancel() {
-        this.visible = false;
-        this.visibleB = false;
-        this.model = {};
+        console.log("cancel ")
+        this.configVisible = false
+        this.previewVisible = false;
       },
 
       //取消收藏夹
@@ -598,14 +492,10 @@
         }).finally(() => {
         })
       },
-
-      transitionQueryFileNo() {
-        // 将输入的中括号 转换为 六角括号
-        if (typeof (this.queryParam.fileNo) !== "undefined") {
-          this.queryParam.fileNo = this.queryParam.fileNo.replace(/\[/g, '〔');
-          this.queryParam.fileNo = this.queryParam.fileNo.replace(/\]/g, '〕');
-        }
-      },
+      refreshDocDetail(){
+        console.log("emit new from comments and call docDetail refreshDocDetail....")
+        this.$refs.docDetailRef.refreshDocDetail()
+      }
 
     }
   }

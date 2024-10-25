@@ -1,5 +1,9 @@
 FROM mysql:5.7
 
-MAINTAINER mahone<liuwenxiong@mail.kykms.cn>
+MAINTAINER hnliuwx@gmail.com
 
-COPY ./km_mysql.sql /docker-entrypoint-initdb.d
+ENV TZ=Asia/Shanghai
+
+RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+COPY ./km_mysql_docker.sql /docker-entrypoint-initdb.d

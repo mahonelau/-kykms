@@ -1,6 +1,7 @@
 <template>
   <div class="rank">
-    <h4 class="title">{{ title }}</h4>
+
+    <h4 class="title"><a-space><a-icon :type="icon" theme="filled" style="color: #1a53ba"></a-icon>{{ title }}</a-space></h4>
     <ul class="list" :style="{height:height?`${height}px`:'auto',overflow:'auto'}">
       <li :key="index" v-for="(item, index) in list">
         <span :class="index < 3 ? 'active' : null">{{ index + 1 }}</span>
@@ -16,6 +17,10 @@
     name: "RankList",
     // ['title', 'list']
     props: {
+      icon: {
+        type: String,
+        default: ''
+      },
       title: {
         type: String,
         default: ''
@@ -35,15 +40,15 @@
 <style lang="less" scoped>
 
   .rank {
-    padding: 0 32px 32px 72px;
+    padding: 0 12px 16px 12px;
 
     .list {
-      margin: 25px 0 0;
+      margin: 5px 0 0;
       padding: 0;
       list-style: none;
 
       li {
-        margin-top: 16px;
+        margin-top: 6px;
 
         span {
           color: #606266;
@@ -75,7 +80,7 @@
   }
 
   .mobile .rank {
-    padding: 0 32px 32px 32px;
+    padding: 0 12px 12px 12px;
   }
 
 </style>

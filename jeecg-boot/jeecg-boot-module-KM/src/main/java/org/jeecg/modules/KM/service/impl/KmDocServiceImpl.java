@@ -1,12 +1,16 @@
 package org.jeecg.modules.KM.service.impl;
 
 import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONObject;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
@@ -24,9 +28,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -44,7 +46,9 @@ import org.jeecg.common.system.vo.KmSearchResultObjVO;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.CommonUtils;
 import org.jeecg.common.util.DateUtils;
+//import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.UUIDGenerator;
+import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.KM.VO.*;
 import org.jeecg.modules.KM.common.config.BaseConfig;
 import org.jeecg.modules.KM.common.enums.*;
@@ -54,30 +58,37 @@ import org.jeecg.modules.KM.common.utils.*;
 import org.jeecg.modules.KM.entity.*;
 import org.jeecg.modules.KM.mapper.KmDocMapper;
 import org.jeecg.modules.KM.service.*;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.URLEncoder;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
 public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements IKmDocService {
 
-    @Autowired
+    @Value("${files.docservice.url.site-ip}")
+    private String docserviceSiteIp;
+    @Resource
     private KmDocMapper kmDocMapper;
     @Autowired
     private IKmFileService kmFileService;
@@ -90,6 +101,8 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
     @Autowired
     private RestHighLevelClient restHighLevelClient;
     @Autowired
+    private EsUtils esUtils;
+    @Autowired
     private KMConstant kmConstant;
     @Autowired
     private ISysBaseAPI sysBaseAPI;
@@ -97,16 +110,57 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
     private DictUtils dictUtils;
     @Autowired
     private IKmDocBusinessTypeService kmDocBusinessTypeService;
-    @Autowired
-    private IKmDocVersionService kmDocVersionService;
+//    @Autowired
+//    private IKmDocVersionService kmDocVersionService;
     @Autowired
     private IKmDocVisitRecordService kmDocVisitRecordService;
     @Autowired
     private IKmSearchRecordService kmSearchRecordService;
     @Autowired
+    private KMRedisUtils KMRedisUtils;
+    @Autowired
     private IKmDocFavouriteService kmDocFavouriteService;
     @Autowired
     private IKmSysConfigService kmSysConfigService;
+    @Autowired
+    private IKmDocVersionService kmDocVersionService;
+
+    private File M2F(MultipartFile file) throws Exception {
+        File f=File.createTempFile(UUID.randomUUID().toString(), "." + FilenameUtils.getExtension(file.getOriginalFilename()));
+        file.transferTo(f);
+        return f;
+    }
+    @SneakyThrows
+    private static MultipartFile fileToMultipartFile(File file)  {
+        InputStream inputStream = new FileInputStream(file);
+        MultipartFile multipartFile = new MockMultipartFile(file.getName(), inputStream);
+        return multipartFile;
+    }
+    @Override
+    public Result<?> updateOfficeFile(String docId, File file,String userName){
+        Result<?> result = new Result<>();
+        KmDocParamVO kmDocParamVO = new KmDocParamVO();
+        MultipartFile multipartFile = fileToMultipartFile(file);
+        //1、保存文件，生成新的kmfile
+        KmFile kmFile = kmFileService.saveFile(multipartFile);
+
+        //2、给kmdoc更换文件
+        result = updateDocFile(docId,kmFile.getId(),userName);
+        if(result.isSuccess()) {
+            //3、写日志
+            kmDocVisitRecordService.logVisit(docId,
+                    "",
+                    DocVisitTypeEnum.UpdateFile.getCode(),
+                    "",
+                    userName);
+        }
+//        else{
+//            kmFileService.deleteKmFile(kmFile.getId());
+//            return Result.error("保存文档数据发生错误");
+//        }
+        return result;
+    }
+
 
     @Override
     public Page<KmDocVO> queryPageList(Page<KmDocVO> page, KmDocParamVO kmDocParamVO,String orderBy){
@@ -118,8 +172,11 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
 
         String userId = sysUser.getId();
         //处理过滤source -> sourceList
-        if(kmDocParamVO.getSource() != null && !kmDocParamVO.getSource().isEmpty())
-            kmDocParamVO.setSourceList(Arrays.asList(kmDocParamVO.getSource().split(",")));
+        if(kmDocParamVO.getDepId() != null && !kmDocParamVO.getDepId().isEmpty())
+            kmDocParamVO.setDepIdList(Arrays.asList(kmDocParamVO.getDepId().split(",")));
+        //处理过滤source -> sourceList
+//        if(kmDocParamVO.getOrgCode() != null && !kmDocParamVO.getOrgCode().isEmpty())
+//            kmDocParamVO.setSourceList(Arrays.asList(kmDocParamVO.getOrgCode().split(",")));
 
         return kmDocMapper.getPageList(page,userId,kmDocParamVO,permissionSql,dbType,orderBy);
     }
@@ -131,9 +188,15 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         if(sysUser == null)
             return null;
 
-        //处理过滤source -> sourceList
-        if(kmDocParamVO.getSource() != null && !kmDocParamVO.getSource().isEmpty())
-            kmDocParamVO.setSourceList(Arrays.asList(kmDocParamVO.getSource().split(",")));
+        String departmentFilterEnabled = kmSysConfigService.getSysConfigValue("departmentFilterEnabled");
+        if( departmentFilterEnabled != null
+                &&  departmentFilterEnabled.equals("1")
+                && !SecurityUtils.getSubject().isPermitted("DepartmentFilterIgnore") ){
+            String orgCode = sysUser.getOrgCode();
+            kmDocParamVO.setOrgCode(orgCode);
+            kmDocParamVO.setDepartmentFilterEnabled(true);
+        }
+
 
         kmDocParamVO.setReleaseFlag(DocReleaseFlagEnum.Released.getCode());
         String userId = sysUser.getId();
@@ -141,22 +204,84 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         String dbType = CommonUtils.getDatabaseType();
         Page<KmDocVO> pageList = kmDocMapper.getPageList(page, userId, kmDocParamVO, "", dbType, orderBy);
 //        if(!pageList.getRecords().isEmpty() && sysUser.getThirdType().equals(KMConstant.InnerUser)){
-        if(!pageList.getRecords().isEmpty()){
-            for (KmDocVO item:pageList.getRecords()) {
-                item.setDownloadFlag(KMConstant.AllowDownload);
-            }
-        }
+//        if(!pageList.getRecords().isEmpty()){
+//            for (KmDocVO item:pageList.getRecords()) {
+//                item.setDownloadFlag(KMConstant.AllowDownload);
+//            }
+//        }
         return pageList;
 //        return kmDocMapper.getPageList(page, userId, kmDocParamVO, "", dbType, orderBy);
     }
 
+    private Result<?> updateDocFile(String docId,String fileId,String userName){
+        Result<?> result = new Result<>();
+        KmDoc kmDoc = this.getById(docId);
+        if (kmDoc == null) {
+            return  Result.error("doc not found");
+        }
+
+        //1、生成新的文档历史版本记录
+        Integer newVersion = kmDoc.getCurrentVersion() == null? 1: kmDoc.getCurrentVersion()+1;
+        KmDocVersion kmDocVersion = new KmDocVersion();
+        kmDocVersion.setDocId(docId);
+        kmDocVersion.setFileId(fileId);
+        kmDocVersion.setVersion(newVersion);
+        kmDocVersion.setCreateBy(userName);
+        kmDocVersion.setComment("Update");
+        if (!kmDocVersionService.save(kmDocVersion)) {
+            return Result.error("save kmdoc version fail");
+        }
+        //3、更新kmdoc记录
+        kmDoc.setFileId(fileId);
+        kmDoc.setCurrentVersion(newVersion);
+        kmDoc.setLastUpdateTime(DateTime.now());
+        kmDoc.setLastUpdateBy(userName);
+        this.updateById(kmDoc);
+
+        //3、转pdf
+        renewPreviewDocSync(kmDoc);
+
+        //4、如果已经发布，入库ES
+        if (kmDoc.getStatus().equals(DocStatusEnum.Passed.getCode())) {
+            ftiIndexDoc(kmDoc);
+        }
+
+        return result;
+    }
+
+    private void renewPreviewDocSync(KmDoc kmDoc){
+        kmDoc.setConvertFlag(DocConvertFlagEnum.WaitConvert.getCode());
+        convertDocSync(kmDoc);
+    }
+
+    @Override
+    public Result<?> importExternalFile(File externalFile, KmDocParamVO kmDocParamVO){
+        KmFile kmFile = kmFileService.transferExternalFile(externalFile);
+        if (oConvertUtils.isNotEmpty(kmFile)) {
+            KmDoc kmDoc = saveDoc(kmFile, kmDocParamVO);
+            if (oConvertUtils.isNotEmpty(kmDoc)) {
+                return auditDocImportedFile(kmDoc.getId());
+            }
+        }
+        return Result.error("未知错误");
+    }
+
     @Override
     @Transactional
-    public KmDoc saveDoc(KmFile kmFile) {
+    public KmDoc saveDoc(KmFile kmFile, KmDocParamVO kmDocParamVO) {
         KmDoc kmDoc =new KmDoc();
         LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 
          String userId = sysUser.getUsername();
+         //传参
+        kmDoc.setCategory(kmDocParamVO.getCategory());
+        kmDoc.setKeywords(kmDocParamVO.getKeywords());
+        if(kmDocParamVO.getDepId() !=null && kmDocParamVO.getDepId().isEmpty()) {
+            String depId = kmDocParamVO.getDepId();
+            String orgCode = sysBaseAPI.queryDepartOrgCodeById(depId);
+            kmDoc.setDepId(depId);
+            kmDoc.setOrgCode(orgCode);
+        }
 
         kmDoc.setCreateBy(userId);
         kmDoc.setCreateTime(DateUtils.getDate());
@@ -164,8 +289,14 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         kmDoc.setDownloads(BigInteger.valueOf(0));
         kmDoc.setViews(BigInteger.valueOf(0));
         kmDoc.setSerialNumber(SerialNumberRule.generate());
+        kmDoc.setStatus(DocStatusEnum.Draft.getCode());
         //默认为公开，并允许下载
-        kmDoc.setPublicFlag(KMConstant.DocPublic);
+//        kmDoc.setPublicRemark(DocPublicRemark.Public.getCode());
+        kmDoc.setPublicRemark(kmDocParamVO.getPublicRemark());
+
+        kmDoc.setOrgCode(sysUser.getOrgCode());
+        kmDoc.setDepId(sysUser.getDepartIds());
+//        kmDoc.setPublicFlag(KMConstant.DocPublic);
         kmDoc.setDownloadFlag(KMConstant.AllowDownload);
 
         //file properties
@@ -177,8 +308,8 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         kmDoc.setFileSize(distFile.length());
 
         //放在审批后再入库
-        kmDoc.setStatus(DocStatusEnum.Passed.getCode());
-        kmDoc.setReleaseFlag(DocReleaseFlagEnum.Released.getCode());
+        kmDoc.setStatus(DocStatusEnum.Draft.getCode());
+        kmDoc.setReleaseFlag(DocReleaseFlagEnum.Off.getCode());
         kmDoc.setFtiFlag(DocFTIFlagEnum.WaitProcess.getCode());
 
         //pdf文件自己就是预览文件
@@ -201,17 +332,40 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         kmDoc.setFtiFlag(DocFTIFlagEnum.WaitProcess.getCode());
         baseMapper.insert(kmDoc);
 
+        if(kmDoc.getId() != null){
+            if(kmDocParamVO.getBusinessTypeList()!=null && kmDocParamVO.getBusinessTypeList().size()>0) {
+                for (String businessType : kmDocParamVO.getBusinessTypeList()) {
+                    KmDocBusinessType tmpKmDocBusinessType = new KmDocBusinessType();
+                    tmpKmDocBusinessType.setDocId(kmDoc.getId());
+                    tmpKmDocBusinessType.setBusinessType(businessType);
+                    if (!kmDocBusinessTypeService.save(tmpKmDocBusinessType)){
+                        return kmDoc;
+                    }
+                }
+            }
+
+            if(kmDocParamVO.getAddTopicIdList()!=null && kmDocParamVO.getAddTopicIdList().size()>0){
+                for (String topic : kmDocParamVO.getAddTopicIdList()) {
+                    KmDocTopicType tmpKmDocTopicType = new KmDocTopicType();
+                    tmpKmDocTopicType.setTopicId(topic);
+                    tmpKmDocTopicType.setDocId(kmDoc.getId());
+                    if(!kmDocTopicTypeService.save(tmpKmDocTopicType)){
+                        return kmDoc;
+                    }
+                }
+            }
+        }
+
         //根据ConvertFlag进行转换处理
         if(kmDoc.getConvertFlag() == null || kmDoc.getConvertFlag() == DocConvertFlagEnum.WaitConvert.getCode()) {
             executorService.singleExecute(() -> convertDocSync(kmDoc));
         }
         return kmDoc;
-
     }
 
     @Override
     public void convertDocSync(KmDoc kmDoc) {
-        //kmDoc = super.getById(kmDoc.getId());
+//        kmDoc = super.getById(kmDoc.getId());
         if (kmDoc.getConvertFlag() != null && !kmDoc.getConvertFlag().equals(DocConvertFlagEnum.WaitConvert.getCode())) {
             return;
         }
@@ -261,7 +415,6 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         this.updateById(kmDoc);
     }
 
-
     @Override
     public void indexDocSyncBatch(List<String> idList) {
         executorService.singleExecute(() -> indexDocBatch(idList));
@@ -281,84 +434,101 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         executorService.singleExecute(() -> ftiIndexDoc(kmDoc));
     }
 
-    //KmDoc对象分析内容并入库ES
     private void ftiIndexDoc(KmDoc kmDoc){
+        ftiIndexDocBase(  kmDoc,true);
+    }
+    private void ftiIndexDocBase(KmDoc kmDoc,boolean logError){
         kmDoc = super.getById(kmDoc.getId());
         log.info("index Task id:{},docName:{}",kmDoc.getId(),kmDoc.getName());
         if(kmDoc==null){
-            kmDoc.setFtiFlag(DocFTIFlagEnum.Fail.getCode());
-            kmDoc.setProcessMsg( "[ftiIndexDoc] doc is null");
+            if(logError){
+                kmDoc.setFtiFlag(DocFTIFlagEnum.Fail.getCode());
+                kmDoc.setProcessMsg("[ftiIndexDoc] doc is null");
+            }
         }else {
             KmFile KmFile = kmFileService.getKmFile(kmDoc.getFileId());
             if(KmFile==null){
-                kmDoc.setFtiFlag(DocFTIFlagEnum.Fail.getCode());
-                kmDoc.setProcessMsg( "[ftiIndexDoc]  upload file not exists,id:" + kmDoc.getId());
-                log.error("入库ES失败,upload file not exists,id:{}",kmDoc.getId());
+                if(logError) {
+                    kmDoc.setFtiFlag(DocFTIFlagEnum.Fail.getCode());
+                    kmDoc.setProcessMsg("[ftiIndexDoc]  upload file not exists,id:" + kmDoc.getId());
+                    log.error("入库ES失败,upload file not exists,id:{}", kmDoc.getId());
+                }
             }else {
                 KmDocEsVO kmDocEsVO = KmDocToEsVO(kmDoc);
                 kmDocEsVO.setReleaseFlag(DocReleaseFlagEnum.Released.getCode());
-                if(kmConstant.isIndexFileType(kmDoc.getFileType())){
-                    File file = baseConfig.getFile(KmFile.getPhysicalPath());
-                    if (file != null && file.exists()) {
-                        String content = TikaUtils.parseContent(file);
+                File file = baseConfig.getFile(KmFile.getPhysicalPath());
+                if (file != null && file.exists()) {
+                    String content = "";
+                    if(kmConstant.isIndexFileType(kmDoc.getFileType())) {
+                        content = TikaUtils.parseContent(file);
                         if (content == null) {
-                            kmDoc.setFtiFlag(DocFTIFlagEnum.Fail.getCode());
-                            kmDoc.setProcessMsg("[ftiIndexDoc] tika解析文件内容出错,路径:" + file.getAbsolutePath() );
-                            log.error("[ftiIndexDoc] tika解析文件内容出错,路径:{}", file.getAbsolutePath());
-                        } else {
-                            //保存提取的全文，准备入库ES
-                            kmDocEsVO.setContent(content);
-                            //保存数据到ES
-                            Result<?> result = this.saveDocToEs(kmDocEsVO,null);
-                            if(result.getCode() == CommonConstant.SC_OK_200){
-                                kmDoc.setFtiFlag(DocFTIFlagEnum.Processed.getCode());
-                                kmDoc.setReleaseFlag(DocReleaseFlagEnum.Released.getCode());
-                                //保存ES的index id
-                                kmDoc.setIndexId(result.getResult().toString());
-                                log.info("入库ES成功:{}",kmDocEsVO.getDocId());
-                            }
-                            else{
+                            content = "";
+                            if(logError) {
                                 kmDoc.setFtiFlag(DocFTIFlagEnum.Fail.getCode());
-                                kmDoc.setProcessMsg(  "[ftiIndexDoc] 入库ES失败：" + result.getMessage());
-                                kmDoc.setReleaseFlag(DocReleaseFlagEnum.Off.getCode());
-                                log.error("入库ES失败,{}",result.getMessage());
+                                kmDoc.setProcessMsg("[ftiIndexDoc] tika解析文件内容为空,路径:" + file.getAbsolutePath());
+                                log.error("[ftiIndexDoc] tika解析文件内容为空,路径:{}", file.getAbsolutePath());
                             }
-                            log.info("解析文件成功:{}",kmDocEsVO.getDocId());
                         }
-                    } else {
-                        kmDoc.setFtiFlag(DocFTIFlagEnum.Fail.getCode());
-                        kmDoc.setProcessMsg( "[ftiIndexDoc] 解析文件失败,文件不存在或打开文件失败，路径:" +KmFile.getPhysicalPath() );
-                        log.error("解析文件失败,文件不存在或打开文件失败,路径:{}",KmFile.getPhysicalPath() );
+                        else {
+                            if(logError) {
+                                kmDoc.setFtiFlag(DocFTIFlagEnum.Processed.getCode());
+                            }
+                        }
                     }
-                }
-                else{
-                    kmDoc.setFtiFlag(DocFTIFlagEnum.NonFTI.getCode());
+                    else{
+                        if(logError) {
+                            kmDoc.setFtiFlag(DocFTIFlagEnum.NonFTI.getCode());
+                        }
+                    }
+                    //保存提取的全文，准备入库ES
+                    kmDocEsVO.setContent(content);
+                    //保存数据到ES
+                    Result<?> result = this.saveDocToEs(kmDocEsVO,null);
+                    if(result.getCode() == CommonConstant.SC_OK_200){
+                        kmDoc.setFtiFlag(DocFTIFlagEnum.Processed.getCode());
+                        kmDoc.setReleaseFlag(DocReleaseFlagEnum.Released.getCode());
+                        //保存ES的index id
+                        kmDoc.setIndexId(result.getResult().toString());
+                        log.info("入库ES成功:{}",kmDocEsVO.getDocId());
+                    }
+                    else{
+                        if(logError) {
+                            kmDoc.setFtiFlag(DocFTIFlagEnum.Fail.getCode());
+                            kmDoc.setProcessMsg("[ftiIndexDoc] 入库ES失败：" + result.getMessage());
+                            kmDoc.setReleaseFlag(DocReleaseFlagEnum.Off.getCode());
+                            log.error("入库ES失败,{}", result.getMessage());
+                        }
+                    }
+                    log.info("解析文件成功:{}",kmDocEsVO.getDocId());
+                } else {
+                    if(logError) {
+                        kmDoc.setFtiFlag(DocFTIFlagEnum.Fail.getCode());
+                        kmDoc.setProcessMsg("[ftiIndexDoc] 解析文件失败,文件不存在或打开文件失败，路径:" + KmFile.getPhysicalPath());
+                        log.error("解析文件失败,文件不存在或打开文件失败,路径:{}", KmFile.getPhysicalPath());
+                    }
                 }
             }
         }
         //保存doc对象
         this.updateById(kmDoc);
     }
-
-
     @Override
     public KmDoc getDocByFileId(String fileId){
         return kmDocMapper.getKmDocByFileId(fileId);
     }
-
 
     private KmDocEsVO KmDocToEsVO(KmDoc kmDoc){
         KmDocEsVO kmDocEsVO = new KmDocEsVO();
         //kmDocEsVO.setIndexId(kmDoc.getIndexId());
         kmDocEsVO.setCategory(kmDoc.getCategory());
         kmDocEsVO.setDocId(kmDoc.getId());
-        kmDocEsVO.setPubTime(kmDoc.getPubTime());
-//        kmDocEsVO.setPubTimeTxt(kmDoc.getPubTimeTxt());
+        kmDocEsVO.setCreateTime(kmDoc.getCreateTime());
         kmDocEsVO.setTitle(kmDoc.getTitle());
-        kmDocEsVO.setSource(kmDoc.getSource());
+        kmDocEsVO.setOrgCode(kmDoc.getOrgCode());
         kmDocEsVO.setReleaseFlag(kmDoc.getReleaseFlag());
-        kmDocEsVO.setFileNo(kmDoc.getFileNo());
-        kmDocEsVO.setPublicFlag(kmDoc.getPublicFlag());
+//        kmDocEsVO.setFileNo(kmDoc.getFileNo());
+//        kmDocEsVO.setPubTimeTxt(kmDoc.getPubTimeTxt());
+        kmDocEsVO.setPublicRemark(kmDoc.getPublicRemark());
         if(kmDoc.getKeywords() != null) {
             kmDocEsVO.setKeywords(kmDoc.getKeywords()
                     .replaceAll("  "," ")
@@ -367,21 +537,12 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
                     .replaceAll("，",",")
                     .split(","));
         }
-
         List<String> docBusinessTypeList = kmDocBusinessTypeService.getBusinessTypes(kmDoc.getId());
         if(docBusinessTypeList != null && docBusinessTypeList.size()>0){
             kmDocEsVO.setBusinessTypes(
                     docBusinessTypeList.toArray(new String[docBusinessTypeList.size()]));
         }
-
-        List<String> docVersionList = kmDocVersionService.getVersions(kmDoc.getId());
-        if(docVersionList!=null && docVersionList.size()>0){
-            kmDocEsVO.setVersions(
-                    docVersionList.toArray(new String[docVersionList.size()]));
-        }
-
         //改为从数据库获取 topicCode
-        //kmDocEsVO.setTopicCodes(RandomUtils.generateRamdonTopicCodes());
         List<String> docTopicCodeList = kmDocTopicTypeService.getDocTopicCodes(kmDoc.getId());
         if(docTopicCodeList != null && docTopicCodeList.size()>0) {
             kmDocEsVO.setTopicCodes(
@@ -391,10 +552,10 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         return kmDocEsVO;
     }
 
-
-    private Result<?> saveDocToEs(KmDoc kmDoc){
-        KmDocEsVO kmDocEsVO = KmDocToEsVO(kmDoc);
-        Result<?> result =  saveDocToEs(kmDocEsVO,kmDoc.getIndexId());
+    private Result<?> saveDocToEs(KmDoc kmDocParam){
+        KmDocEsVO kmDocEsVO = KmDocToEsVO(kmDocParam);
+        Result<?> result =  saveDocToEs(kmDocEsVO,kmDocParam.getIndexId());
+        KmDoc kmDoc = super.getById(kmDocParam.getId());
         if(result.isSuccess()){
             if(result.getResult() != null && !result.getResult().toString().isEmpty() ){
                 String newIndexId = result.getResult().toString();
@@ -457,7 +618,8 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         }
     }
 
-    private Result<?> saveDocToEs(KmDocEsVO kmDocEsVO,String indexId) {
+    @Override
+    public Result<?> saveDocToEs(KmDocEsVO kmDocEsVO, String indexId) {
         try {
             boolean indexExistFlag = true ;
             if(indexId != null && !indexId.isEmpty()) {
@@ -525,7 +687,8 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         }
     }
 
-    private Result<?> deleteDocFromEs(String indexId){
+    @Override
+    public Result<?> deleteDocFromEs(String indexId){
         try {
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
@@ -581,7 +744,6 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         }
         else {
             String userId = sysUser.getId();
-
             LambdaQueryWrapper<KmDocFavourite> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.in(KmDocFavourite::getDocId,docIdList);
             queryWrapper.eq(KmDocFavourite::getUserId,userId);
@@ -590,28 +752,24 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
             if(kmDocFavouriteList != null && kmDocFavouriteList.size()>0){
                 kmDocFavouriteList.forEach(e-> favouritDocList.add(e.getDocId()));
             }
-
             List<KmDoc> kmDocList = super.listByIds(docIdList);
             Map<String, KmDoc> kmDocMap = new HashMap<>();
             kmDocList.forEach(e -> kmDocMap.put(e.getId(), e));
-
             kmDocEsVOList.forEach((e) -> {
                 KmSearchResultVO kmSearchResultVO = new KmSearchResultVO();
                 kmSearchResultVO.setCategory(e.getCategory());
                 kmSearchResultVO.setId(e.getDocId());
-                //kmSearchResultVO.setPubTime(e.getPubTime());
-                kmSearchResultVO.setSource(e.getSource());
+                kmSearchResultVO.setCreateTime(e.getCreateTime());
+                kmSearchResultVO.setPublicRemark(e.getPublicRemark());
+                kmSearchResultVO.setOrgCode(e.getOrgCode());
                 kmSearchResultVO.setTitle(e.getTitle());
-                kmSearchResultVO.setFileNo(e.getFileNo());
-
-                if (e.getVersions() != null)
-                    kmSearchResultVO.setVersions(StringUtils.concatListToString(Arrays.asList(e.getVersions())));
+                kmSearchResultVO.setContent(e.getContent());
                 if (e.getKeywords() != null)
                     kmSearchResultVO.setKeywords(StringUtils.concatListToString(Arrays.asList(e.getKeywords())));
                 if (e.getTopicCodes() != null)
                     kmSearchResultVO.setTopicCodes(StringUtils.concatListToString(Arrays.asList(e.getTopicCodes())));
                 if (e.getBusinessTypes() != null)
-                    kmSearchResultVO.setBusinessType(StringUtils.concatListToString(Arrays.asList(e.getBusinessTypes())));
+                    kmSearchResultVO.setBusinessTypes(StringUtils.concatListToString(Arrays.asList(e.getBusinessTypes())));
                 //拼装db信息
                 if (kmDocMap.containsKey(kmSearchResultVO.getId())) {
                     KmDoc one = kmDocMap.get(kmSearchResultVO.getId());
@@ -620,13 +778,10 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
                     kmSearchResultVO.setFileId(one.getFileId());
                     kmSearchResultVO.setPreviewFileId(one.getPreviewFileId());
                     kmSearchResultVO.setFileType(one.getFileType());
-                    kmSearchResultVO.setSize(one.getFileSize());
-                    kmSearchResultVO.setPubTimeTxt(one.getPubTimeTxt());
+                    kmSearchResultVO.setFileSize(one.getFileSize());
                     kmSearchResultVO.setDownloadFlag(one.getDownloadFlag());
-                    kmSearchResultVO.setEffectTime(one.getEffectTime());
                     kmSearchResultVO.setRemark(one.getRemark());
-                    kmSearchResultVO.setOrgCode(one.getOrgCode());
-
+                    kmSearchResultVO.setCreateBy(one.getCreateBy());
                 }
                 //拼装收藏夹标记
                 if(favouritDocList.contains(e.getDocId()))
@@ -634,12 +789,46 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
                 else
                     kmSearchResultVO.setFavourite(0);
 
-
                 kmSearchResultVOList.add(kmSearchResultVO);
             });
             return kmSearchResultVOList;
         }
     }
+
+    private KmSearchRecord getParamKmSearchRecord(KmDocEsParamVO kmDocEsParamVO ){
+        KmSearchRecord kmSearchRecord = new KmSearchRecord();
+        if (kmDocEsParamVO.getTitle() != null && !kmDocEsParamVO.getTitle().isEmpty()) {
+            kmSearchRecord.setTitle(kmDocEsParamVO.getTitle());
+        }
+
+        // 关键字检索
+        if (kmDocEsParamVO.getKeywords() != null && kmDocEsParamVO.getKeywords().size() > 0) {
+            kmSearchRecord.setKeywords(StringUtils.concatListToString(kmDocEsParamVO.getKeywords()));
+        }
+        //content
+        if (kmDocEsParamVO.getContent() != null && !kmDocEsParamVO.getContent().isEmpty()) {
+            kmSearchRecord.setContent(kmDocEsParamVO.getContent());
+        }
+        return kmSearchRecord;
+    }
+
+    private List<String>  getParamKeywords(KmDocEsParamVO kmDocEsParamVO ){
+        List<String> keywords = new ArrayList<>();
+         if (kmDocEsParamVO.getTitle() != null && !kmDocEsParamVO.getTitle().isEmpty()) {
+             keywords.add(kmDocEsParamVO.getTitle());
+         }
+
+        // 关键字检索
+        if (kmDocEsParamVO.getKeywords() != null && kmDocEsParamVO.getKeywords().size() > 0) {
+            keywords.addAll(kmDocEsParamVO.getKeywords().subList(0, kmDocEsParamVO.getKeywords().size()));
+        }
+        //content
+        if (kmDocEsParamVO.getContent() != null && !kmDocEsParamVO.getContent().isEmpty()) {
+            keywords.add(kmDocEsParamVO.getContent());
+        }
+        return keywords;
+    }
+
 
     /*
     普通检索
@@ -658,192 +847,107 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         }
         KmSearchRecord kmSearchRecord = new KmSearchRecord();
 
-        HttpSession session = req.getSession();
-
         //最终条件
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        BoolQueryBuilder boolFinalQueryBuilder = QueryBuilders.boolQuery();
         //普通检索的条件，综合 ： 标题、关键字、全文 合并检索
         BoolQueryBuilder boolQueryBuilderDefault = QueryBuilders.boolQuery();
-        List<String> paramPaths = new ArrayList<>();
-        List<String> keywords = new ArrayList<>();
 
-        if(kmDocEsParamVO.getWithinSearchFlag() != null
-                && kmDocEsParamVO.getWithinSearchFlag() == 1
-                && (session.getAttribute("searchParamsMust") != null
-                || session.getAttribute("searchParamsFilter") != null
-                || session.getAttribute("searchParamsShould") != null)){
-            //历史参数处理，历史参数全部用filter
-            Object paramObjMust = session.getAttribute("searchParamsMust");
-            List<QueryBuilder> must = (List<QueryBuilder>) paramObjMust;
-            if(must.size()>0)
-                must.forEach(e -> boolQueryBuilder.filter().add(e)) ;
+        //结果中查询中的过滤
+        if (kmDocEsParamVO.getFilterParams() != null && kmDocEsParamVO.getFilterParams().size()>0 ) {
+            BoolQueryBuilder filterQueryParams = esUtils.buildESQueryParams(kmDocEsParamVO.getFilterParams());
+            boolFinalQueryBuilder.filter().addAll(filterQueryParams.filter());
+        }
 
-            Object paramObjFilter = session.getAttribute("searchParamsFilter");
-            List<QueryBuilder> filter = (List<QueryBuilder>) paramObjFilter;
-            if(filter.size()>0)
-                filter.forEach(e -> boolQueryBuilder.filter().add(e));
-
-            Object paramObjShould = session.getAttribute("searchParamsShould");
-            List<QueryBuilder> should = (List<QueryBuilder>) paramObjShould;
-            if(should.size()>0)
-                should.forEach(e -> boolQueryBuilder.filter().add(e));
-
-            //参数路径处理
-            Object  pathObj = session.getAttribute("paramPaths");
-//            Object  pathObj = redisUtil.get(KMConstant.SearchParamPrefix + userId + "_" + "paramPaths");
-            if(pathObj != null) {
-                List<String> historyParamPath = (List<String>) pathObj;
-                if(historyParamPath.size()>0) {
-                    for (String s : historyParamPath) {
-                        paramPaths.add(s);
-                    }
-                }
+        //准备好标题、全文检索的条件
+        AbstractQueryBuilder titleBoolQueryBuilder = null;
+        AbstractQueryBuilder contentBoolQueryBuilder  = null;
+        if (oConvertUtils.isNotEmpty(kmDocEsParamVO.getTitle())) {
+            kmSearchRecord.setTitle(kmDocEsParamVO.getTitle());
+            if(kmDocEsParamVO.getPhraseMatchSearchFlag() != null && kmDocEsParamVO.getPhraseMatchSearchFlag()) {
+                titleBoolQueryBuilder = QueryBuilders.
+                        matchPhraseQuery("title", kmDocEsParamVO.getTitle())
+                        .slop(2);
             }
-            //搜索关键字处理
-            Object  keywordObj = session.getAttribute("keywords");
-//            Object  keywordObj = redisUtil.get(KMConstant.SearchParamPrefix + userId + "_" +  "keywords");
-            if(keywordObj != null) {
-                List<String> historyKeywords = (List<String>) keywordObj;
-                if(historyKeywords.size()>0) {
-                    for (String s : historyKeywords) {
-                        keywords.add(s);
-                    }
-                }
+            else{
+                titleBoolQueryBuilder = QueryBuilders.matchQuery("title", kmDocEsParamVO.getTitle())
+                        .analyzer("ik_smart").boost(kmConstant.getTitleSearchBoost());
+            }
+        }
+        if (oConvertUtils.isNotEmpty(kmDocEsParamVO.getContent())) {
+            kmSearchRecord.setTitle(kmDocEsParamVO.getContent());
+            if(kmDocEsParamVO.getPhraseMatchSearchFlag() != null && kmDocEsParamVO.getPhraseMatchSearchFlag()) {
+                contentBoolQueryBuilder = QueryBuilders.matchPhraseQuery("content", kmDocEsParamVO.getContent())
+                        .slop(2);
+            }
+            else{
+                contentBoolQueryBuilder = QueryBuilders.matchQuery("content", kmDocEsParamVO.getContent())
+                        .analyzer("ik_smart").boost(kmConstant.getContentSearchBoost());
             }
         }
 
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        String paramPath = "";
         //1、分类为必需条件 用filter
-        if (kmDocEsParamVO.getCategory() != null) {
-            paramPath = KMConstant.SearchTermSeprator + "分类: ";
+        if (kmDocEsParamVO.getCategory() != null && kmDocEsParamVO.getCategory().size()>0) {
             List<String> categorys = kmDocEsParamVO.getCategory();
-            for (int i = 0; i < categorys.size(); i++) {
-                paramPath = paramPath.concat(dictUtils.getDicText("km_dict_category", categorys.get(i)));
-                paramPath = paramPath.concat(",");
-            }
-            paramPath = paramPath.substring(0, paramPath.length() - 1);
-            boolQueryBuilder
+            boolFinalQueryBuilder
                     .filter()
                     .add(QueryBuilders.termsQuery("category", categorys));
         }
 
-        //2、标题检索 高级用must，高级用should
+        //2、标题检索 高级用must，快速用should
         if (kmDocEsParamVO.getTitle() != null && !kmDocEsParamVO.getTitle().isEmpty()) {
-            paramPath = KMConstant.SearchTermSeprator + "标题: " + kmDocEsParamVO.getTitle() +  paramPath;
-            keywords.add(kmDocEsParamVO.getTitle());
-            kmSearchRecord.setTitle(kmDocEsParamVO.getTitle());
-            if(kmDocEsParamVO.getAdvSearchFlag() != null && kmDocEsParamVO.getAdvSearchFlag() == 1) {
-                boolQueryBuilder
-                        .must()
-                        .add(QueryBuilders.matchQuery("title", kmDocEsParamVO.getTitle())
-                                .analyzer("ik_smart").boost(kmConstant.getTitleSearchBoost()));
+            if(kmDocEsParamVO.getAdvSearchFlag() != null && kmDocEsParamVO.getAdvSearchFlag() ) {
+                boolFinalQueryBuilder.must().add(titleBoolQueryBuilder);
             }
             else{
-                boolQueryBuilderDefault
-                        .should()
-                        .add(QueryBuilders.matchQuery("title", kmDocEsParamVO.getTitle())
-                                .analyzer("ik_smart").boost(kmConstant.getTitleSearchBoost()));
+                boolQueryBuilderDefault.should().add(titleBoolQueryBuilder);
             }
         }
-        //3、关键字检索 用term精确匹配;  高级用must，高级用should
-        String keywordString = "";
-        if (kmDocEsParamVO.getKeywords() != null && kmDocEsParamVO.getKeywords().size() > 0) {
-            keywordString = String.join(",",kmDocEsParamVO.getKeywords() );
-            if((kmDocEsParamVO.getTitle() != null && !kmDocEsParamVO.getTitle().isEmpty()
-                    && keywordString.equals(kmDocEsParamVO.getTitle()))
-                    || kmDocEsParamVO.getAdvSearchFlag()!=1){
-                paramPath = KMConstant.SearchTermSeprator + "关键字" + paramPath;
-            }
-            else{
-                paramPath = KMConstant.SearchTermSeprator + "关键字: " + keywordString + paramPath ;
-            }
-
-            keywords.addAll(kmDocEsParamVO.getKeywords().subList(0, kmDocEsParamVO.getKeywords().size()));
-            kmSearchRecord.setKeywords(StringUtils.concatListToString(kmDocEsParamVO.getKeywords()));
-            BoolQueryBuilder boolQueryBuilderKeywords = QueryBuilders.boolQuery();
-            kmDocEsParamVO.getKeywords().forEach(e -> {
-                boolQueryBuilderKeywords
-                        .should()
-                        .add(QueryBuilders.termsQuery("keywords", e)
-                                .boost(kmConstant.getKeywordSearchBoost()));
-            });
-            if(kmDocEsParamVO.getAdvSearchFlag() != null && kmDocEsParamVO.getAdvSearchFlag() == 1) {
-                boolQueryBuilder
-                        .must()
-                        .add(boolQueryBuilderKeywords);
-            }
-            else{
-                boolQueryBuilderDefault
-                        .should()
-                        .add(boolQueryBuilderKeywords);
-            }
-        }
-        //4、全文检索  高级用must，高级用should
+        //3、全文检索  高级用must，快速用should
         if (kmDocEsParamVO.getContent() != null && !kmDocEsParamVO.getContent().isEmpty()) {
-            if((keywordString != null && !keywordString.isEmpty()
-                    && keywordString.equals(kmDocEsParamVO.getContent()))
-                    ||  kmDocEsParamVO.getAdvSearchFlag()!=1){
-                paramPath = KMConstant.SearchTermSeprator + "全文" + paramPath;
+            if(kmDocEsParamVO.getAdvSearchFlag() != null && kmDocEsParamVO.getAdvSearchFlag() ) {
+                boolFinalQueryBuilder.must().add(contentBoolQueryBuilder);
             }
             else {
-                paramPath = KMConstant.SearchTermSeprator + "全文: " + kmDocEsParamVO.getContent() + paramPath ;
-            }
-            keywords.add(kmDocEsParamVO.getContent());
-            kmSearchRecord.setContent(kmDocEsParamVO.getContent());
-            if(kmDocEsParamVO.getAdvSearchFlag() != null && kmDocEsParamVO.getAdvSearchFlag() == 1) {
-                boolQueryBuilder
-                        .must()
-                        .add(QueryBuilders.matchQuery("content", kmDocEsParamVO.getContent())
-                                .analyzer("ik_smart").boost(kmConstant.getContentSearchBoost()));
-            }
-            else {
-                boolQueryBuilderDefault
-                        .should()
-                        .add(QueryBuilders.matchQuery("content", kmDocEsParamVO.getContent())
-                                .analyzer("ik_smart").boost(kmConstant.getContentSearchBoost()));
+                boolQueryBuilderDefault.should().add(contentBoolQueryBuilder);
             }
         }
 
+        //4、关键字检索 用term精确匹配;  高级用must，快速用should
+        if (kmDocEsParamVO.getKeywords() != null && kmDocEsParamVO.getKeywords().size() > 0) {
+            kmSearchRecord.setKeywords(StringUtils.concatListToString(kmDocEsParamVO.getKeywords()));
+            TermsQueryBuilder boolQueryBuilderKeywords =
+                    QueryBuilders.termsQuery("keywords",kmDocEsParamVO.getKeywords() )
+                    .boost(kmConstant.getKeywordSearchBoost());
+
+            if(kmDocEsParamVO.getAdvSearchFlag() != null && kmDocEsParamVO.getAdvSearchFlag() ) {
+                boolFinalQueryBuilder.must().add(boolQueryBuilderKeywords);
+            }
+            else{
+                boolQueryBuilderDefault.should().add(boolQueryBuilderKeywords);
+            }
+        }
         //处理普通检索的合并条件：标题、关键字、全文
-        if(kmDocEsParamVO.getAdvSearchFlag() == null || kmDocEsParamVO.getAdvSearchFlag() == 0) {
-            boolQueryBuilder
-                    .must()
-                    .add(boolQueryBuilderDefault);
+        if(kmDocEsParamVO.getAdvSearchFlag() == null || !kmDocEsParamVO.getAdvSearchFlag() ) {
+            boolFinalQueryBuilder.must().add(boolQueryBuilderDefault);
         }
 
-
-            //5、发布时间检索 用filter
-        if (parameterMap.containsKey("pubTimeEnd")) {
-            paramPath = KMConstant.SearchTermSeprator + "发布时间结束: " + kmDocEsParamVO.getPubTimeEnd() + paramPath ;
-            boolQueryBuilder.filter().add(
+        //5、发布时间检索 用filter
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        if(kmDocEsParamVO.getCreateTimeEnd() != null){
+            boolFinalQueryBuilder.filter().add(
                     QueryBuilders
-                            .rangeQuery("pubTime")
-                            .lte(kmDocEsParamVO.getPubTimeEnd()));
+                            .rangeQuery("createTime")
+                            .lte(format.format(kmDocEsParamVO.getCreateTimeEnd() )));
         }
-        if (parameterMap.containsKey("pubTimeStart")) {
-            paramPath = KMConstant.SearchTermSeprator + "发布时间开始: " + kmDocEsParamVO.getPubTimeStart() + paramPath ;
-            boolQueryBuilder.filter().add(
+        if(kmDocEsParamVO.getCreateTimeStart() != null){
+            boolFinalQueryBuilder.filter().add(
                     QueryBuilders
-                            .rangeQuery("pubTime")
-                            .gte(kmDocEsParamVO.getPubTimeStart()));
+                            .rangeQuery("createTime")
+                            .gte( format.format(kmDocEsParamVO.getCreateTimeStart())));
         }
 
-        //6、来源检索 用filter
-        if (kmDocEsParamVO.getSource() != null && !kmDocEsParamVO.getSource().isEmpty()) {
-            String tmpSource ="";
-            List<String> source = kmDocEsParamVO.getSource();
-            for (int i = 0; i < source.size(); i++) {
-                tmpSource = tmpSource.concat(dictUtils.getDicText("km_dict_source", source.get(i)));
-                tmpSource = tmpSource.concat(",");
-            }
-            paramPath =  KMConstant.SearchTermSeprator + "来源: " + tmpSource.substring(0, tmpSource.length() - 1) +  paramPath ;
-            boolQueryBuilder
-                    .filter()
-                    .add(QueryBuilders.termsQuery("source", source));
-        }
-
-        //7、业务类型检索（多选） 用filter
+        //6、标签检索（多选） 用filter
         if (kmDocEsParamVO.getBusinessTypes() != null && kmDocEsParamVO.getBusinessTypes().size() > 0) {
             String tmpBusinessType = "";
             List<String> businessTypes = kmDocEsParamVO.getBusinessTypes();
@@ -851,29 +955,13 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
                 tmpBusinessType = tmpBusinessType.concat(dictUtils.getDicText("km_dict_business", businessTypes.get(i)));
                 tmpBusinessType = tmpBusinessType.concat(",");
             }
-            paramPath =  KMConstant.SearchTermSeprator + "业务类型: " + tmpBusinessType.substring(0, tmpBusinessType.length() - 1) + paramPath  ;
-            boolQueryBuilder
+            boolFinalQueryBuilder
                     .filter()
                     .add(QueryBuilders.termsQuery("businessTypes", businessTypes));
         }
 
-        //8、版本状态检索（多选） 用filter
-        if (kmDocEsParamVO.getVersions() != null && kmDocEsParamVO.getVersions().size() > 0) {
-            String tmpVersion = "";
-            List<String> versions = kmDocEsParamVO.getVersions();
-            for (int i = 0; i < versions.size(); i++) {
-                tmpVersion = tmpVersion.concat(dictUtils.getDicText("km_dict_versions", versions.get(i)));
-                tmpVersion = tmpVersion.concat(",");
-            }
-            paramPath = KMConstant.SearchTermSeprator + "版本: " +  tmpVersion.substring(0, tmpVersion.length() - 1) + paramPath ;
-            boolQueryBuilder
-                    .filter()
-                    .add(QueryBuilders.termsQuery("versions", versions));
-        }
-
-        //9、专题检索（多选，前缀模糊匹配） 用filter
+        //7、专题检索（多选，前缀模糊匹配） 用filter
         if (kmDocEsParamVO.getTopicCodes() != null && kmDocEsParamVO.getTopicCodes().size() > 0) {
-            String tmpTopicCodes = "";
             kmSearchRecord.setTopicCodes(StringUtils.concatListToString(kmDocEsParamVO.getTopicCodes()));
             BoolQueryBuilder boolQueryBuilderTopicCodes = QueryBuilders.boolQuery();
             List<String> topicCodes = kmDocEsParamVO.getTopicCodes();
@@ -882,36 +970,35 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
                 boolQueryBuilderTopicCodes
                         .should()
                         .add(QueryBuilders.prefixQuery("topicCodes", topicCodes.get(i)));
-
-                String topicName = sysBaseAPI.queryCategoryNameByCode(topicCodes.get(i));
-                if (topicName != null)
-                    tmpTopicCodes = tmpTopicCodes.concat(topicName);
-                else
-                    tmpTopicCodes = tmpTopicCodes.concat(topicCodes.get(i));
-                tmpTopicCodes = tmpTopicCodes.concat(",");
             }
-            paramPath = KMConstant.SearchTermSeprator + "专题: " + tmpTopicCodes.substring(0, tmpTopicCodes.length() - 1) + paramPath ;
-
-            boolQueryBuilder
+            boolFinalQueryBuilder
                     .filter()
                     .add(boolQueryBuilderTopicCodes);
         }
 
-        //10、文号，（前缀模糊匹配） 用filter
-        if(kmDocEsParamVO.getFileNo() != null && !kmDocEsParamVO.getFileNo().isEmpty()){
-            paramPath = KMConstant.SearchTermSeprator + "文号: " + kmDocEsParamVO.getFileNo() + paramPath  ;
-            boolQueryBuilder
+        //8、检索:部门范围过滤
+        String departmentFilterEnabled = kmSysConfigService.getSysConfigValue("DepartmentFilterEnabled");
+        if ( departmentFilterEnabled != null
+                && departmentFilterEnabled.equals("1")
+                && !SecurityUtils.getSubject().isPermitted("DepartmentFilterIgnore") )
+        {
+            BoolQueryBuilder boolQueryBuilderDepartmentFilter = QueryBuilders.boolQuery();
+            String orgCode = sysUser.getOrgCode();
+            if (oConvertUtils.isNotEmpty(orgCode)) {
+                boolQueryBuilderDepartmentFilter
+                        .should()
+                        .add(QueryBuilders.prefixQuery("orgCode", orgCode));
+            }
+            boolQueryBuilderDepartmentFilter
+                    .should()
+                    .add(QueryBuilders.termsQuery("publicRemark","0"));
+            boolFinalQueryBuilder
                     .filter()
-                    .add(QueryBuilders.wildcardQuery("fileNo", kmDocEsParamVO.getFileNo()));
+                    .add(boolQueryBuilderDepartmentFilter);
         }
 
-        //去掉检索参数第一个+
-        if(!paramPath.isEmpty() && paramPath.length()>3)
-        paramPath = paramPath.substring(3);
-
-
-        //11、发布状态必须为1
-        boolQueryBuilder
+        //9、发布状态必须为1
+        boolFinalQueryBuilder
                 .filter()
                 .add(QueryBuilders.termQuery("releaseFlag",1));
 
@@ -925,19 +1012,23 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
             if(column.endsWith(CommonConstant.DICT_TEXT_SUFFIX)) {
                 column = column.substring(0, column.lastIndexOf(CommonConstant.DICT_TEXT_SUFFIX));
             }
-//            if(column.equals("pubTimeTxt")) {
-//                column = "pubTime";
-//            }
-
             FieldSortBuilder fieldSortBuilder = SortBuilders.fieldSort(column).order(SortOrder.fromString(order));
             searchSourceBuilder.sort(fieldSortBuilder);
         }
 
-        searchSourceBuilder.query(boolQueryBuilder);
-
+        searchSourceBuilder.query(boolFinalQueryBuilder);
         // highlight field 仅对title
-        HighlightBuilder highlightBuilder = new HighlightBuilder().field("title").requireFieldMatch(false);
-        highlightBuilder.preTags("<span style=\"color:blue\">");
+        HighlightBuilder highlightBuilder = new HighlightBuilder()
+                .field("title").requireFieldMatch(false)
+                .numOfFragments(1)
+                .fragmentSize(200);
+        highlightBuilder.field("content")
+                .requireFieldMatch(false)
+                .numOfFragments(1)
+                .fragmentSize(200)
+                .noMatchSize(200);
+//                .highlighterType("fvh");
+        highlightBuilder.preTags("<span style=color:red;font-weight:bold>");
         highlightBuilder.postTags("</span>");
         searchSourceBuilder.highlighter(highlightBuilder);
 
@@ -952,40 +1043,21 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         searchSourceBuilder.timeout(new TimeValue(KMConstant.SearchTimeOutSeconds, TimeUnit.SECONDS));
 
         // 过滤返回结果字段，去掉非必要信息，关键：去掉content
-        String excludeFields[] = {"content"}; //{"content","keywords"};
-        String includeFields[] = {}; //{"id","title","source","versions","pubTime"};
+        String excludeFields[] = {"content"};       //{"content","keywords"};
+        String includeFields[] = {};                //{"id","title","orgCode","versions","pubTime"};
         searchSourceBuilder.fetchSource(includeFields,excludeFields);
 
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.source(searchSourceBuilder);
         searchRequest.indices(KMConstant.DocIndexAliasName);
-
-        log.debug(searchRequest.source().toString());
-        //保存session，以便在结果中查询以及记录日志
-        //分页、排序变换的时候不更新session，历史条件不叠加
-        if(paramPaths == null
-                || paramPaths.size() == 0
-                || !paramPaths.get(paramPaths.size() -1).equals(paramPath)) {
-            paramPaths.add(paramPath);
-            session.setAttribute("searchParamsMust", boolQueryBuilder.must());
-            session.setAttribute("searchParamsFilter", boolQueryBuilder.filter());
-            session.setAttribute("searchParamsShould", boolQueryBuilder.should());
-            session.setAttribute("paramPaths", paramPaths);
-            session.setAttribute("keywords", keywords);
-        }
-
-        kmSearchResultObjVO.setParamPath(paramPaths);
-
         SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
         if(searchResponse.status() != RestStatus.OK || searchResponse.getHits().getTotalHits().value<=0){
             kmSearchResultObjVO.setKmSearchResultVOPage(resultVOPage);
             kmSearchResultObjVO.setSuccess(true);
         }
         else {
-
             SearchHits hits = searchResponse.getHits();
             SearchHit[] searchHits = hits.getHits();
-
             for (SearchHit hit : searchHits) {
                 log.debug(hit.getSourceAsString());
                 KmDocEsVO kmDocEsVO = JSON.parseObject(hit.getSourceAsString(), KmDocEsVO.class);
@@ -996,29 +1068,28 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
                     //获取高亮显示的字段
                     Text[] fragments = highlight.fragments();
                     String fragmentString = fragments[0].string();
-
                     kmDocEsVO.setTitle(fragmentString);
                 }
+                if (highlightFields.containsKey("content")) {
+                    HighlightField content = highlightFields.get("content");
+                    String contentString = content.getFragments()[0].toString();
+                    kmDocEsVO.setContent(contentString);
+                }
                 kmDocEsVOList.add(kmDocEsVO);
-
             }
-
             List<KmSearchResultVO> kmSearchResultVOList = retrieveDocDbInfo(kmDocEsVOList);
             resultVOPage.setRecords(kmSearchResultVOList);
-            //set page
             resultVOPage.setTotal(hits.getTotalHits().value);
             resultVOPage.setHitCount(hits.getTotalHits().value > 0);
-
             kmSearchResultObjVO.setKmSearchResultVOPage(resultVOPage);
             kmSearchResultObjVO.setSuccess(true);
         }
-        //日志和限制
+        //日志
         executorService.execute(()->kmSearchRecordService.logSearch(kmSearchRecord.getKeywords(),
                 kmSearchRecord.getTitle(),
                 kmSearchRecord.getContent(),
                 kmSearchRecord.getTopicCodes(),
                 IpUtils.getIpAddr(req)));
-
         return kmSearchResultObjVO;
     }
 
@@ -1030,6 +1101,16 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         List<KmDocEsVO> kmDocEsVOList = new ArrayList<>();
         Page<KmSearchResultVO> resultVOPage = new Page<KmSearchResultVO>(page.getCurrent(), page.getSize());
         KmSearchResultObjVO kmSearchResultObjVO = new KmSearchResultObjVO();
+
+        try {
+            if(!KMRedisUtils.validUserLimit(KMConstant.UserSearchLimitPrefix,kmConstant.getSearchLimit(),Calendar.SECOND,10)) {
+                kmSearchResultObjVO.setSuccess(false);
+                kmSearchResultObjVO.setMessage("操作太频繁,请稍后再试");
+                return kmSearchResultObjVO;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         if(sysUser == null){
@@ -1188,7 +1269,7 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         Result result = edit(kmDocOrig,kmdocTarget);
         if(result.getCode() == CommonConstant.SC_OK_200){
             if(kmdocTarget.getReleaseFlag() == DocReleaseFlagEnum.Released.getCode() ){
-                //已经发布的，保存到ES
+                //已经发布的，保存到ES.  orgcode已被edit修改
                 result =  saveDocToEs(kmdocTarget);
                 if(result.getCode() != CommonConstant.SC_OK_200){
                     //事务回滚
@@ -1212,7 +1293,6 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         if(kmDocOrig == null)
             return Result.error("找不到文档");
         if(kmDocOrig.getStatus() != DocStatusEnum.Draft.getCode()
-                && kmDocOrig.getStatus() != DocStatusEnum.Passed.getCode()
                 && kmDocOrig.getStatus() != DocStatusEnum.WaitAudit.getCode()
                 && kmDocOrig.getStatus() != DocStatusEnum.Reject.getCode() )
             return Result.error("文档状态不允许修改");
@@ -1224,16 +1304,8 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return Result.error(result.getMessage());
         }
-        else {
-            //保存到ES
-            result = saveDocToEs(kmdocTarget);
-            if (result.getCode() != CommonConstant.SC_OK_200) {
-                //事务回滚
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return Result.error(result.getMessage());
-            }
+        else
             return Result.OK("修改成功");
-        }
     }
 
     //editAndRelease
@@ -1288,25 +1360,37 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         return Result.error("审核失败!");
     }
 
+    @Override
+    public Result<?> auditDocImportedFile(String id){
+        KmDoc kmDoc = super.getById(id);
+        kmDoc.setLastUpdateTime(DateUtils.getDate());
+        if(super.updateById(kmDoc)) {
+            // 审核后才入库ES
+            indexDocSync(kmDoc);
+            return Result.OK("审核成功!");
+        }else
+            return Result.error("审核失败!");
+    }
+
 
     //编辑doc
     @Transactional(propagation= Propagation.SUPPORTS)
     public Result<?> edit(KmDoc kmDocOrig,KmDocParamVO kmDocParamVO) {
-        KmDoc kmDocTarget = new KmDoc();
-//        KmDoc kmDocTarget = super.getById(kmDocOrig.getId());
+//        KmDoc kmDocTarget = new KmDoc();
+        KmDoc kmDocTarget = super.getById(kmDocOrig.getId());
         // 只允许部分字段可以修改
-        BeanUtils.copyProperties(kmDocOrig,kmDocTarget);
-        kmDocTarget.setPubTimeTxt(kmDocParamVO.getPubTimeTxt());
+//        BeanUtils.copyProperties(kmDocOrig,kmDocTarget);
         kmDocTarget.setTitle(kmDocParamVO.getTitle());
         kmDocTarget.setKeywords(kmDocParamVO.getKeywords());
         kmDocTarget.setCategory(kmDocParamVO.getCategory());
-        kmDocTarget.setSource(kmDocParamVO.getSource());
         kmDocTarget.setDownloadFlag(kmDocParamVO.getDownloadFlag());
-        kmDocTarget.setEffectTime(kmDocParamVO.getEffectTime());
-        kmDocTarget.setFileNo(kmDocParamVO.getFileNo());
         kmDocTarget.setPublicRemark(kmDocParamVO.getPublicRemark());
-        kmDocTarget.setPublicFlag(kmDocParamVO.getPublicFlag());
         kmDocTarget.setRemark(kmDocParamVO.getRemark());
+//        kmDocTarget.setPubTimeTxt(kmDocParamVO.getPubTimeTxt());
+//        kmDocTarget.setSource(kmDocParamVO.getSource());
+//        kmDocTarget.setPublicFlag(kmDocParamVO.getPublicFlag());
+//        kmDocTarget.setEffectTime(kmDocParamVO.getEffectTime());
+//        kmDocTarget.setFileNo(kmDocParamVO.getFileNo());
         //目前传id，后端需要转换
         String depId = kmDocParamVO.getDepId();
         if(depId != null && !depId.isEmpty()) {
@@ -1314,27 +1398,29 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
             if(orgCode != null && !orgCode.isEmpty()) {
                 kmDocTarget.setOrgCode(orgCode);
                 kmDocTarget.setDepId(depId);
+                //前端orgcode不传，这里回传给调用方回写ES
+                kmDocParamVO.setOrgCode(orgCode);
             }
         }
         //处理发布年份
-        String pubTimeTxt = kmDocTarget.getPubTimeTxt();
-        if(pubTimeTxt != null && pubTimeTxt.length()>0){
-            String pubTime = "";
-            if(pubTimeTxt.indexOf("/") >0  ){
-                pubTime = pubTimeTxt.substring(0,pubTimeTxt.indexOf("/"));
-                kmDocTarget.setPubTime(pubTime);
-            }
-            else if(  pubTimeTxt.indexOf("-") >0){
-                pubTime = pubTimeTxt.substring(0,pubTimeTxt.indexOf("-"));
-                kmDocTarget.setPubTime(pubTime);
-            }
-            else{
-                if(pubTimeTxt.length()==4)
-                    kmDocTarget.setPubTime(pubTimeTxt);
-                else
-                    return Result.error("发布日期格式错误");
-            }
-        }
+//        String pubTimeTxt = kmDocTarget.getPubTimeTxt();
+//        if(pubTimeTxt != null && pubTimeTxt.length()>0){
+//            String pubTime = "";
+//            if(pubTimeTxt.indexOf("/") >0  ){
+//                pubTime = pubTimeTxt.substring(0,pubTimeTxt.indexOf("/"));
+//                kmDocTarget.setPubTime(pubTime);
+//            }
+//            else if(  pubTimeTxt.indexOf("-") >0){
+//                pubTime = pubTimeTxt.substring(0,pubTimeTxt.indexOf("-"));
+//                kmDocTarget.setPubTime(pubTime);
+//            }
+//            else{
+//                if(pubTimeTxt.length()==4)
+//                    kmDocTarget.setPubTime(pubTimeTxt);
+//                else
+//                    return Result.error("发布日期格式错误");
+//            }
+//        }
 
         if(kmDocParamVO.getRemoveBusinessTypeList()!=null && kmDocParamVO.getRemoveBusinessTypeList().size()>0) {
             for (String businessType : kmDocParamVO.getRemoveBusinessTypeList()) {
@@ -1344,7 +1430,7 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
                 queryWrapper.eq(KmDocBusinessType::getBusinessType,businessType);
                 KmDocBusinessType tmpKmDocBusinessType = kmDocBusinessTypeService.getOne(queryWrapper);
                 if (tmpKmDocBusinessType != null && !kmDocBusinessTypeService.removeById(tmpKmDocBusinessType))
-                    return Result.error("删除业务类型错误");
+                    return Result.error("删除标签错误");
             }
         }
         if(kmDocParamVO.getAddBusinessTypeList()!=null && kmDocParamVO.getAddBusinessTypeList().size()>0) {
@@ -1353,30 +1439,10 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
                 tmpKmDocBusinessType.setDocId(kmDocOrig.getId());
                 tmpKmDocBusinessType.setBusinessType(businessType);
                 if (!kmDocBusinessTypeService.save(tmpKmDocBusinessType))
-                    return Result.error("保存业务类型错误");
+                    return Result.error("保存标签错误");
             }
         }
 
-        if(kmDocParamVO.getRemoveVersionList()!=null && kmDocParamVO.getRemoveVersionList().size()>0) {
-            for (String version : kmDocParamVO.getRemoveVersionList()) {
-                //KmDocVersion tmpKmDocVersion = kmDocVersionService.getByDocIdAndVersion(kmDocOrig.getId(), version);
-                LambdaQueryWrapper<KmDocVersion> queryWrapper = new LambdaQueryWrapper();
-                queryWrapper.eq(KmDocVersion::getDocId,kmDocOrig.getId());
-                queryWrapper.eq(KmDocVersion::getVersion,version);
-                KmDocVersion tmpKmDocVersion = kmDocVersionService.getOne(queryWrapper);
-                if (tmpKmDocVersion != null && !kmDocVersionService.removeById(tmpKmDocVersion))
-                    return Result.error("删除版本状态错误");
-            }
-        }
-        if(kmDocParamVO.getAddVersionList()!=null && kmDocParamVO.getAddVersionList().size()>0) {
-            for (String version : kmDocParamVO.getAddVersionList()) {
-                KmDocVersion tmpKmDocVersion = new KmDocVersion();
-                tmpKmDocVersion.setDocId(kmDocOrig.getId());
-                tmpKmDocVersion.setVersion(version);
-                if (!kmDocVersionService.save(tmpKmDocVersion))
-                    return Result.error("保存版本状态错误");
-            }
-        }
 
         if(kmDocParamVO.getRemoveTopicIdList()!=null && kmDocParamVO.getRemoveTopicIdList().size()>0){
             for (String topic :kmDocParamVO.getRemoveTopicIdList()) {
@@ -1408,6 +1474,8 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
 
     public Result<?> deleteDoc(String docId,HttpServletRequest req){
         KmDoc kmDoc = this.getById(docId);
+//		if(kmDoc!= null && (kmDoc.getStatus().equals(DocStatusEnum.Draft.getCode())
+//				|| kmDoc.getStatus().equals(DocStatusEnum.Reject.getCode()))) {
         if(kmDoc!= null) {
             //先从ES删除，如果失败直接返回
             if( kmDoc.getStatus().equals(DocStatusEnum.Passed.getCode())
@@ -1444,11 +1512,33 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
 
     //流方式获取文件或预览文件
     private  void getKmDoc( KmDoc kmDoc, HttpServletRequest httpServletRequest,HttpServletResponse response, String getMethod) throws IOException{
+//        KmDoc kmDoc = super.getById(docId);
+//        if(kmDoc == null) {
+//            response.sendError(HttpStatus.NOT_FOUND.value(),"无效的文档");
+//            return;
+//        }
 
         KmFile kmFile = null;
         String filename = "";
 
-        if(getMethod.equals("Download")) {
+        if(getMethod.equals("Download") || getMethod.equals("Edit")) {
+            //进行权限控制
+//            LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+//            if (sysUser == null ) {
+//                response.sendError(HttpStatus.UNAUTHORIZED.value(), "登录用户信息异常");
+//                return;
+//            }
+//            if(sysUser.getThirdType() == null
+//                    ||sysUser.getThirdType().equals(KMConstant.PublicUser)) {
+//                //如果是公众用户，下载条件：发布+上架+文档公开+允许下载
+//                if (kmDoc.getStatus() != DocStatusEnum.Passed.getCode()
+//                        && kmDoc.getReleaseFlag() != DocReleaseFlagEnum.Released.getCode()
+//                        && kmDoc.getPublicFlag() != KMConstant.DocPublic
+//                        && kmDoc.getDownloadFlag() != KMConstant.AllowDownload) {
+//                    response.sendError(HttpStatus.FORBIDDEN.value(), "文档不允许下载");
+//                    return;
+//                }
+//            }
             kmFile = kmFileService.getKmFile(kmDoc.getFileId());
             if(kmDoc.getTitle() != null && !kmDoc.getTitle().isEmpty())
                 filename = kmDoc.getTitle() + "." + kmDoc.getFileType(); //根据title命名文件名
@@ -1478,14 +1568,15 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         ServletOutputStream outputStream = null;
         try {
             inputStream = new FileInputStream(filePath);// 文件的存放路径
-            response.reset();
+//            response.reset();
             response.setContentType("application/octet-stream");
 //            String filename = kmDoc.getTitle() + "." + kmDoc.getFileType(); //根据title命名文件名
             //解决跨域
-            response.addHeader("Access-Control-Allow-Origin", httpServletRequest.getHeader("Origin"));
-            response.addHeader("Access-Control-Allow-Methods", "POST,GET,PUT,DELETE,OPTIONS");
-            response.addHeader("Access-Control-Allow-Credentials", "true");
-            response.addHeader("Access-Control-Allow-Headers", "Content-Type,X-Requested-With,token");
+//            response.addHeader("Access-Control-Allow-Origin", httpServletRequest.getHeader("Origin"));
+//            response.addHeader("Access-Control-Allow-Methods", "POST,GET,PUT,DELETE,OPTIONS");
+//            response.addHeader("Access-Control-Allow-Credentials", "true");
+//            response.addHeader("Access-Control-Allow-Headers", "*");
+//            response.addHeader("Access-Control-Allow-Headers", "Content-Type,X-Requested-With,token");
             response.addHeader("Access-Control-Max-Age", "600000");
             //response.setHeader("Content-Length", "" + kmDoc.getFileSize());
 
@@ -1504,7 +1595,7 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
             if(getMethod.equals("Download")){
                 kmDoc.setDownloads(kmDoc.getDownloads().add(BigInteger.valueOf(1)));
             }
-            else{
+            else if(getMethod.equals("View")){
                 kmDoc.setViews(kmDoc.getViews().add(BigInteger.valueOf(1)));
             }
             super.updateById(kmDoc);
@@ -1526,42 +1617,74 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         }
     }
 
+
+    //for onlyoffice editor
+    public void downloadDocOF(String docId, HttpServletResponse response, HttpServletRequest req) throws IOException, ParseException {
+        KmDoc kmDoc = super.getById(docId);
+        if(kmDoc == null) {
+            response.sendError(HttpStatus.NOT_FOUND.value(),"无效的文档");
+            return;
+        }
+        log.info("docserviceSiteIp:" + docserviceSiteIp);
+        log.info("req.getRemoteAddr():" + req.getRemoteAddr());
+        boolean onlyOfficeDownloadFlag = req.getRemoteAddr().equals(docserviceSiteIp);
+        //24小时下载次数限制：via redis，对院内用户不限制
+        if(onlyOfficeDownloadFlag ){
+            getKmDoc(kmDoc, req,response, "Edit");
+        }
+        else{
+            response.sendError(HttpStatus.FORBIDDEN.value(),"下载限制");
+        }
+    }
     //下载文件
     @SuppressWarnings("ALL")
-    public void downloadKmDoc(String docId, HttpServletResponse response, HttpServletRequest req) throws IOException {
+    public void downloadKmDoc(String docId, HttpServletResponse response, HttpServletRequest req) throws IOException, ParseException {
         KmDoc kmDoc = super.getById(docId);
         if(kmDoc == null) {
             response.sendError(HttpStatus.NOT_FOUND.value(),"无效的文档");
             return;
         }
 
+        //进行权限控制
         LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         if (sysUser == null ) {
             response.sendError(HttpStatus.UNAUTHORIZED.value(), "登录用户信息异常");
             return;
         }
+        //todo:根据文档的部门访问范围控制访问权限
 
-        //关键字处理
-        Subject subject = SecurityUtils.getSubject();
-        Session session = subject.getSession();
-        Object keywordsObj = session.getAttribute("keywords");
+        //对onlyoffice服务器放行
+        if (req.getRemoteAddr().equals("")) {
 
-        getKmDoc(kmDoc, req,response, "Download");
-
-        //日志
-        String concatKeyword = "";
-        if(keywordsObj !=null){
-            List<String> keywordsList = (List<String>)keywordsObj;
-            concatKeyword = StringUtils.concatListToString(keywordsList);
         }
-        kmDocVisitRecordService.logVisit(docId,
-                IpUtils.getIpAddr(req),
-                DocVisitTypeEnum.View.getCode(),concatKeyword);
+        //24小时下载次数限制：via redis，对院内用户不限制
+        if(KMRedisUtils.validUserLimit(KMConstant.UserDownloadLimitPrefix,kmConstant.getDownloadLimit(),Calendar.DATE,1)) {
+            //关键字处理
+            Subject subject = SecurityUtils.getSubject();
+            Session session = subject.getSession();
+            Object keywordsObj = session.getAttribute("keywords");
+
+            getKmDoc(kmDoc, req,response, "Download");
+            KMRedisUtils.refreshUserLimit(KMConstant.UserDownloadLimitPrefix,TimeUnit.DAYS,1);
+
+            //日志
+            String concatKeyword = "";
+            if(keywordsObj !=null){
+                List<String> keywordsList = (List<String>)keywordsObj;
+                concatKeyword = StringUtils.concatListToString(keywordsList);
+            }
+            kmDocVisitRecordService.logVisit(docId,
+                    IpUtils.getIpAddr(req),
+                    DocVisitTypeEnum.View.getCode(),concatKeyword);
+        }
+        else{
+            response.sendError(HttpStatus.FORBIDDEN.value(),"24小时下载次数超过限制，请稍后再试");
+        }
     }
 
     //预览文件
     @SuppressWarnings("ALL")
-    public void viewKmDoc( String docId, HttpServletResponse response,HttpServletRequest req)  {
+    public void viewKmDoc( String docId, HttpServletResponse response,HttpServletRequest req) throws IOException {
         try {
             KmDoc kmDoc = super.getById(docId);
             if(kmDoc == null) {
@@ -1573,25 +1696,31 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
                 response.sendError(HttpStatus.UNAUTHORIZED.value(), "登录用户信息异常");
                 return;
             }
+            //todo:根据文档的部门访问范围控制访问权限
 
-            //日志，关键字处理
-            Subject subject = SecurityUtils.getSubject();
-            Session session = subject.getSession();
-            Object keywordsObj = session.getAttribute("keywords");
+            if(KMRedisUtils.validUserLimit(KMConstant.UserViewLimitPrefix,kmConstant.getViewLimit(),Calendar.SECOND,10)) {
+                //日志，关键字处理
+                Subject subject = SecurityUtils.getSubject();
+                Session session = subject.getSession();
+                Object keywordsObj = session.getAttribute("keywords");
 
-            getKmDoc(kmDoc,req, response, "View");
+                getKmDoc(kmDoc,req, response, "View");
+                KMRedisUtils.refreshUserLimit(KMConstant.UserViewLimitPrefix, TimeUnit.SECONDS, 10);
 
-            String concatKeyword = "";
-            if(keywordsObj !=null){
-                List<String> keywordsList = (List<String>)keywordsObj;
-                concatKeyword = StringUtils.concatListToString(keywordsList);
+                String concatKeyword = "";
+                if(keywordsObj !=null){
+                    List<String> keywordsList = (List<String>)keywordsObj;
+                    concatKeyword = StringUtils.concatListToString(keywordsList);
+                }
+                kmDocVisitRecordService.logVisit(docId,
+                        IpUtils.getIpAddr(req),
+                        DocVisitTypeEnum.View.getCode(),
+                        concatKeyword);
             }
-            kmDocVisitRecordService.logVisit(docId,
-                    IpUtils.getIpAddr(req),
-                    DocVisitTypeEnum.View.getCode(),
-                    concatKeyword);
-
-        } catch (Exception e) {
+            else {
+                response.sendError(HttpStatus.FORBIDDEN.value(),"预览太频繁，请稍后再试");
+            }
+        } catch (ParseException e) {
             e.printStackTrace();
         }
 
@@ -1602,6 +1731,26 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         return  kmDocMapper.queryTopicPageList(page,topicId);
     }
 
+    @Override
+    public Boolean checkCategoryOfDoc(String category){
+        QueryWrapper<KmDoc> queryWrapper = new QueryWrapper<>();
+        queryWrapper.ne("status",9);
+        queryWrapper.eq("category",category);
+        Integer selectCount = baseMapper.selectCount(queryWrapper);
+        return selectCount > 0;
+    }
+
+    @Override
+    public Boolean checkTopicOfDoc(String topidId){
+        Integer topicCountOfDoc = kmDocMapper.checkTopicOfDoc(topidId);
+        return topicCountOfDoc > 0;
+    }
+
+    @Override
+    public Boolean checkBusinessTypeOfDoc(String businessType){
+        Integer businessTypeOfDoc = kmDocMapper.checkBusinessTypeOfDoc(businessType);
+        return businessTypeOfDoc > 0;
+    }
     @Override
     public Result<?> addDocToTopic( String topicId, List<String> docIds) {
         List<String> failDocIds = new ArrayList<>();
@@ -1614,10 +1763,21 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
                     failCount += 1;
                 }
                 else {
+                    KmDoc kmDoc = this.getById(docId);
+                    if (kmDoc == null) {
+                        return Result.error("kmdoc not found");
+                    }
                     KmDocTopicType kmDocTopicType = new KmDocTopicType();
                     kmDocTopicType.setDocId(docId);
                     kmDocTopicType.setTopicId(topicId);
                     if (!kmDocTopicTypeService.save(kmDocTopicType)) {
+                        failDocIds.add(docId);
+                        failCount += 1;
+                        continue;
+                    }
+                    //保存km_doc到es
+                    Result<?> result = saveDocToEs(kmDoc);
+                    if (!result.isSuccess()) {
                         failDocIds.add(docId);
                         failCount += 1;
                     }
@@ -1644,7 +1804,12 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
         KmDocTopicType tmpKmDocTopicType = kmDocTopicTypeService.getByDocIdAndTopicId(docId,topicId);
         if(tmpKmDocTopicType!=null && !kmDocTopicTypeService.removeById(tmpKmDocTopicType))
             return  Result.error("删除知识专题错误");
-
+        else {
+            KmDoc kmDoc = this.getById(docId);
+            if (kmDoc != null) {
+                return saveDocToEs(kmDoc);
+            }
+        }
         return Result.OK();
 
     }
@@ -1656,19 +1821,23 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
     }
 
     @Override
-    public void initESIndex(){
-        KmDocEsVO kmEsVO = new KmDocEsVO();
-        kmEsVO.setTitle("for init");
-        kmEsVO.setDocId("1");
-        Result<?> result = saveDocToEs(kmEsVO, "");
-        if (result.isSuccess()) {
-            String indexId = (String) result.getResult();
-            if (indexId != null && !indexId.isEmpty()) {
-                Result<?> result1 = deleteDocFromEs(indexId);
-                if (result1.isSuccess()) {
-                    log.info("init index success!");
-                }
-            }
-        }
+    public List<KmDocStatisticsVO> queryKmDocStatistics(Integer statisticsType){
+        String dbType = CommonUtils.getDatabaseType();
+        return  kmDocMapper.queryKmDocStatistics(statisticsType,dbType);
+    }
+
+    @Override
+    public KmDocSummaryVO queryKmDocSummary(){
+        String dbType = CommonUtils.getDatabaseType();
+        return  kmDocMapper.queryKmDocSummary(dbType);
+    }
+
+
+    @Override
+    public List<KmDoc> getReleasedDocs(){
+        QueryWrapper<KmDoc> queryWrapper = new QueryWrapper<KmDoc>();
+        queryWrapper.eq("status",2);
+        List<KmDoc> kmDocList = kmDocMapper.selectList(queryWrapper);
+        return kmDocList;
     }
 }
