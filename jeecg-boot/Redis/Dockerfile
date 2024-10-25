@@ -1,3 +1,4 @@
-FROM redis:5.0
-
+FROM redis:6.0
 MAINTAINER hnliuwx@gmail.com
+
+

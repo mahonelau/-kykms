@@ -39,6 +39,17 @@ public class ElasticsearchConfig {
     private String masterHost;
     private Integer masterPort;
 
+    public boolean isMasterAuth() {
+        return masterAuth;
+    }
+
+    public void setMasterAuth(boolean masterAuth) {
+        this.masterAuth = masterAuth;
+    }
+
+    private boolean masterAuth;
+
+
     public String getMasterUserName() {
         return masterUserName;
     }
@@ -63,11 +74,12 @@ public class ElasticsearchConfig {
 
         HttpHost host=new HttpHost(masterHost, masterPort, HttpHost.DEFAULT_SCHEME_NAME);
         RestClientBuilder builder=RestClient.builder(host);
-//        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-//        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(masterUserName, masterUserPwd));
-//        builder.setHttpClientConfigCallback(f -> f.setDefaultCredentialsProvider(credentialsProvider));
-        RestHighLevelClient restClient = new RestHighLevelClient( builder);
+        if(masterAuth) {
+            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(masterUserName, masterUserPwd));
+            builder.setHttpClientConfigCallback(f -> f.setDefaultCredentialsProvider(credentialsProvider));
+        }
 
-        return restClient;
+        return new RestHighLevelClient( builder);
     }
 }

@@ -22,7 +22,7 @@ management:
 ##文件上传和转换工具的配置
 base:
   #上传文件保存的路径
-  upload-dir: /kykms/KmDocs
+  upload-dir: /usr/local/kykms/KmDocs
   # libreOffice安装路径
   soffice-path: /usr/bin/soffice
   #  soffice-path: /opt/libreoffice7.0/program/soffice
@@ -128,8 +128,8 @@ mybatis-plus:
 jeecg :
   uploadType: alioss
   path :
-    upload: /opt/upload
-    webapp: /opt/webapp
+    upload: /usr/local/kmDocs/upload
+    webapp: /usr/local/kmDocs/webapp
   shiro:
     excludeUrls: /test/jeecgDemo/demo3,/test/jeecgDemo/redisDemo/**,/category/**,/visual/**,/map/**,/jmreport/bigscreen2/**,/sys/loginThird,/KM/EsMgnt/**
 

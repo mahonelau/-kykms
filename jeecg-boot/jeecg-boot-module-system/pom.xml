@@ -71,4 +71,29 @@
 			</plugin>
 		</plugins>
 	</build>
+
+<!--	<build>-->
+<!--		<plugins>-->
+<!--			<plugin>-->
+<!--				<groupId>org.springframework.boot</groupId>-->
+<!--				<artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--				<configuration>-->
+<!--					<layout>ZIP</layout>-->
+<!--					<includes>-->
+<!--						<include>-->
+<!--							<groupId>nothing</groupId>-->
+<!--							<artifactId>nothing</artifactId>-->
+<!--						</include>-->
+<!--					</includes>-->
+<!--				</configuration>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<goals>-->
+<!--							<goal>repackage</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
+<!--		</plugins>-->
+<!--	</build>-->
 </project>
