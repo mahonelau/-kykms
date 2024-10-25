@@ -155,10 +155,11 @@ KMS技术架构图
    
 ```
 
-系统效果(旗舰版)
+系统效果(智能版)
 ----
 
 ##### 公共检索
+智能问答
 ![智能问答](./Docs/Pics/search_AI.jpg)
 检索首页
 ![检索首页](./Docs/Pics/search_home.jpg)
@@ -182,7 +183,7 @@ KMS技术架构图
 授权管理
 ![授权管理](./Docs/Pics/km_auth.png)
 编辑与创建
-![编辑与创建](./Docs/Pics/edit.png)
+![编辑与创建](./Docs/Pics/edit.jpg)
 
 
 附属文档
