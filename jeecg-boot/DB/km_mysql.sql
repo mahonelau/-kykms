@@ -88,7 +88,7 @@ CREATE TABLE `km_doc_favourite`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `km_doc_topic_type`;
 CREATE TABLE `km_doc_topic_type`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci not null ,
   `doc_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `topic_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
