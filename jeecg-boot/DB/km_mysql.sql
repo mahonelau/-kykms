@@ -83,7 +83,7 @@ INSERT INTO `km_doc_favourite` VALUES ('1531984806786387970', 'e9ca23d68d884d4eb
 -- ----------------------------
 DROP TABLE IF EXISTS `km_doc_topic_type`;
 CREATE TABLE `km_doc_topic_type`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci not null ,
   `doc_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `topic_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
