@@ -86,8 +86,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements IKmDocService {
 
-    @Value("${files.docservice.url.site-ip}")
-    private String docserviceSiteIp;
+//    @Value("${files.docservice.url.site-ip}")
+//    private String docserviceSiteIp;
     @Resource
     private KmDocMapper kmDocMapper;
     @Autowired
@@ -1619,23 +1619,23 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
 
 
     //for onlyoffice editor
-    public void downloadDocOF(String docId, HttpServletResponse response, HttpServletRequest req) throws IOException, ParseException {
-        KmDoc kmDoc = super.getById(docId);
-        if(kmDoc == null) {
-            response.sendError(HttpStatus.NOT_FOUND.value(),"无效的文档");
-            return;
-        }
-        log.info("docserviceSiteIp:" + docserviceSiteIp);
-        log.info("req.getRemoteAddr():" + req.getRemoteAddr());
-        boolean onlyOfficeDownloadFlag = req.getRemoteAddr().equals(docserviceSiteIp);
-        //24小时下载次数限制：via redis，对院内用户不限制
-        if(onlyOfficeDownloadFlag ){
-            getKmDoc(kmDoc, req,response, "Edit");
-        }
-        else{
-            response.sendError(HttpStatus.FORBIDDEN.value(),"下载限制");
-        }
-    }
+//    public void downloadDocOF(String docId, HttpServletResponse response, HttpServletRequest req) throws IOException, ParseException {
+//        KmDoc kmDoc = super.getById(docId);
+//        if(kmDoc == null) {
+//            response.sendError(HttpStatus.NOT_FOUND.value(),"无效的文档");
+//            return;
+//        }
+//        log.info("docserviceSiteIp:" + docserviceSiteIp);
+//        log.info("req.getRemoteAddr():" + req.getRemoteAddr());
+//        boolean onlyOfficeDownloadFlag = req.getRemoteAddr().equals(docserviceSiteIp);
+//        //24小时下载次数限制：via redis，对院内用户不限制
+//        if(onlyOfficeDownloadFlag ){
+//            getKmDoc(kmDoc, req,response, "Edit");
+//        }
+//        else{
+//            response.sendError(HttpStatus.FORBIDDEN.value(),"下载限制");
+//        }
+//    }
     //下载文件
     @SuppressWarnings("ALL")
     public void downloadKmDoc(String docId, HttpServletResponse response, HttpServletRequest req) throws IOException, ParseException {

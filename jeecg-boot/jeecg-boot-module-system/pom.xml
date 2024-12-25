@@ -50,26 +50,39 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<layout>ZIP</layout>
-					<includes>
-						<include>
-							<groupId>nothing</groupId>
-							<artifactId>nothing</artifactId>
-						</include>
-					</includes>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+
+			<!--	jar包一体化打包，请放行此配置-->
+							<plugin>
+								<groupId>org.springframework.boot</groupId>
+								<artifactId>spring-boot-maven-plugin</artifactId>
+								<configuration>
+									<!--微服务模式下修改为true,跳过此打包插件，否则微服务模块无法引用-->
+									<skip>false</skip>
+								</configuration>
+							</plugin>
+
+			<!--	jar包与lib包分离，请放行此配置-->
+<!--			<plugin>-->
+<!--				<groupId>org.springframework.boot</groupId>-->
+<!--				<artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--				<configuration>-->
+<!--					<layout>ZIP</layout>-->
+<!--					<includes>-->
+<!--						<include>-->
+<!--							<groupId>nothing</groupId>-->
+<!--							<artifactId>nothing</artifactId>-->
+<!--						</include>-->
+<!--					</includes>-->
+<!--				</configuration>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<goals>-->
+<!--							<goal>repackage</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
+
 		</plugins>
 	</build>
 <!--	<build>-->

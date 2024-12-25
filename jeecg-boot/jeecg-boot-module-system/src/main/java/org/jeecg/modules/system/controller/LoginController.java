@@ -1,6 +1,5 @@
 package org.jeecg.modules.system.controller;
 
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.exceptions.ClientException;
@@ -13,35 +12,25 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.constant.CacheConstant;
 import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.system.api.ISysBaseAPI;
-import org.jeecg.modules.KM.common.config.BaseConfig;
-import org.jeecg.modules.KM.common.rules.KMConstant;
-import org.jeecg.modules.KM.common.utils.StringUtils;
-import org.jeecg.modules.KM.service.IKmDocVisitRecordService;
-import org.jeecg.modules.KM.service.IKmSysConfigService;
-import org.jeecg.modules.base.service.BaseCommonService;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.*;
 import org.jeecg.common.util.encryption.EncryptedString;
+import org.jeecg.modules.KM.common.config.BaseConfig;
+import org.jeecg.modules.KM.service.IKmSysConfigService;
+import org.jeecg.modules.base.service.BaseCommonService;
 import org.jeecg.modules.system.entity.SysDepart;
-import org.jeecg.modules.system.entity.SysRole;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.model.SysLoginModel;
-import org.jeecg.modules.system.model.SysThirdLoginModel;
 import org.jeecg.modules.system.service.*;
 import org.jeecg.modules.system.util.RandImageUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.text.ParseException;
 import java.util.*;
 
 /**
