@@ -8,6 +8,10 @@ services:
     restart: always
     container_name: kykms-mysql-comm
     image: registry.cn-guangzhou.aliyuncs.com/kyxxjs/kykms-mysql:comm
+    volumes:
+      - ./docker/mysql/conf/mysqld.cnf:/etc/mysql/conf.d/source/mysqld.cnf
+      - ./docker/mysql/data:/var/lib/mysql
+      - ./docker/mysql/log:/var/log/mysql
     command:
       --character-set-server=utf8mb4
       --collation-server=utf8mb4_general_ci
