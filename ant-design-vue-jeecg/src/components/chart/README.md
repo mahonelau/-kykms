@@ -1,367 +1,56 @@
-# 报表组件文档
 
-## 柱状图
 
-##### 引用方式
-
-```js 
-import Bar from '@/components/chart/Bar'
-```
-
-##### 参数列表
-
-| 参数名        | 类型     | 必填 | 说明         |
-|------------|--------|----|------------|
-| title      | string |    | 报表标题       |
-| dataSource | array  | ✔️ | 报表数据源      |
-| height     | number |    | 报表高度，默认254 |
-
-##### dataSource 示例
-
-```json
-[
-    {
-        "x": "1月",
-        "y": 320
-    },
-    {
-        "x": "2月",
-        "y": 457
-    },
-    {
-        "x": "3月",
-        "y": 182
-    }
-]
-```
-
-##### 代码示例
-
-```html
-<template>
-    <bar title="柱状图" :dataSource="dataSource" :height="420"/>
-</template>
-
-<script>
-    import Bar from '@/components/chart/Bar'
-
-    export default {
-        name: 'ChartDemo',
-        components: {
-            Bar
-        },
-        data() {
-            return {
-                dataSource: [
-                    {
-                        "x": "1月",
-                        "y": 320
-                    },
-                    {
-                        "x": "2月",
-                        "y": 457
-                    },
-                    {
-                        "x": "3月",
-                        "y": 182
-                    }
-                ]
-            }
-        }
-    }
-</script>
-
-<style></style>
-```
-
-## 多列柱状图
-
-##### 引用方式
-
-```js 
-import BarMultid from '@/components/chart/BarMultid'
-```
-
-##### 参数列表
-
-| 参数名        | 类型     | 必填 | 说明         |
-|------------|--------|----|------------|
-| title      | string |    | 报表标题       |
-| fields     | array  |    | 主列字段列表     |
-| dataSource | array  |    | 报表数据源      |
-| height     | number |    | 报表高度，默认254 |
-
-##### fields 示例
-
-```json
-["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug."]
-```
-
-##### dataSource 示例
-
-```json
-[
-    {
-        "type": "Jeecg", // 列名
-        "Jan.": 18.9,
-        "Feb.": 28.8,
-        "Mar.": 39.3,
-        "Apr.": 81.4,
-        "May": 47,
-        "Jun.": 20.3,
-        "Jul.": 24,
-        "Aug.": 35.6
-    },
-    {
-        "type": "Jeebt",
-        "Jan.": 12.4,
-        "Feb.": 23.2,
-        "Mar.": 34.5,
-        "Apr.": 99.7,
-        "May": 52.6,
-        "Jun.": 35.5,
-        "Jul.": 37.4,
-        "Aug.": 42.4
-    }
-]
-```
-
-## 迷你柱状图
-
-不带标题和数据轴的柱状图
-
-##### 引用方式
-
-```js 
-import MiniBar from '@/components/chart/MiniBar'
-```
-
-##### 参数列表
-
-| 参数名        | 类型     | 必填 | 说明            |
-|------------|--------|----|---------------|
-| width      | number |    | 报表宽度度，默认自适应宽度 |
-| height     | number |    | 报表高度，默认200    |
-| dataSource | array  |    | 报表数据源         |
-
-##### dataSource 示例
-
-```json
-[
-    {
-        "x": "1月",
-        "y": 320
-    },
-    {
-        "x": "2月",
-        "y": 457
-    },
-    {
-        "x": "3月",
-        "y": 182
-    }
-]
-```
-
-## 面积图
-
-##### 引用方式
-
-```js 
-import AreaChartTy from '@/components/chart/AreaChartTy'
-```
-
-##### 参数列表
-
-| 参数名        | 类型     | 必填 | 说明         |
-|------------|--------|----|------------|
-| title      | string |    | 报表标题       |
-| dataSource | array  | ✔️ | 报表数据源      |
-| height     | number |    | 报表高度，默认254 |
-| lineSize   | number |    | 线的粗细，默认2   |
-
-##### dataSource 示例
-
-```json
-[
-    {
-        "x": "1月",
-        "y": 320
-    },
-    {
-        "x": "2月",
-        "y": 457
-    },
-    {
-        "x": "3月",
-        "y": 182
-    }
-]
-```
-
-## 多行折线图
-
-##### 引用方式
-
-```js 
-import LineChartMultid from '@/components/chart/LineChartMultid'
-```
-
-##### 参数列表
-
-| 参数名        | 类型     | 必填 | 说明         |
-|------------|--------|----|------------|
-| title      | string |    | 报表标题       |
-| fields     | array  |    | 主列字段列表     |
-| dataSource | array  |    | 报表数据源      |
-| height     | number |    | 报表高度，默认254 |
-
-##### fields 示例
-
-```json
-["jeecg", "jeebt"]
-```
-
-##### dataSource 示例
-
-```json
-[
-    {
-        "type": "Jan", // 列名
-        "jeecg": 7,
-        "jeebt": 3.9
-    },
-    { "type": "Feb", "jeecg": 6.9, "jeebt": 4.2 },
-    { "type": "Mar", "jeecg": 9.5, "jeebt": 5.7 },
-    { "type": "Apr", "jeecg": 14.5, "jeebt": 8.5 },
-    { "type": "May", "jeecg": 18.4, "jeebt": 11.9 },
-    { "type": "Jun", "jeecg": 21.5, "jeebt": 15.2 },
-    { "type": "Jul", "jeecg": 25.2, "jeebt": 17 },
-    { "type": "Aug", "jeecg": 26.5, "jeebt": 16.6 },
-    { "type": "Sep", "jeecg": 23.3, "jeebt": 14.2 },
-    { "type": "Oct", "jeecg": 18.3, "jeebt": 10.3 },
-    { "type": "Nov", "jeecg": 13.9, "jeebt": 6.6 },
-    { "type": "Dec", "jeecg": 9.6, "jeebt": 4.8 }
-]
-```
-
-## 饼状图
-
-##### 引用方式
-
-```js 
-import Pie from '@/components/chart/Pie'
-```
-
-##### 参数列表
-
-| 参数名        | 类型     | 必填 | 说明         |
-|------------|--------|----|------------|
-| dataSource | array  |    | 报表数据源      |
-| height     | number |    | 报表高度，默认254 |
-
-##### dataSource 示例
-
-```json
-[
-    // 所有的 percent 相加等于 100
-    { "item": "一月", "percent": 40 },
-    { "item": "二月", "percent": 21 },
-    { "item": "三月", "percent": 17 },
-    { "item": "四月", "percent": 13 },
-    { "item": "五月", "percent": 9 }
-]
-```
-
-## 雷达图
-
-##### 引用方式
-
-```js 
-import Radar from '@/components/chart/Radar'
-```
-
-##### 参数列表
-
-| 参数名        | 类型     | 必填 | 说明         |
-|------------|--------|----|------------|
-| dataSource | array  |    | 报表数据源      |
-| height     | number |    | 报表高度，默认254 |
-
-##### dataSource 示例
-
-```json
-[
-    // score 最小值为 0，最大值为 100
-    { "item": "一月", "score": 40 },
-    { "item": "二月", "score": 20 },
-    { "item": "三月", "score": 67 },
-    { "item": "四月", "score": 43 },
-    { "item": "五月", "score": 90 }
-]
-```
-
-## 进度条
-
-##### 引用方式
-
-```js 
-import MiniProgress from '@/components/chart/MiniProgress'
-```
-
-##### 参数列表
-
-| 参数名        | 类型     | 必填 | 说明                |
-|------------|--------|----|-------------------|
-| percentage | number |    | 当前进度百分比，默认0，最高100 |
-| target     | number |    | 目标值，默认10          |
-| height     | number |    | 进度条高度，默认10        |
-| color      | string |    | 进度条颜色，默认 #13C2C2  |
-
-## 仪表盘
-
-##### 引用方式
-
-```js 
-import DashChartDemo from '@/components/chart/DashChartDemo'
-```
-
-##### 参数列表
-
-| 参数名    | 类型     | 必填 | 说明             |
-|--------|--------|----|----------------|
-| title  | string |    | 报表标题           |
-| value  | number |    | 当前值，默认6.7，最大为9 |
-| height | number |    | 报表高度，默认254     |
-
-## 排名列表
-
-##### 引用方式
-
-```js 
-import RankList from '@/components/chart/RankList'
-```
-
-##### 参数列表
-
-| 参数名    | 类型     | 必填 | 说明           |
-|--------|--------|----|--------------|
-| title  | string |    | 报表标题         |
-| list   | array  |    | 排名列表数据       |
-| height | number |    | 报表高度，默认自适应高度 |
-
-##### list 示例
-
-```json
-[
-    {
-        "name": "北京朝阳 1 号店",
-        "total": 1981
-    },
-    { "name": "北京朝阳 2 号店", "total": 1359 },
-    { "name": "北京朝阳 3 号店", "total": 1354 },
-    { "name": "北京朝阳 4 号店", "total": 263 },
-    { "name": "北京朝阳 5 号店", "total": 446 },
-    { "name": "北京朝阳 6 号店", "total": 796 }
-]
-```
+# 科亿知识库 KYKMS
+
+## 项目简介
+科亿知识库（KYKMS）是一款高效的知识管理系统，旨在帮助用户对文档进行分类、归集和检索。无论是个人学习、企业内部文档管理，还是大规模知识库的构建，KYKMS 提供了全面的解决方案。它结合了AI能力，为用户提供智能分类、标签和摘要功能，使知识管理更加便捷。
+
+## 为什么选择科亿知识库？
+- **专业验证**：产品经过两年多的运营，被数百客户广泛使用，背后有专业团队支持。
+- **AI加持**：引入大模型能力，结合本地知识库，打造智能管家，提升知识检索和管理效率。
+- **灵活部署**：支持本地化部署，可对接主流大模型，如Chat-GPT、通义千问等。
+- **全场景适用**：不仅适合企业内部文档管理，也适用于知识密集型单位和历史文档整理。
+
+## 附属文档
+- [KMS功能思维导图](./Docs/Pics/旗舰版功能思维导图.png)
+- [KMS技术架构图](./Docs/Pics/系统架构设计.jpg)
+
+## 技术架构
+### 后端
+- **基础框架**：Spring Boot 2.3.5.RELEASE
+- **数据库**：MySQL 5.7 及以上版本
+- **搜索引擎**：Elasticsearch 7.6.1
+- **文件处理**：LibreOffice 配合文件上传配置
+
+### 前端
+- **框架**：Ant Design Vue
+- **部署方式**：Nginx + Docker
+- **代码结构**：模块化设计，支持多页面和响应式布局
+- **特色组件**：封装了适用于文档管理的组件，如高级搜索、PDF预览、数据字典等。
+
+## 功能模块
+- **文档管理**：支持上传、编辑、提审、发布等操作。
+- **权限控制**：通过角色和用户权限管理，实现文档访问的精细化控制。
+- **检索系统**：提供全文检索、高级搜索、智能推荐等功能。
+- **系统配置**：支持Redis、数据库、文件存储等各类系统参数配置。
+- **日志管理**：记录所有用户操作，支持日志查询和清理。
+
+## 系统效果（智能版）
+- **智能检索**：结合AI能力，实现高效检索和智能推荐。
+- **数据可视化**：提供丰富的图表展示，如柱状图、折线图、饼图等。
+- **文档预览**：支持PDF、Office等文档在线预览。
+
+## 开发环境
+- **后端配置**：需配置MySQL、Redis、Elasticsearch及LibreOffice。
+- **前端配置**：通过.env.development 文件配置后端接口IP。
+
+## 特别鸣谢
+- 感谢所有贡献者及使用科亿知识库的用户。
+- 感谢开源社区，使产品得以不断优化和发展。
+
+## 版权声明
+本软件采用 Apache License 开源协议，可以自由使用。若进行二次开发，请保留本软件的版权说明。
+
+## 交流互动
+- **官网**：[http://www.kykms.cn](http://www.kykms.cn)
+- **捐赠**：如本软件对您有帮助，欢迎支持我们！
