@@ -2,7 +2,7 @@ spring:
   application:
     name: jeecg-system
   profiles:
-    active: test
+    active: docker
 #    active: @profile.name@
   datasource:
     druid:

@@ -1,9 +1,9 @@
 base:
   upload-dir: /kykms/KmDocs
-  db-backup-dir: c:\KmDocs
+  db-backup-dir: /kykms/dbBackup
   soffice-path: /usr/bin/soffice
 esclient:
-  master-host: kykms-ES
+  master-host: kykms-ES-comm
   master-port: 9200
   master-auth: false
 spring:
@@ -15,13 +15,13 @@ spring:
     dynamic:
       datasource:
         master:
-          url: jdbc:mysql://kykms-mysql:3306/km?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          url: jdbc:mysql://kykms-mysql-comm:3306/km?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
           username: root
           password: root
           driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
-    database: 0
-    host: kykms-redis
+    database: 3
+    host: kykms-redis-comm
     lettuce:
       pool:
         max-active: 8
@@ -29,7 +29,7 @@ spring:
         max-wait: -1ms
         min-idle: 0
       shutdown-timeout: 100ms
-    password: ''
+    password: 123456
     port: 6379
 jeecg:
   uploadType: local

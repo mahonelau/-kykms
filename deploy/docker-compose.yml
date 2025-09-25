@@ -1,0 +1,88 @@
+version: '3'
+services:
+  kykms-mysql-comm:
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_HOST: '%'
+      TZ: Asia/Shanghai
+    restart: always
+    container_name: kykms-mysql-comm
+    image: registry.cn-guangzhou.aliyuncs.com/kyxxjs/kykms-mysql:comm
+    volumes:
+      - ./docker/mysql/conf/mysqld.cnf:/etc/mysql/conf.d/source/mysqld.cnf
+      - ./docker/mysql/data:/var/lib/mysql
+      - ./docker/mysql/log:/var/log/mysql
+    command:
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --explicit_defaults_for_timestamp=true
+      --lower_case_table_names=1
+      --max_allowed_packet=128M
+    ports:
+      - 3306:3306
+    networks:
+      kykms_network:
+
+  kykms-redis-comm:
+    image: registry.cn-guangzhou.aliyuncs.com/kyxxjs/kykms-redis:6.0
+    ports:
+      - 6379:6379
+    restart: always
+    container_name: kykms-redis-comm
+    volumes:
+      - ./docker/redis/conf:/etc/redis
+    command: [ "redis-server", "/etc/redis/redis.conf" ]
+    networks:
+      kykms_network:
+
+  kykms-ES-comm:
+    image: registry.cn-guangzhou.aliyuncs.com/kyxxjs/kykms-es:7.6.1
+    restart: always
+    container_name: kykms-ES-comm
+    volumes:
+      - ./docker/elasticsearch/data:/usr/share/elasticsearch/data
+      - ./docker/elasticsearch/logs:/usr/share/elasticsearch/logs
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms1G -Xmx2G"
+      - TZ=Asia/Shanghai
+    networks:
+      kykms_network:
+
+  kykms-comm:
+    image: registry.cn-guangzhou.aliyuncs.com/kyxxjs/kykms:comm
+    container_name: kykms-comm
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=en_US.UTF-8
+    depends_on:
+      - kykms-mysql-comm
+      - kykms-redis-comm
+      - kykms-ES-comm
+    ports:
+      - "8080:8080"
+    networks:
+      kykms_network:
+    restart: always
+    command: java -jar ./jeecg-boot-module-system-2.4.5.jar ./catalina.out 2>&1 &
+
+  kykms-nginx-comm:
+    image: registry.cn-guangzhou.aliyuncs.com/kyxxjs/kykms-nginx:comm
+    depends_on:
+      - kykms-comm
+    container_name: kykms-nginx-comm
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+      - ./docker/nginx/log:/var/log/nginx
+    networks:
+      kykms_network:
+    restart: always
+
+networks:
+  kykms_network:
+    external: true

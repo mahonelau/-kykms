@@ -48,7 +48,7 @@ CREATE TABLE `km_doc`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `km_doc_business_type`;
 CREATE TABLE `km_doc_business_type`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL,
   `doc_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `business_type` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
@@ -83,7 +83,7 @@ INSERT INTO `km_doc_favourite` VALUES ('1531984806786387970', 'e9ca23d68d884d4eb
 -- ----------------------------
 DROP TABLE IF EXISTS `km_doc_topic_type`;
 CREATE TABLE `km_doc_topic_type`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci not null ,
   `doc_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `topic_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
@@ -94,7 +94,7 @@ CREATE TABLE `km_doc_topic_type`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `km_doc_visit_record`;
 CREATE TABLE `km_doc_visit_record`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL,
   `doc_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `visit_type` decimal(6, 0) NULL DEFAULT NULL COMMENT '1：上传 2：预览 3：下载 4：删除',
   `keywords` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
@@ -109,7 +109,7 @@ CREATE TABLE `km_doc_visit_record`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `km_file`;
 CREATE TABLE `km_file`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL,
   `sha256` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
   `physical_path` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
   `url` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
@@ -122,7 +122,7 @@ CREATE TABLE `km_file`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `km_search_record`;
 CREATE TABLE `km_search_record`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'id',
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'id',
   `keywords` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'keywords',
   `title` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
   `content` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
@@ -150,7 +150,7 @@ INSERT INTO `km_search_record` VALUES ('1531978326683201537', '递进', '递进'
 -- ----------------------------
 DROP TABLE IF EXISTS `km_sys_config`;
 CREATE TABLE `km_sys_config`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `item_code` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `item_value` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `item_name` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
@@ -178,7 +178,7 @@ INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `creat
 INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('14', 'SiteTitle', '科亿知识库', '站点名称', NULL, 'text', '');
 INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('15', 'SiteHomePageUrl', 'http://www.kykms.cn', '站点首页url', NULL, 'text', '');
 INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('16', 'SiteCopyRight', '科亿信息技术', '站点版权所有者', NULL, 'text', '');
-INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('17', 'SiteAvatar', 'temp/logo_透明_1666960531563.png', '站点logo', NULL, 'img', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('17', 'SiteAvatar', '', '站点logo', NULL, 'img', '');
 INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('19', 'DefaultPageUseTopicList', '0', '启用知识专题目录树浏览页作为首页', NULL, 'checkBox', '');
 INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('20', 'HeaderBackgroundColor', '#03A7EF', '页面抬头背景色', NULL, 'text', '');
 
@@ -516,7 +516,7 @@ CREATE TABLE `sys_announcement`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_announcement_send`;
 CREATE TABLE `sys_announcement_send`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `annt_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '通告ID',
   `user_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '用户id',
   `read_flag` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '阅读状态（0未读，1已读）',

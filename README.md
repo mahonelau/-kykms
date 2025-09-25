@@ -35,7 +35,8 @@
 - 官方站点 ：  [http://www.kykms.cn](http://www.kykms.cn)
 - 技术文档 ：  科亿知识库的使用、部署手册，技术说明，请访问 - [技术文档大全](http://docs.kykms.cn/docs/mindoc/mindoc-1ephusv88b42s)
 - 本产品有五个版本：开源版、绿色单机版、专业版、旗舰版、智能版 - [版本功能比较](http://www.kykms.cn/edition) 
-- 智能版在线演示 ：  [智能版](http://kg.kykms.cn/loginRandom) 
+- 智能版在线演示 ：  [随机登录](http://kg.kykms.cn/loginRandom) 
+- 旗舰版在线演示 ：  [随机登录](http://test.kykms.cn/loginRandom)
 - 绿色单机版 ： [试用下载](http://service.kykms.cn/download-index)  -  [更多介绍](http://docs.kykms.cn/docs/greenDesktop/greenDesktop-1et33iuds3f68)
 - 开发环境准备与运行，请参考：[开发环境准备与运行](./开发环境准备与运行.MD)
 - 本地部署试用：强烈建议[docker方式部署](http://docs.kykms.cn/docs/mindoc/mindoc-1f80r7nnv763o)；此外提供多版本安装包直接下载 - [下载入口](http://service.kykms.cn/download-index)
@@ -49,7 +50,7 @@
 
 版权声明
 -----------------------------------
-本着开源精神，科亿遵循 GPL-3.0 开源协议发布，提供源码用于学习、自用与技术交流，但不允许修改后和衍生的代码做为闭源的商业软件发布和销售 ！ 如果需要将本产品在本地进行任何附带商业化性质行为使用， 请联系项目负责人进行商业授权 ，以遵守 GPL 协议保证您的正常使用。 
+本着开源精神，本软件开源授权许可为Apache License，可以自由使用，但是如果基于本软件进行二次开发，请保留本软件的版权说明。 
 科亿开源团队拥有对本开源协议的最终解释权。
 
 

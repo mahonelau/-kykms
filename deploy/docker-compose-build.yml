@@ -6,14 +6,14 @@ version: '3'
 services:
   kykms-mysql:
     build:
-      context: ./DB
+      context: DB
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_ROOT_HOST: '%'
       TZ: Asia/Shanghai
     restart: always
     container_name: kykms-mysql
-    image: mysql:comm
+    image: registry.cn-guangzhou.aliyuncs.com/kyxxjs/kykms-mysql:comm
     volumes:
       - ./docker/mysql/data:/var/lib/mysql
       - ./docker/mysql/log:/var/log/mysql
@@ -29,7 +29,7 @@ services:
       kykms_network:
 
   kykms-redis:
-    image: redis:comm
+    image: registry.cn-guangzhou.aliyuncs.com/kyxxjs/kykms-redis:6.0
     build:
       context: ./redis
     ports:
@@ -40,9 +40,9 @@ services:
       kykms_network:
 
   kykms-ES:
-    image: elasticsearch:comm
+    image: registry.cn-guangzhou.aliyuncs.com/kyxxjs/kykms-es:7.6.1
     build:
-      context: ./ES
+      context: ES
     restart: always
     container_name: kykms-ES
     environment:
@@ -57,8 +57,8 @@ services:
 
   kykms:
     build:
-      context: ./jeecg-boot-module-system
-    image: kykms:comm
+      context: ../jeecg-boot/jeecg-boot-module-system
+    image: registry.cn-guangzhou.aliyuncs.com/kyxxjs/kykms:comm
     container_name: kykms
     environment:
       - TZ=Asia/Shanghai
@@ -77,7 +77,7 @@ services:
   kykms-nginx:
     build:
       context: ../ant-design-vue-jeecg
-    image: kykms-nginx:comm
+    image: registry.cn-guangzhou.aliyuncs.com/kyxxjs/kykms-nginx:comm
     depends_on:
       - kykms
     container_name: kykms-nginx
