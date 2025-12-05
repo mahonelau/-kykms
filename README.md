@@ -1,4 +1,4 @@
-<p align="center"><img src= "https://gitee.com/kyxxjs/km_community/blob/business/Docs/Pics/logo_keyi.png " alt="kykms" width="100" /></p>
+<p align="center"><img src= "https://download.kykms.cn/logo_keyi.png" alt="kykms" width="100" /></p>
 <h1 align="center">科亿知识库  KYKMS</h1>
 
 -----------------------------------
