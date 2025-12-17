@@ -281,6 +281,10 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
             String orgCode = sysBaseAPI.queryDepartOrgCodeById(depId);
             kmDoc.setDepId(depId);
             kmDoc.setOrgCode(orgCode);
+        }else {
+            // 只有参数中没有部门ID时，才使用用户的部门ID
+            kmDoc.setDepId(sysUser.getDepartIds());
+            kmDoc.setOrgCode(sysUser.getOrgCode());
         }
 
         kmDoc.setCreateBy(userId);
@@ -294,8 +298,7 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
 //        kmDoc.setPublicRemark(DocPublicRemark.Public.getCode());
         kmDoc.setPublicRemark(kmDocParamVO.getPublicRemark());
 
-        kmDoc.setOrgCode(sysUser.getOrgCode());
-        kmDoc.setDepId(sysUser.getDepartIds());
+
 //        kmDoc.setPublicFlag(KMConstant.DocPublic);
         kmDoc.setDownloadFlag(KMConstant.AllowDownload);
 
