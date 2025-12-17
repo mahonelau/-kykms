@@ -276,7 +276,7 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
          //传参
         kmDoc.setCategory(kmDocParamVO.getCategory());
         kmDoc.setKeywords(kmDocParamVO.getKeywords());
-        if(kmDocParamVO.getDepId() !=null && kmDocParamVO.getDepId().isEmpty()) {
+        if(kmDocParamVO.getDepId() !=null && !kmDocParamVO.getDepId().isEmpty()) {
             String depId = kmDocParamVO.getDepId();
             String orgCode = sysBaseAPI.queryDepartOrgCodeById(depId);
             kmDoc.setDepId(depId);
