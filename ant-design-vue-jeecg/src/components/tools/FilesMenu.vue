@@ -81,7 +81,7 @@ export default {
           this.$router.push('/front/user/login')
         } else {
           let routeData = this.$router.resolve({
-            path: '/km/filemanagement/FilesList',
+            path: '/km/filemanagement/DraftsList',
             query: {}
           })
           window.open(routeData.href, '_blank')
