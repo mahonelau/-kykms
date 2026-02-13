@@ -1,7 +1,13 @@
 <p align="center"><img src= "https://download.kykms.cn/logo_keyi.png" alt="kykms" width="100" /></p>
 <h1 align="center">科亿知识库  KYKMS</h1>
 
------------------------------------
+# 🚀全新设计
+
+**`KMatrix`**： 基于 RuoYi-Vue-Plus 与 LangChain4j 构建的，源于KYKMS，超越KYKMS，全新设计理念，全面拥抱AI与大模型的新一代 AI 知识库工作流平台。
+
+- 代码库： [https://gitee.com/kyxxjs/kmatrix-service](https://gitee.com/kyxxjs/kmatrix-service)
+- 推荐使用全新设计的新版本，老版本也继续提供服务，客户服务不受影响；老客户如果要部署新版本，可以联系我们，可提供新版部署服务，但是暂不支持旧系统的平滑迁移升级。
+- 下面是旧版KYKMS的介绍：
 
 在信息泛滥的今天，你是否也面临这样的困境：明明存储了大量文档，却总在关键时刻找不到关键信息；团队协作时，每个人都有一套自己的分类标准，导致知识碎片化严重；面对海量技术文档，传统的关键词搜索如同大海捞针，效率低下。
 
